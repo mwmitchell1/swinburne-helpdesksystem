@@ -1,2 +1,2 @@
-# helpdesksystem
+# Helpdesk System
 Helpdesk system for the Programming, MASH and networking helpdesks
