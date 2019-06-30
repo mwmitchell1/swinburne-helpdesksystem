@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelpDeskSystem", "HelpDeskSystem\HelpDeskSystem.csproj", "{2AC440D5-F440-4853-B079-BF627E6E5EFD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Website", "Helpdesk.Website\Helpdesk.Website.csproj", "{C2C88675-8ECF-44F2-8861-F8F073719871}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Helpdesk.Services", "Helpdesk.Services\Helpdesk.Services.csproj", "{EEDFA38F-C5A6-4899-9DE3-E3C2C4F8F804}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.DataLayer", "Helpdesk.DataLayer\Helpdesk.DataLayer.csproj", "{D16625CD-7EA7-48EB-997C-4366DEAF8959}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Data", "Helpdesk.Data\Helpdesk.Data.csproj", "{6F6239D7-DCCA-4125-9C36-F13D7D5C7B8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Common", "Helpdesk.Common\Helpdesk.Common.csproj", "{3B250494-283E-4736-AFE6-675E45120F2B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +19,26 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2AC440D5-F440-4853-B079-BF627E6E5EFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2AC440D5-F440-4853-B079-BF627E6E5EFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2AC440D5-F440-4853-B079-BF627E6E5EFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2AC440D5-F440-4853-B079-BF627E6E5EFD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2C88675-8ECF-44F2-8861-F8F073719871}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2C88675-8ECF-44F2-8861-F8F073719871}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2C88675-8ECF-44F2-8861-F8F073719871}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2C88675-8ECF-44F2-8861-F8F073719871}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEDFA38F-C5A6-4899-9DE3-E3C2C4F8F804}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEDFA38F-C5A6-4899-9DE3-E3C2C4F8F804}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEDFA38F-C5A6-4899-9DE3-E3C2C4F8F804}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEDFA38F-C5A6-4899-9DE3-E3C2C4F8F804}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D16625CD-7EA7-48EB-997C-4366DEAF8959}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D16625CD-7EA7-48EB-997C-4366DEAF8959}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D16625CD-7EA7-48EB-997C-4366DEAF8959}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D16625CD-7EA7-48EB-997C-4366DEAF8959}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F6239D7-DCCA-4125-9C36-F13D7D5C7B8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F6239D7-DCCA-4125-9C36-F13D7D5C7B8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F6239D7-DCCA-4125-9C36-F13D7D5C7B8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F6239D7-DCCA-4125-9C36-F13D7D5C7B8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B250494-283E-4736-AFE6-675E45120F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B250494-283E-4736-AFE6-675E45120F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B250494-283E-4736-AFE6-675E45120F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B250494-283E-4736-AFE6-675E45120F2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

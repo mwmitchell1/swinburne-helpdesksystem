@@ -1,5 +1,12 @@
 HelpdeskSystem/.vs/
 HelpdeskSystem/HelpdeskSystem/obj/
 HelpdeskSystem/HelpdeskSystem/bin/
-/obj/
-*/obj/*
+*/obj/
+HelpdeskSystem/Helpdesk.Data/obj/
+HelpdeskSystem/Helpdesk.DataLayer/bin/
+HelpdeskSystem/Helpdesk.Services/obj/
+HelpdeskSystem/Helpdesk.Common/bin/
+HelpdeskSystem/Helpdesk.Common/obj/
+HelpdeskSystem/Helpdesk.Data/bin/
+HelpdeskSystem/Helpdesk.Services/bin/
+HelpdeskSystem/Helpdesk.DataLayer/obj/
