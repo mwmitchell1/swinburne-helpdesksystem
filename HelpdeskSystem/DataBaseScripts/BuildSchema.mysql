@@ -1,0 +1,92 @@
+create database HelpdeskSystem;
+
+use HelpdeskSystem;
+
+CREATE TABLE User (
+    UserID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    Username VARCHAR(20) UNIQUE NOT NULL,
+    Password text NOT NULL
+);
+
+CREATE TABLE HelpdeskSettings (
+    HelpdeskID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    Name VARCHAR(50) NOT NULL,
+    HasCheckIn BOOL,
+    HasQueue BOOL
+);
+
+CREATE TABLE Unit (
+    UnitID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    Code VARCHAR(8) NOT NULL,
+    Name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE NickNames (
+    StudentID INT PRIMARY KEY NOT NULL,
+    SID VARCHAR(20) NOT NULL,
+    NickName VARCHAR(20) UNIQUE NOT NULL
+);
+
+CREATE TABLE Topic (
+    TopicID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    UnitID INT NOT NULL,
+    Name VARCHAR(50) NOT NULL,
+    FOREIGN KEY (UnitID)
+        REFERENCES Unit (UnitID)
+);
+
+CREATE TABLE QueueItem (
+    ItemID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    StudentID INT NOT NULL,
+    TopicID INT NOT NULL,
+    NickName VARCHAR(20) NOT NULL,
+    TimeAdded DATETIME NOT NULL,
+    TimeHelped BOOL,
+    TimeRemoved BOOL,
+    FOREIGN KEY (StudentID)
+        REFERENCES NickNames (StudentID),
+    FOREIGN KEY (TopicID)
+        REFERENCES Topic (TopicID)
+);
+
+CREATE TABLE CheckInHistory (
+    CheckInID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    UnitID INT NOT NULL,
+    CheckInTime DATETIME NOT NULL,
+    CheckoutTime DATETIME,
+    ForcedCheckout BOOL,
+    FOREIGN KEY (UnitID)
+        REFERENCES Unit (UnitID)
+);
+
+CREATE TABLE CheckInQueueItem (
+    ID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    QueueItemID INT NOT NULL,
+    CheckInID INT NOT NULL,
+    FOREIGN KEY (QueueItemID)
+        REFERENCES QueueItem (ItemID),
+    FOREIGN KEY (CheckInID)
+        REFERENCES CheckInHistory (CheckInID)
+);
+
+CREATE TABLE HelpdeskUnit (
+    HelpdeskUnitID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    HelpdeskID INT NOT NULL,
+    UnitID INT NOT NULL,
+    FOREIGN KEY (HelpdeskID)
+        REFERENCES HelpdeskSettings (HelpdeskID),
+    FOREIGN KEY (UnitID)
+        REFERENCES Unit (UnitID)
+);
+
+CREATE TABLE TimeSpans (
+    SpanID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    HelpdeskID INT,
+    Name VARCHAR(200),
+    StartDate DATETIME,
+    EndDate DATETIME
+);
+
+INSERT INTO User (Username, Password) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=');
+
+drop database HelpdeskSystem;
