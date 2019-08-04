@@ -8,4 +8,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+    <Folder Include="Responses\Users\" />
+  </ItemGroup>
+
 </Project>

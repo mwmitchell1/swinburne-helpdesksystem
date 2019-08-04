@@ -14,7 +14,7 @@ namespace Helpdesk.Website.Controllers.api
     {
         protected static Logger s_logger = LogManager.GetCurrentClassLogger();
 
-        protected string buildBadRequestMessage(BaseResponse response)
+        protected string BuildBadRequestMessage(BaseResponse response)
         {
             string message = string.Empty;
             try
@@ -29,6 +29,11 @@ namespace Helpdesk.Website.Controllers.api
             }
 
             return message;
+        }
+
+        protected bool IsAuthorized()
+        {
+            return true;
         }
     }
 }

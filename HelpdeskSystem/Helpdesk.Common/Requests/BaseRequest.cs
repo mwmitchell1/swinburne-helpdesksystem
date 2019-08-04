@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Helpdesk.Common.Requests
 {
+    /// <summary>
+    /// Used as the base for all requests so that they all are validatable
+    /// </summary>
     public class BaseRequest : IValidatableObject
     {
         public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
