@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Helpdesk.Website.Models
+namespace Helpdesk.Data.Models
 {
     public partial class Helpdeskunit
     {
