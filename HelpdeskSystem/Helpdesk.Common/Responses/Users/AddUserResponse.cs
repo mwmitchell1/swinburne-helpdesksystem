@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Helpdesk.Common.Responses.Users
 {
-    public class AddUserReponse : BaseResponse
+    public class AddUserResponse : BaseResponse
     {
         public int UserId { get; set; }
     }
