@@ -12,6 +12,8 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddUser()
         {
+            // NOTE: This test will fail if the user already exists!
+            // Need to decide how to handle tests that conflict with previous tests.
             UsersFacade usersFacade = new UsersFacade();
 
             AddUserRequest addUserRequest = new AddUserRequest();

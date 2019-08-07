@@ -64,7 +64,10 @@ namespace Helpdesk.DataLayer
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
                 var user = context.User.FirstOrDefault(u => u.Username == username);
-                dto = DAO2DTO(user);
+                if (user != null)
+                {
+                    dto = DAO2DTO(user);
+                }
             }
 
             return dto;
