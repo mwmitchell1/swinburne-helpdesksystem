@@ -3,7 +3,6 @@ using Helpdesk.Data.Models;
 using Helpdesk.Common.Requests.Users;
 using System;
 using System.Collections.Generic;
-using Helpdesk.Data.Models;
 using NLog;
 using System.Text;
 using System.Linq;
