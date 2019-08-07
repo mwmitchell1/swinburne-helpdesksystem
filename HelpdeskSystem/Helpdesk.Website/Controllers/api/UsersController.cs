@@ -80,9 +80,9 @@ namespace Helpdesk.Website.Controllers.api
 
                 CookieOptions cookie = new CookieOptions()
                 {
-                    Expires = DateTime.Now.AddYears(1),
+                    Expires = DateTime.Now.AddHours(4),
                     HttpOnly = false,
-                    Domain = ".celestiallibrarycore.com.au",
+                    Domain = ".swin.helpdesk.edu.au",
                     IsEssential = true,
                     Path = "/",
                     Secure = false,
