@@ -14,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Helpdesk.Common.Extensions;
 
 namespace Helpdesk.Services
 {
@@ -151,6 +152,43 @@ namespace Helpdesk.Services
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to perform log in attempt."));
             }
             return response;
+        }
+
+        public bool VerifyUser(string username, string userId)
+        {
+            bool result = false;
+
+            try
+            {
+                var dataLayer = new UsersDataLayer();
+                int userID = -1;
+
+                if (!int.TryParse(userId, out userID))
+                    throw new Exception("Invalid user id received.");
+
+                UserDTO userFromID = dataLayer.GetUser(userID);
+
+                UserDTO userFromUsername = dataLayer.GetUserByUsername(username);
+
+                if (!(userFromID.UserId == userFromUsername.UserId && userFromID.Username == userFromUsername.Username))
+                {
+                    s_logger.Warn("Unable to verify user.");
+                    result = false;
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Warn(ex, "Unable to find user in system.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to perform log in attempt.");
+            }
+            return result;
         }
 
         private string HashText(string text)
