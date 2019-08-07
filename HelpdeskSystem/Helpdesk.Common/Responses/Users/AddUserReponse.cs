@@ -6,5 +6,6 @@ namespace Helpdesk.Common.Responses.Users
 {
     public class AddUserReponse : BaseResponse
     {
+        public int UserId { get; set; }
     }
 }
