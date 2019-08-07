@@ -5,15 +5,12 @@ using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Users;
 using Helpdesk.DataLayer;
 using NLog;
-using Helpdesk.DataLayer;
 using Microsoft.IdentityModel.Tokens;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -46,7 +43,7 @@ namespace Helpdesk.Services
 
         public AddUserResponse AddUser(AddUserRequest request)
         {
-            s_Logger.Info("Adding user...");
+            s_logger.Info("Adding user...");
 
             AddUserResponse response = new AddUserResponse();
 
@@ -71,7 +68,7 @@ namespace Helpdesk.Services
             }
             catch(Exception ex)
             {
-                s_Logger.Error(ex, "Unable to add user!");
+                s_logger.Error(ex, "Unable to add user!");
                 response.Status = HttpStatusCode.InternalServerError;
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to add user!"));
             }
@@ -131,7 +128,7 @@ namespace Helpdesk.Services
                 {
                     Subject = new ClaimsIdentity(new Claim[] {
                         new Claim(ClaimTypes.Name, user.Username),
-                        new Claim(ClaimTypes.Sid, user.UserID.ToString())
+                        new Claim(ClaimTypes.Sid, user.UserId.ToString())
                     }),
                     Expires = DateTime.Now.AddYears(1),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
