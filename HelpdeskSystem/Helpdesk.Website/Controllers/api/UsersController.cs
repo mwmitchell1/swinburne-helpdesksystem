@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Helpdesk.Common.Requests.Users;
+using Helpdesk.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -69,10 +70,34 @@ namespace Helpdesk.Website.Controllers.api
         [Route("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            if (!IsAuthorized())
-                return Unauthorized();
+            if (request == null)
+                return BadRequest();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new UsersFacade();
+                var result = facade.LoginUser(request);
+
+                CookieOptions cookie = new CookieOptions()
+                {
+                    Expires = DateTime.Now.AddYears(1),
+                    HttpOnly = false,
+                    Domain = ".celestiallibrarycore.com.au",
+                    IsEssential = true,
+                    Path = "/",
+                    Secure = false,
+                    SameSite = SameSiteMode.Strict,
+                };
+
+                Response.Cookies.Append("AuthToken", result.Token, cookie);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to log in user.");
+            }
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 }
