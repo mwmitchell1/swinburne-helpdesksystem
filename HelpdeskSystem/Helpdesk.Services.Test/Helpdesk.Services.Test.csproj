@@ -16,4 +16,9 @@
     <ProjectReference Include="..\Helpdesk.Services\Helpdesk.Services.csproj" />
     <ProjectReference Include="..\Helpdesk.Common\Helpdesk.Common.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
