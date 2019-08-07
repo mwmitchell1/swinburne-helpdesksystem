@@ -4,10 +4,14 @@ using Helpdesk.Common.Requests.Users;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Users;
 using Helpdesk.DataLayer;
+using NLog;
+using Helpdesk.DataLayer;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -40,9 +44,38 @@ namespace Helpdesk.Services
             throw new NotImplementedException();
         }
 
-        public AddUserReponse AddUser(AddUserRequest request)
+        public AddUserResponse AddUser(AddUserRequest request)
         {
-            throw new NotImplementedException();
+            s_Logger.Info("Adding user...");
+
+            AddUserResponse response = new AddUserResponse();
+
+            try
+            {
+                response = (AddUserResponse)request.CheckValidation(response);
+                if (response.Status == HttpStatusCode.BadRequest)
+                {
+                    return response;
+                }
+
+                var dataLayer = new DataLayer.UsersDataLayer();
+                int? result = dataLayer.AddUser(request);
+
+                if (result == null)
+                {
+                    throw new Exception("Unable to add user!");
+                }
+
+                response.UserId = (int)result;
+                response.Status = HttpStatusCode.OK;
+            }
+            catch(Exception ex)
+            {
+                s_Logger.Error(ex, "Unable to add user!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to add user!"));
+            }
+            return response;
         }
 
         public UpdateUserResponse UpdateUser(int id, UpdateUserRequest request)
