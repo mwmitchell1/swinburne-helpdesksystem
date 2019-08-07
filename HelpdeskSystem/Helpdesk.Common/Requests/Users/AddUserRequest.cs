@@ -13,5 +13,20 @@ namespace Helpdesk.Common.Requests.Users
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "{0} cannot be empty!")]
         public string Password { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "{0} cannot be empty!")]
+        public string PasswordConfirm { get; set; }
+
+        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var results = new List<ValidationResult>();
+
+            if (!Password.Equals(PasswordConfirm))
+            {
+                results.Add(new ValidationResult("Password confirmation must match password!"));
+            }
+
+            return results;
+        }
     }
 }

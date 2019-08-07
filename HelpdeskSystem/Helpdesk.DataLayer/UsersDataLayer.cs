@@ -55,18 +55,8 @@ namespace Helpdesk.DataLayer
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
                 var user = context.User.FirstOrDefault(u => u.Username == username);
+                dto = DAO2DTO(user);
             }
-            return dto;
-        }
-
-        public UserDTO DAO2DTO(User user)
-        {
-            var dto = new UserDTO()
-            {
-                UserID = user.UserId,
-                Password = user.Password,
-                Username = user.Username
-            };
 
             return dto;
         }
@@ -75,17 +65,10 @@ namespace Helpdesk.DataLayer
         {
             UserDTO userDTO = null;
 
-            try
-            {
-                userDTO = new UserDTO();
-                userDTO.UserId = user.UserId;
-                userDTO.Username = user.Username;
-                userDTO.Password = user.Password;
-            }
-            catch (Exception ex)
-            {
-                s_Logger.Error(ex, "Could not convert User to UserDTO!");
-            }
+            userDTO = new UserDTO();
+            userDTO.UserId = user.UserId;
+            userDTO.Username = user.Username;
+            userDTO.Password = user.Password;
 
             return userDTO;
         }
@@ -93,18 +76,10 @@ namespace Helpdesk.DataLayer
         public User DTO2DAO(UserDTO userDTO)
         {
             User user = null;
-
-            try
-            {
-                user = new User();
-                user.UserId = userDTO.UserId;
-                user.Username = userDTO.Username;
-                user.Password = userDTO.Password;
-            }
-            catch (Exception ex)
-            {
-                s_Logger.Error(ex, "Could not convert UserDTO to User!");
-            }
+            user = new User();
+            user.UserId = userDTO.UserId;
+            user.Username = userDTO.Username;
+            user.Password = userDTO.Password;
 
             return user;
         }
