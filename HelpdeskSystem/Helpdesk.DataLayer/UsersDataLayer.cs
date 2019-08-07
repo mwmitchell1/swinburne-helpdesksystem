@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using NLog;
 using System.Text;
 using System.Linq;
+using Helpdesk.Common.Extensions;
 
 namespace Helpdesk.DataLayer
 {
@@ -20,10 +21,10 @@ namespace Helpdesk.DataLayer
             User user = new User();
             user.Username = request.Username;
             user.Password = request.Password;
-            using (var db = new helpdesksystemContext())
+            using (var context = new helpdesksystemContext())
             {
-                db.User.Add(user);
-                db.SaveChanges();
+                context.User.Add(user);
+                context.SaveChanges();
                 userId = user.UserId;
             }
             return userId;
@@ -31,7 +32,15 @@ namespace Helpdesk.DataLayer
 
         public UserDTO GetUser(int id)
         {
-            throw new NotImplementedException();
+            UserDTO userDto = null;
+            using (var context = new helpdesksystemContext())
+            {
+                var user = context.User.FirstOrDefault(u => u.UserId == id);
+
+                if (user != null)
+                    userDto = DAO2DTO(user);
+            }
+            return userDto;
         }
 
         public List<UserDTO> GetUsers()
