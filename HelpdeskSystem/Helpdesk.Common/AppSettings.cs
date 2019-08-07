@@ -10,7 +10,7 @@ namespace Helpdesk.Common
     {
         public string DefaultConnection { get; } = string.Empty;
 
-        //public string AppSecret { get; set; }
+        public string AppSecret { get; set; }
 
         public AppSettings()
         {
@@ -21,7 +21,7 @@ namespace Helpdesk.Common
             var root = configurationBuilder.Build();
 
             DefaultConnection = root.GetConnectionString("DefaultConnection");
-            //AppSecret = root.GetSection("AppSettings").GetSection("Secret").Value;
+            AppSecret = root.GetSection("AppSettings").GetSection("Secret").Value;
 
             var appSetting = root.GetSection("ApplicationSettings");
         }
