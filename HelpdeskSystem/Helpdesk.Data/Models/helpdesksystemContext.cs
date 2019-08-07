@@ -3,7 +3,7 @@ using Helpdesk.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Helpdesk.Website.Models
+namespace Helpdesk.Data.Models
 {
     public partial class helpdesksystemContext : DbContext
     {
