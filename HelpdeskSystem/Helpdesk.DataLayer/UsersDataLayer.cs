@@ -2,15 +2,29 @@
 using Helpdesk.Common.Requests.Users;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using Helpdesk.Data.Models;
+using NLog;
 
 namespace Helpdesk.DataLayer
 {
     public class UsersDataLayer
     {
+        private static Logger s_Logger = LogManager.GetCurrentClassLogger();
+
         public int? AddUser(AddUserRequest request)
         {
-            throw new NotImplementedException();
+            int? userId = null;
+
+            User user = new User();
+            user.Username = request.Username;
+            user.Password = request.Password;
+            using (var db = new helpdesksystemContext())
+            {
+                db.User.Add(user);
+                db.SaveChanges();
+                userId = user.UserId;
+            }
+            return userId;
         }
 
         public UserDTO GetUser(int id)
@@ -36,6 +50,44 @@ namespace Helpdesk.DataLayer
         public UserDTO GetUserByUsername(AddUserRequest request)
         {
             throw new NotImplementedException();
+        }
+
+        public UserDTO DAO2DTO(User user)
+        {
+            UserDTO userDTO = null;
+
+            try
+            {
+                userDTO = new UserDTO();
+                userDTO.UserId = user.UserId;
+                userDTO.Username = user.Username;
+                userDTO.Password = user.Password;
+            }
+            catch (Exception ex)
+            {
+                s_Logger.Error(ex, "Could not convert User to UserDTO!");
+            }
+
+            return userDTO;
+        }
+
+        public User DTO2DAO(UserDTO userDTO)
+        {
+            User user = null;
+
+            try
+            {
+                user = new User();
+                user.UserId = userDTO.UserId;
+                user.Username = userDTO.Username;
+                user.Password = userDTO.Password;
+            }
+            catch (Exception ex)
+            {
+                s_Logger.Error(ex, "Could not convert UserDTO to User!");
+            }
+
+            return user;
         }
     }
 }
