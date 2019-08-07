@@ -22,5 +22,21 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
         }
+
+        [TestMethod]
+        public void LoginUserValid()
+        {
+            LoginRequest request = new LoginRequest()
+            {
+                Password = "Password1",
+                Username = "Admin"
+            };
+
+            var facade = new UsersFacade();
+            var response = facade.LoginUser(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsFalse(string.IsNullOrEmpty(response.Token));
+        }
     }
 }
