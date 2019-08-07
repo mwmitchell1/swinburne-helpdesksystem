@@ -1,0 +1,18 @@
+{
+  "ConnectionStrings": {
+<<<<<<< HEAD
+    "DefaultConnection": "server=localhost;port=3306;user=helpdeskadmin;password=Sunday408!;database=helpdesksystem"
+=======
+    "DefaultConnection": "server=localhost;port=3306;user=root;password=Sunday408!;database=HelpdeskSystem"
+>>>>>>> 35f4461eada139ce10c15a6b80e0dfa1f6038dd6
+  },
+  "AppSettings": {
+    "Secret": "AAAAB3NzaC1yc2EAAAABJQAAAQEAg6ScNLtiZOxFbtlMnWyx0WVZUZWthEI8OR60F+CGOET05buAY/m61lIH5cap1mRsNIDGgwu+N9bcUCrJ3gJCi04FWfOgXaosCLgClZdWqGXWyovCAgJ/7xPjGaukQA4Y6/aubMvQr+yeOLpcqbkfe87odFLRsCe6/iw3tfL/s4Cl/ke"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
