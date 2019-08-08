@@ -11,13 +11,16 @@ import { LoginComponent } from './authentication/login/login.component';
 import { CookieService } from 'ngx-cookie-service';
 import { AuthInterceptor } from './helpers/auth.inteceptor';
 import { AuthGuardService } from './helpers/auth.guard.service';
+import { AuthenticationService } from './authentication/authentication.service';
+import { LogoutComponent } from './authentication/logout/logout.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavMenuComponent,
     HomeComponent,
-    LoginComponent
+    LoginComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -26,7 +29,8 @@ import { AuthGuardService } from './helpers/auth.guard.service';
     ReactiveFormsModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'login', component: LoginComponent, pathMatch: 'full' }
+      { path: 'login', component: LoginComponent, pathMatch: 'full' },
+      { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
     ])
   ],
   providers: [CookieService,
@@ -35,7 +39,8 @@ import { AuthGuardService } from './helpers/auth.guard.service';
       useClass: AuthInterceptor,
       multi: true,
     },
-    AuthGuardService],
+    AuthGuardService,
+    AuthenticationService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
