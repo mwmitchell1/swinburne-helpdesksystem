@@ -32,14 +32,75 @@ namespace Helpdesk.Services
             _appSettings = new AppSettings();
         }
 
+        /// <summary>
+        /// This method is responsible for retrieving all users from the database
+        /// </summary>
+        /// <returns>The response that indicates if the operation was a success,
+        /// and the list of users</returns>
         public GetUsersResponse GetUsers()
         {
-            throw new NotImplementedException();
+            s_logger.Info("Getting users...");
+
+            GetUsersResponse response = new GetUsersResponse();
+
+            try
+            {
+                var dataLayer = new UsersDataLayer();
+
+                List<UserDTO> users = dataLayer.GetUsers();
+
+                if (users[0] == null)
+                {
+                    throw new Exception("Unable to get users!");
+                }
+
+                response.Users = users;
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get users!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get users!"));
+            }
+            return response;
         }
 
+        /// <summary>
+        /// This method is responsible for getting a specific user from the database
+        /// </summary>
+        /// <param name="id">The UserId of the specific user to be retrieved</param>
+        /// <returns>The response that indicates if the operation was a success,
+        /// and the details of the retrieved user if it was</returns>
         public GetUserResponse GetUser(int id)
         {
-            throw new NotImplementedException();
+            s_logger.Info("Getting user...");
+
+            GetUserResponse response = new GetUserResponse();
+
+            try
+            {
+                var dataLayer = new UsersDataLayer();
+
+                UserDTO user = dataLayer.GetUser(id);
+
+                if (user == null)
+                {
+                    response.Status = HttpStatusCode.NotFound;
+                }
+                else
+                {
+                    response.User = user;
+                    response.Status = HttpStatusCode.OK;
+                }
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get user!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get user!"));
+            }
+            return response;
         }
 
         public AddUserResponse AddUser(AddUserRequest request)
@@ -83,9 +144,52 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This method is responsible for updating a specific user's information, such
+        /// as their username and password
+        /// </summary>
+        /// <param name="id">The UserId of the user to be updated</param>
+        /// <param name="request">The user's new information</param>
+        /// <returns>The response that indicates if the update was successfull</returns>
         public UpdateUserResponse UpdateUser(int id, UpdateUserRequest request)
         {
-            throw new NotImplementedException();
+            s_logger.Info("Updating user...");
+
+            UpdateUserResponse response = new UpdateUserResponse();
+
+            try
+            {
+                response = (UpdateUserResponse)request.CheckValidation(response);
+                if (response.Status == HttpStatusCode.BadRequest)
+                {
+                    return response;
+                }
+
+                request.Password = HashText(request.Password);
+
+                var dataLayer = new UsersDataLayer();
+
+                if (dataLayer.GetUserByUsername(request.Username) != null)
+                {
+                    throw new Exception("Unable to update user! User with username " + request.Username + "already exists!");
+                }
+
+                bool result = dataLayer.UpdateUser(id, request);
+
+                if (result == false)
+                    throw new Exception("Unable to update user!");
+
+                response.result = result;
+                response.Status = HttpStatusCode.OK;
+
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to update user!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update user!"));
+            }
+            return response;
         }
 
         public DeleteUserResponse DeleteUser(int id)

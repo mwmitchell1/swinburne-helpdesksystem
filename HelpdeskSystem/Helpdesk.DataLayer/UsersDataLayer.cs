@@ -51,14 +51,53 @@ namespace Helpdesk.DataLayer
             return userDto;
         }
 
+        /// <summary>
+        /// This method retrieves a list of all the users in the database
+        /// </summary>
+        /// <returns>A list of users retrieved from the database</returns>
         public List<UserDTO> GetUsers()
         {
-            throw new NotImplementedException();
+            List<UserDTO> userDTOs = new List<UserDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var users = context.User.ToList();
+
+                foreach (User user in users)
+                {
+                    if (user != null)
+                    {
+                        UserDTO userDTO = DAO2DTO(user);
+                        userDTOs.Add(userDTO);
+                    }
+                }
+            }
+            return userDTOs;
         }
 
+        /// <summary>
+        /// Used to update the specified user in the databse with the request's information
+        /// </summary>
+        /// <param name="id">The UserId of the user to be updated</param>
+        /// <param name="request">The request that contains the user's new information</param>
+        /// <returns>A boolean that indicates whether the operation was a success</returns>
         public bool UpdateUser(int id, UpdateUserRequest request)
         {
-            throw new NotImplementedException();
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                User user = context.User.Single(u => u.UserId == id);
+
+                if (user == null)
+                {
+                    return false;
+                }
+
+                user.Username = request.Username;
+                user.Password = request.Password;
+
+                context.SaveChanges();
+            }
+            return true;
         }
 
         public bool DeleteUser(int id)
