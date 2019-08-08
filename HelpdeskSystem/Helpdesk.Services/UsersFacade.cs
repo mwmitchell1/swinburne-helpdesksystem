@@ -102,6 +102,8 @@ namespace Helpdesk.Services
             try
             {
 
+                response = (LoginResponse)request.CheckValidation(response);
+
                 if (response.Status == HttpStatusCode.BadRequest)
                     return response;
 
