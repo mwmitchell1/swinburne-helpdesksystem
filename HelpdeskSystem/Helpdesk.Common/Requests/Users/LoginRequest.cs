@@ -5,7 +5,10 @@ using System.Text;
 
 namespace Helpdesk.Common.Requests.Users
 {
-    public class LoginRequest
+    /// <summary>
+    /// Used to transfer the information required for a user to login
+    /// </summary>
+    public class LoginRequest : BaseRequest
     {
         [Required (AllowEmptyStrings = false, ErrorMessage = "Please enter a username.")]
         public string Username { get; set; }

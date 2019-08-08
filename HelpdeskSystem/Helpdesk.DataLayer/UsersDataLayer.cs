@@ -10,6 +10,9 @@ using Helpdesk.Common.Extensions;
 
 namespace Helpdesk.DataLayer
 {
+    /// <summary>
+    /// Used to handle any business logic relatedto users including CRUD, login and logout
+    /// </summary>
     public class UsersDataLayer
     {
         private static Logger s_Logger = LogManager.GetCurrentClassLogger();
@@ -30,6 +33,11 @@ namespace Helpdesk.DataLayer
             return userId;
         }
 
+        /// <summary>
+        /// Used to retreve a user by their id
+        /// </summary>
+        /// <param name="id">The id of the user</param>
+        /// <returns>The user DTO</returns>
         public UserDTO GetUser(int id)
         {
             UserDTO userDto = null;
@@ -58,6 +66,11 @@ namespace Helpdesk.DataLayer
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Used to get a user by their username initially made for the login function
+        /// </summary>
+        /// <param name="username">The username of the user</param>
+        /// <returns>The object that represents the user</returns>
         public UserDTO GetUserByUsername(string username)
         {
             UserDTO dto = null;
@@ -73,6 +86,11 @@ namespace Helpdesk.DataLayer
             return dto;
         }
 
+        /// <summary>
+        /// Converts the user DAO to a DTO to send to the front end
+        /// </summary>
+        /// <param name="user">The DAO for the user</param>
+        /// <returns>The DTO for the user</returns>
         public UserDTO DAO2DTO(User user)
         {
             UserDTO userDTO = null;
@@ -85,6 +103,11 @@ namespace Helpdesk.DataLayer
             return userDTO;
         }
 
+        /// <summary>
+        /// Converts the user DTO to a DAO to interact with the database
+        /// </summary>
+        /// <param name="user">The DTO for the user</param>
+        /// <returns>The DAO for the user</returns>
         public User DTO2DAO(UserDTO userDTO)
         {
             User user = null;

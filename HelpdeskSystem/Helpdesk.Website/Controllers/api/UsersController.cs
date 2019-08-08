@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Helpdesk.Website.Controllers.api
 {
+    /// <summary>
+    /// Used as the access point for any features relating to users
+    /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/users")]
     [ApiController]
@@ -67,6 +70,12 @@ namespace Helpdesk.Website.Controllers.api
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// This calls the login business code and assigns a cookie to the users browser
+        /// which contains the authtoken if they are a valid user
+        /// </summary>
+        /// <param name="request">The users login information</param>
+        /// <returns>The response which indicates if they are sucessful</returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
@@ -112,6 +121,40 @@ namespace Helpdesk.Website.Controllers.api
                 s_logger.Error(ex, "Unable to add galaxy.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Used to invalidate the cookie that contains the users auth token in order to log them out
+        /// </summary>
+        /// <returns>The status to indicate if loggin them out is sucessful</returns>
+        [Route("logout")]
+        [HttpGet()]
+        public IActionResult Logout()
+        {
+            try
+            {
+                var cookie = HttpContext.Request.Cookies["AuthToken"];
+
+                if (cookie != null)
+                {
+                    var expiredCookie = new CookieOptions()
+                    {
+                        Domain = ".swin.helpdesk.edu.au",
+                        Expires = DateTime.Now.AddDays(-1),
+                        HttpOnly = false,
+                        Path = "/",
+                        SameSite = SameSiteMode.Lax
+                    };
+
+                    Response.Cookies.Append("AuthToken", "", expiredCookie);
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to log out user.");
+            }
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 }
