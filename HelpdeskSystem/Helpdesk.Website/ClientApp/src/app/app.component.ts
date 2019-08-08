@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,15 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'app';
+
+  //private _userService: UserService;
+  public userIsAuthorized: boolean;
+
+  /**
+   * 
+   */
+  constructor(private cookieService: CookieService) {
+    //this._userService = service;
+  }
 }
+

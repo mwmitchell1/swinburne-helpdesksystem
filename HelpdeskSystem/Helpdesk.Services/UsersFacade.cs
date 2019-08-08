@@ -93,6 +93,12 @@ namespace Helpdesk.Services
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// This method is responsable for handling the validation and verification of the users login attempt
+        /// </summary>
+        /// <param name="request">the users login information</param>
+        /// <returns>The response which indicates if they are sucessful and the bearer token
+        /// they will use for authentication on success</returns>
         public LoginResponse LoginUser(LoginRequest request)
         {
             s_logger.Info("Attempting to log in.");
@@ -101,13 +107,16 @@ namespace Helpdesk.Services
 
             try
             {
+                //Validate input
+                response = (LoginResponse)request.CheckValidation(response);
 
                 if (response.Status == HttpStatusCode.BadRequest)
                     return response;
 
                 var dataLayer = new UsersDataLayer();
-                UserDTO user = dataLayer.GetUserByUsername(request.Username);
 
+                //Verify user exists
+                UserDTO user = dataLayer.GetUserByUsername(request.Username);
                 if (user == null)
                 {
                     response.Token = string.Empty;
@@ -117,8 +126,8 @@ namespace Helpdesk.Services
                     return response;
                 }
 
+                // Ensure that their password is correct
                 string hashedPassword = HashText(request.Password);
-
                 if (user.Password != hashedPassword)
                 {
                     response.Token = string.Empty;
@@ -128,7 +137,7 @@ namespace Helpdesk.Services
                     return response;
                 }
 
-
+                // Generate users bearer token
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.AppSecret);
 
@@ -161,6 +170,12 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This is used to check that the user that is logged in is actually a valid user in the system 
+        /// </summary>
+        /// <param name="username">The username of the user</param>
+        /// <param name="userId">The id of the user</param>
+        /// <returns>An indicator of whether or not the user is valid</returns>
         public bool VerifyUser(string username, string userId)
         {
             bool result = false;
@@ -198,6 +213,11 @@ namespace Helpdesk.Services
             return result;
         }
 
+        /// <summary>
+        /// Used to hash passwords when a user logs in, is added to the system or has their password changed
+        /// </summary>
+        /// <param name="text">The password in plain text</param>
+        /// <returns>The hashed password</returns>
         private string HashText(string text)
         {
             string result = string.Empty;
