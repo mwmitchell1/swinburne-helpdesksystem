@@ -11,14 +11,12 @@ export class AppComponent {
 
   //private _userService: UserService;
   public userIsAuthorized: boolean;
-  private _cookieService: CookieService;
 
   /**
-   *
+   * 
    */
   constructor(private cookieService: CookieService) {
     //this._userService = service;
-    this._cookieService = cookieService;
   }
 }
 

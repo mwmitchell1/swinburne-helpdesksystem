@@ -6,6 +6,10 @@ using System.Text;
 
 namespace Helpdesk.Common
 {
+    /// <summary>
+    /// This is used to load the web apps settings file so that it can't be used
+    /// througout the code.
+    /// </summary>
     public class AppSettings
     {
         public string DefaultConnection { get; } = string.Empty;

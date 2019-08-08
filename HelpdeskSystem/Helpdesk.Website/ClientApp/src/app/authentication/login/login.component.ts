@@ -1,24 +1,21 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { LoginRequest } from 'src/app/data/requests/login-request';
-import { HttpClient } from '@angular/common/http';
-import { CookieService } from 'ngx-cookie-service';
 import { FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthenticationService } from '../authentication.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
+
+/**
+ * This class is used to handle the logic for the login component
+ */
 export class LoginComponent implements OnInit {
-
-  public loginRequest: LoginRequest;
-  private client: HttpClient;
-  private baseUrl: string;
   loginForm;
-
-  constructor(private builder: FormBuilder, private http: HttpClient, @Inject('BASE_URL') baseUrl: string, private cookieService: CookieService) {
-    this.client = http;
-    this.baseUrl = baseUrl;
+  constructor(private builder: FormBuilder, private service: AuthenticationService) {
     this.loginForm = this.builder.group({
       username: '',
       password: ''
@@ -28,11 +25,14 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
+  /**
+   * This function calls the log in function in the auth service 
+   * @param data The login inforamtion of the user
+   */
   logIn(data) {
-    var loginRequest = new LoginRequest()
+    var loginRequest = new LoginRequest;
     loginRequest.Password = data.password;
     loginRequest.Username = data.username
-    this.client.post<LoginRequest>(this.baseUrl + 'api/users/login', JSON.stringify(this.loginRequest)).subscribe();
+    this.service.loginUser(loginRequest).subscribe(result => console.log(result));
   }
-
 }
