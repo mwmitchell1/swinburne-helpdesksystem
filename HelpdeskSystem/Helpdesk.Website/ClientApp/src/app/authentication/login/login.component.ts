@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { LoginRequest } from 'src/app/requests/login-request';
+import { LoginRequest } from 'src/app/data/requests/login-request';
 import { HttpClient } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { FormBuilder } from '@angular/forms';
