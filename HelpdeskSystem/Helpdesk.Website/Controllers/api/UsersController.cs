@@ -62,12 +62,34 @@ namespace Helpdesk.Website.Controllers.api
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult DeleteUser ([FromRoute] int id)
+        public IActionResult DeleteUser([FromRoute] int id)
         {
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new UsersFacade();
+                var result = facade.DeleteUser(id);
+
+                switch (result.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok();
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(result));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete galaxy.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         /// <summary>

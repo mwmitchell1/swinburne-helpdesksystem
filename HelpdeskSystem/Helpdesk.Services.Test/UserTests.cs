@@ -2,6 +2,7 @@ using System.Net;
 using Helpdesk.Common.DTOs;
 using Helpdesk.Common.Requests.Users;
 using Helpdesk.Common.Responses.Users;
+using Helpdesk.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Helpdesk.Services.Test
@@ -15,16 +16,12 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddUser()
         {
-            // NOTE: This test will fail if the user already exists!
-            // Need to decide how to handle tests that conflict with previous tests.
-            // WR: You can use a auto gen alpha string function, there is one on stack overflow
-            // if you Google it.
             UsersFacade usersFacade = new UsersFacade();
 
             AddUserRequest addUserRequest = new AddUserRequest();
-            addUserRequest.Username = "Timmy";
-            addUserRequest.Password = "FellDownAWell1";
-            addUserRequest.PasswordConfirm = "FellDownAWell1";
+            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
+            addUserRequest.Password = "Password1";
+            addUserRequest.PasswordConfirm = "Password1";
 
             AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
 
@@ -107,6 +104,45 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
             Assert.IsTrue(string.IsNullOrEmpty(response.Token));
+        }
+
+        /// <summary>
+        /// Ensures that the code can delete a user
+        /// </summary>
+        [TestMethod]
+        public void DeleteUser()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest();
+            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
+            addUserRequest.Password = "Password1";
+            addUserRequest.PasswordConfirm = "Password1";
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
+
+            DeleteUserResponse deleteResponse = usersFacade.DeleteUser(addUserResponse.UserId);
+
+            Assert.AreEqual(HttpStatusCode.OK, deleteResponse.Status);
+
+            GetUserResponse response = usersFacade.GetUser(addUserResponse.UserId);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
+        }
+
+        /// <summary>
+        /// Ensures that deleting a user that does not exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void DeleteUserNotFound()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            DeleteUserResponse deleteResponse = usersFacade.DeleteUser(0);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, deleteResponse.Status);
         }
     }
 }

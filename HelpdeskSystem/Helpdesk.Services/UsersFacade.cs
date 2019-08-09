@@ -197,9 +197,35 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This method is responsible for handling the deletion of a user from the system
+        /// </summary>
+        /// <param name="id">The id of the user to be deleted</param>
+        /// <returns>A response that indicates whether or not the deletion was successful</returns>
         public DeleteUserResponse DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            var response = new DeleteUserResponse();
+
+            try
+            {
+                var dataLayer = new UsersDataLayer();
+                bool result = dataLayer.DeleteUser(id);
+
+                if (result)
+                    response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Warn($"Unable to find the user with id [{id}]");
+                response.Status = HttpStatusCode.NotFound;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete the user.");
+                response.Status = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
         }
 
         /// <summary>
@@ -210,7 +236,7 @@ namespace Helpdesk.Services
         /// they will use for authentication on success</returns>
         public LoginResponse LoginUser(LoginRequest request)
         {
-            s_logger.Info("Attempting to log in.");
+            s_logger.Info("Attempting to log in...");
 
             LoginResponse response = new LoginResponse();
 
