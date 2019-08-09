@@ -5,7 +5,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
-import { NavMenuComponent } from './nav-menu/nav-menu.component';
+import { NavbarComponent } from './navbar/navbar.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './authentication/login/login.component';
 import { CookieService } from 'ngx-cookie-service';
@@ -17,7 +17,7 @@ import { LogoutComponent } from './authentication/logout/logout.component';
 @NgModule({
   declarations: [
     AppComponent,
-    NavMenuComponent,
+    NavbarComponent,
     HomeComponent,
     LoginComponent,
     LogoutComponent
