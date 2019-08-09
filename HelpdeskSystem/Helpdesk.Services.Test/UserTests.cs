@@ -9,6 +9,9 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class UserTests
     {
+        /// <summary>
+        /// Tests adding a user to the database with a valid request.
+        /// </summary>
         [TestMethod]
         public void AddUser()
         {
