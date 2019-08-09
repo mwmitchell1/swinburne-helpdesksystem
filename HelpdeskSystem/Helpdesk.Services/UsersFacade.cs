@@ -103,6 +103,11 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This method is responsible for adding a new user.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public AddUserResponse AddUser(AddUserRequest request)
         {
             s_logger.Info("Adding user...");
