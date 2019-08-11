@@ -13,6 +13,7 @@ import { AuthInterceptor } from './helpers/auth.inteceptor';
 import { AuthGuardService } from './helpers/auth.guard.service';
 import { AuthenticationService } from './authentication/authentication.service';
 import { LogoutComponent } from './authentication/logout/logout.component';
+import { AdminComponent } from './admin/admin.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { LogoutComponent } from './authentication/logout/logout.component';
     NavbarComponent,
     HomeComponent,
     LoginComponent,
-    LogoutComponent
+    LogoutComponent,
+    AdminComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -32,9 +34,8 @@ import { LogoutComponent } from './authentication/logout/logout.component';
       { path: 'login', component: LoginComponent, pathMatch: 'full' },
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
       { path: ':helpdesk', component: HomeComponent, pathMatch: 'full' },
-      { path: 'admin', component: HomeComponent, pathMatch: 'full' },
-      { path: 'admin', component: HomeComponent, pathMatch: 'full'},
-      { path: 'admin/:helpdesk', component: HomeComponent, pathMatch: 'full' }
+      { path: 'admin', component: AdminComponent, pathMatch: 'full' },
+      { path: 'admin/:helpdesk', component: AdminComponent, pathMatch: 'full' }
     ])
   ],
   providers: [CookieService,
