@@ -31,6 +31,10 @@ import { LogoutComponent } from './authentication/logout/logout.component';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'login', component: LoginComponent, pathMatch: 'full' },
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
+      { path: ':helpdesk', component: HomeComponent, pathMatch: 'full' },
+      { path: 'admin', component: HomeComponent, pathMatch: 'full' },
+      { path: 'admin', component: HomeComponent, pathMatch: 'full'},
+      { path: 'admin/:helpdesk', component: HomeComponent, pathMatch: 'full' }
     ])
   ],
   providers: [CookieService,
