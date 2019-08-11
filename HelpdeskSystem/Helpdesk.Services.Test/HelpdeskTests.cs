@@ -3,6 +3,7 @@ using System.Net;
 using Helpdesk.Common.DTOs;
 using Helpdesk.Common.Requests.Helpdesk;
 using Helpdesk.Common.Responses.Helpdesk;
+using Helpdesk.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Helpdesk.Services.Test
@@ -11,19 +12,15 @@ namespace Helpdesk.Services.Test
     public class HelpdeskTests
     {
         /// <summary>
-        /// Tests adding a timespan to the database using a valid request.
+        /// Tests adding a timespan to the database with a valid request.
         /// </summary>
         [TestMethod]
         public void AddTimespan()
         {
-            // NOTE: This test will fail if the user already exists!
-            // Need to decide how to handle tests that conflict with previous tests.
-            // WR: You can use a auto gen alpha string function, there is one on stack overflow
-            // if you Google it.
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
-            addTimeSpanRequest.Name = "Test Period";
+            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
             DateTime startDate = DateTime.Today;
             DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
             addTimeSpanRequest.StartDate = startDate;
@@ -32,6 +29,46 @@ namespace Helpdesk.Services.Test
             AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+        }
+
+        /// <summary>
+        /// Tests adding a timespan where the end date precedes the start date.
+        /// </summary>
+        [TestMethod]
+        public void AddTimespanEndBeforeStart()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
+            DateTime startDate = DateTime.Today;
+            DateTime endDate = new DateTime(startDate.Year - 1, startDate.Month, startDate.Day, 0, 0, 0);
+            addTimeSpanRequest.StartDate = startDate;
+            addTimeSpanRequest.EndDate = endDate;
+
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, addTimeSpanResponse.Status);
+        }
+
+        /// <summary>
+        /// Tests adding a timespan where the start date predates the year that this system became available (2019).
+        /// </summary>
+        [TestMethod]
+        public void AddTimespanStartDatePredatesSystem()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
+            DateTime startDate = new DateTime(2018, 1, 1, 0, 0, 0);
+            DateTime endDate = DateTime.Today;
+            addTimeSpanRequest.StartDate = startDate;
+            addTimeSpanRequest.EndDate = endDate;
+
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, addTimeSpanResponse.Status);
         }
     }
 }

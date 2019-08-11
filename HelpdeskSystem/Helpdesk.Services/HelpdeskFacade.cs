@@ -53,6 +53,17 @@ namespace Helpdesk.Services
                     return response;
                 }
 
+                //TODO Need a method to check timespan name in request against names in the database.
+                // Assuming timespans are unique?
+                /*
+                var dataLayer = new HelpdeskDataLayer();
+
+                if (dataLayer.GetTimeSpanByName(request.Name) != null)
+                {
+                    throw new Exception("Unable to add timespan! Timespan already exists!");
+                }
+                */
+
                 var dataLayer = new HelpdeskDataLayer();
 
                 int? result = dataLayer.AddTimeSpan(request);
