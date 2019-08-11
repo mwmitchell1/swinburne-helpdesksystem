@@ -2,25 +2,27 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
       <a class="navbar-brand" href="#">Swinburne Helpdesk</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="collapse navbar-collapse" id="navbar">
         <ul class="navbar-nav ml-auto">
         <span class="navbar-text active">Helpdesk: </span>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              &lt;Placeholder&gt;
+          <li class="navbar__helpdesk-list nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+              {{ helpdeskIsSelected() ? selectedHelpdesk.name : 'Select Helpdesk' }}
             </a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-              <a class="dropdown-item" href="#">&lt;Placeholder&gt;</a>
-              <a class="dropdown-item" href="#">&lt;Placeholder&gt;</a>
-              <a class="dropdown-item" href="#">&lt;Placeholder&gt;</a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item"
+                *ngFor="let helpdesk of helpdesks"
+                [routerLink]="[helpdesk.name]"
+                (click)="setSelectedHelpdesk(helpdesk.name)">{{ helpdesk.name }}</a>
             </div>
           </li>
 
           <li class="nav-item">
-            <a class="nav-item nav-link">Admin</a>
+            <a class="nav-item nav-link"
+               [routerLink]='["admin", helpdeskIsSelected() ? selectedHelpdesk.name : ""]'>Admin</a>
           </li>
         </ul>
 
