@@ -124,7 +124,7 @@ namespace Helpdesk.Services
                 request.Password = HashText(request.Password);
 
                 var dataLayer = new UsersDataLayer();
-
+                
                 if (dataLayer.GetUserByUsername(request.Username) != null)
                 {
                     throw new Exception("Unable to add user! User already exists!");
