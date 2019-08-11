@@ -15,14 +15,14 @@
             <div class="dropdown-menu">
               <a class="dropdown-item"
                 *ngFor="let helpdesk of helpdesks"
-                [routerLink]="[helpdesk.name]"
+                [routerLink]="[isAdminSection ? 'admin' : '', helpdesk.name]"
                 (click)="setSelectedHelpdesk(helpdesk.name)">{{ helpdesk.name }}</a>
             </div>
           </li>
 
           <li class="nav-item">
             <a class="nav-item nav-link"
-               [routerLink]='["admin", helpdeskIsSelected() ? selectedHelpdesk.name : ""]'>Admin</a>
+               [routerLink]="['admin', helpdeskIsSelected() ? selectedHelpdesk.name : '']">Admin</a>
           </li>
         </ul>
 

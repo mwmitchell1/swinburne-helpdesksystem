@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { AuthenticationService } from '../authentication/authentication.service';
+import { NavigationStart, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-navbar',
@@ -10,6 +13,7 @@ export class NavbarComponent {
   isExpanded = false;
   public authenticationService: AuthenticationService;
   public userIsAuthorized: boolean;
+  public isAdminSection: boolean;
 
   public selectedHelpdesk: object;
 
@@ -28,9 +32,25 @@ export class NavbarComponent {
     }
   ];
 
-  constructor(private service: AuthenticationService) {
+  constructor(private service: AuthenticationService, private router: Router) {
     this.authenticationService = service;
     this.userIsAuthorized = this.authenticationService.isLoggedIn();
+
+    // Router navigation event
+    router.events.pipe(
+      filter(e => e instanceof NavigationStart)
+    ).subscribe(e => {
+      console.log(e);
+      // @ts-ignore
+      const url = e.url.split('/').splice(1);
+      console.log(url);
+
+      // check if first section of url is 'admin'
+      this.isAdminSection = (url[0].toLowerCase() === 'admin');
+
+      // if 3 sections and second
+      if (url.length > 1 && url[1] !== '') { this.setSelectedHelpdesk(url[1]); }
+    });
   }
 
   collapse() {
