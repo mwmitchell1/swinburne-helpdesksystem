@@ -40,15 +40,13 @@ export class NavbarComponent {
     router.events.pipe(
       filter(e => e instanceof NavigationStart)
     ).subscribe(e => {
-      console.log(e);
       // @ts-ignore
       const url = e.url.split('/').splice(1);
-      console.log(url);
 
       // check if first section of url is 'admin'
       this.isAdminSection = (url[0].toLowerCase() === 'admin');
 
-      // if 3 sections and second
+      // if 3 sections and second is not empty
       if (url.length > 1 && url[1] !== '') { this.setSelectedHelpdesk(url[1]); }
     });
   }
