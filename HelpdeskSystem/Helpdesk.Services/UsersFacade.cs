@@ -103,6 +103,11 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This method is responsible for adding a new user.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public AddUserResponse AddUser(AddUserRequest request)
         {
             s_logger.Info("Adding user...");
@@ -119,7 +124,7 @@ namespace Helpdesk.Services
                 request.Password = HashText(request.Password);
 
                 var dataLayer = new UsersDataLayer();
-
+                
                 if (dataLayer.GetUserByUsername(request.Username) != null)
                 {
                     throw new Exception("Unable to add user! User already exists!");
