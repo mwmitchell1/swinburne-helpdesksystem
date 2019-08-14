@@ -18,7 +18,7 @@ namespace Helpdesk.Website.Controllers.api
     public class HelpdeskController : BaseApiController
     {
         [HttpGet]
-        [Route("timespans")]
+        [Route("timespan")]
         public IActionResult GetTimeSpans()
         {
             if (!IsAuthorized())
@@ -38,7 +38,7 @@ namespace Helpdesk.Website.Controllers.api
         }
 
         [HttpPost]
-        [Route("")]
+        [Route("timespan")]
         public IActionResult AddTimeSpan([FromBody] AddTimeSpanRequest request)
         {
             if (!IsAuthorized())
