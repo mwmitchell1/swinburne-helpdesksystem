@@ -277,7 +277,7 @@ namespace Helpdesk.Services
                         new Claim(ClaimTypes.Name, user.Username),
                         new Claim(ClaimTypes.Sid, user.UserId.ToString())
                     }),
-                    Expires = DateTime.Now.AddYears(1),
+                    Expires = DateTime.Now.AddHours(4),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
                 };
 
