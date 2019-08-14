@@ -27,7 +27,29 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new UsersFacade();
+                var result = facade.GetUser(id);
+
+                switch (result.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok();
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(result));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get user.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpGet]
@@ -35,19 +57,63 @@ namespace Helpdesk.Website.Controllers.api
         public IActionResult GetUsers()
         {
             if (!IsAuthorized())
-                return Unauthorized();
+                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new UsersFacade();
+                var result = facade.GetUsers();
+
+                switch (result.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok();
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(result));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get users.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPost]
-        [Route("{id}")]
+        [Route("")]
         public IActionResult AddUser([FromBody] AddUserRequest request)
         {
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new UsersFacade();
+                var result = facade.AddUser(request);
+
+                switch (result.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(result);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(result));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to add user.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPatch]
@@ -57,7 +123,29 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new UsersFacade();
+                var result = facade.UpdateUser(id, request);
+
+                switch (result.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok();
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(result));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to update user.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpDelete]

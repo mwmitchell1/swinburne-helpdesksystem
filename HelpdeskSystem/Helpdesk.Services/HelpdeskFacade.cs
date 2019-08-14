@@ -34,9 +34,55 @@ namespace Helpdesk.Services
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// This method is responsible for adding a new timespan.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public AddTimeSpanResponse AddTimeSpan(AddTimeSpanRequest request)
         {
-            throw new NotImplementedException();
+            s_logger.Info("Adding timespan...");
+
+            AddTimeSpanResponse response = new AddTimeSpanResponse();
+
+            try
+            {
+                response = (AddTimeSpanResponse)request.CheckValidation(response);
+                if (response.Status == HttpStatusCode.BadRequest)
+                {
+                    return response;
+                }
+
+                //TODO Need a method to check timespan name in request against names in the database.
+                // Assuming timespans are unique?
+                /*
+                var dataLayer = new HelpdeskDataLayer();
+
+                if (dataLayer.GetTimeSpanByName(request.Name) != null)
+                {
+                    throw new Exception("Unable to add timespan! Timespan already exists!");
+                }
+                */
+
+                var dataLayer = new HelpdeskDataLayer();
+
+                int? result = dataLayer.AddTimeSpan(request);
+
+                if (result == null)
+                {
+                    throw new Exception("Unable to add timespan!");
+                }
+
+                response.SpanId = (int)result;
+                response.Status = HttpStatusCode.OK;
+            }
+            catch(Exception ex)
+            {
+                s_logger.Error(ex, "Unable to add timespan!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to add timespan!"));
+            }
+            return response;
         }
 
         /// <summary>

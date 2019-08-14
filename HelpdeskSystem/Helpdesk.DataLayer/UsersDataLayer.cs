@@ -17,6 +17,11 @@ namespace Helpdesk.DataLayer
     {
         private static Logger s_Logger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Used to add a user to the database.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public int? AddUser(AddUserRequest request)
         {
             int? userId = null;

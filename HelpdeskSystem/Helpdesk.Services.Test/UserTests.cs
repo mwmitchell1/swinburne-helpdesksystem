@@ -10,6 +10,9 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class UserTests
     {
+        /// <summary>
+        /// Tests adding a user to the database with a valid request.
+        /// </summary>
         [TestMethod]
         public void AddUser()
         {
@@ -23,6 +26,97 @@ namespace Helpdesk.Services.Test
             AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test that inputed username length is within the contraints set in the database.
+        /// Limit currently set to 20 characters.
+        /// </summary>
+        [TestMethod]
+        public void AddUserUsernameTooLong()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest();
+            addUserRequest.Username = AlphaNumericStringGenerator.GetString(21);
+            addUserRequest.Password = "Password1";
+            addUserRequest.PasswordConfirm = "Password1";
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, addUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test adding a user with an empty username string.
+        /// </summary>
+        [TestMethod]
+        public void AddUserEmptyUsername()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest();
+            addUserRequest.Username = "";
+            addUserRequest.Password = "Password1";
+            addUserRequest.PasswordConfirm = "Password1";
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, addUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test adding a user with an empty password string.
+        /// </summary>
+        [TestMethod]
+        public void AddUserEmptyPassword()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest();
+            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
+            addUserRequest.Password = "";
+            addUserRequest.PasswordConfirm = "Password1";
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, addUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test adding a user with an empty password confirmation string.
+        /// </summary>
+        [TestMethod]
+        public void AddUserEmptyPasswordConfirm()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest();
+            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
+            addUserRequest.Password = "Password1";
+            addUserRequest.PasswordConfirm = "";
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, addUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test adding a user where the password and password confirmation fields do not match.
+        /// </summary>
+        [TestMethod]
+        public void AddUserPasswordMismatch()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest();
+            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
+            addUserRequest.Password = "Password1";
+            addUserRequest.PasswordConfirm = "Password2";
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, addUserResponse.Status);
         }
 
         /// <summary>

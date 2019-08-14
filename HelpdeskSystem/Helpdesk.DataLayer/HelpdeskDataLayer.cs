@@ -10,9 +10,26 @@ namespace Helpdesk.DataLayer
 {
     public class HelpdeskDataLayer
     {
+        /// <summary>
+        /// This method adds a timespan to the database.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public int? AddTimeSpan(AddTimeSpanRequest request)
         {
-            throw new NotImplementedException();
+            int? spanId = null;
+
+            Timespans timespan = new Timespans();
+            timespan.Name = request.Name;
+            timespan.StartDate = request.StartDate;
+            timespan.EndDate = request.EndDate;
+            using (var context = new helpdesksystemContext())
+            {
+                context.Timespans.Add(timespan);
+                context.SaveChanges();
+                spanId = timespan.SpanId;
+            }
+            return spanId;
         }
 
         public TimeSpanDTO GetTimeSpan(int id)
