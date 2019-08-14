@@ -41,7 +41,7 @@ namespace Helpdesk.Website.Controllers.api
         }
 
         [HttpPost]
-        [Route("{id}")]
+        [Route("")]
         public IActionResult AddUser([FromBody] AddUserRequest request)
         {
             if (!IsAuthorized())
@@ -55,7 +55,7 @@ namespace Helpdesk.Website.Controllers.api
                 switch (result.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(result);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(result));
                     case HttpStatusCode.InternalServerError:
