@@ -38,7 +38,7 @@ namespace Helpdesk.Website.Controllers.api
         }
 
         [HttpPost]
-        [Route("timespan")]
+        [Route("")]
         public IActionResult AddTimeSpan([FromBody] AddTimeSpanRequest request)
         {
             if (!IsAuthorized())
@@ -52,7 +52,7 @@ namespace Helpdesk.Website.Controllers.api
                 switch (result.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(result);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(result));
                     case HttpStatusCode.InternalServerError:
