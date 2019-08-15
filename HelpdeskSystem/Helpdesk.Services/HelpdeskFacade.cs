@@ -14,6 +14,9 @@ using System.Text;
 
 namespace Helpdesk.Services
 {
+    /// <summary>
+    /// This class is used to handle the business logic of helpdesks & timespans
+    /// </summary>
     public class HelpdeskFacade
     {
         private static Logger s_logger = LogManager.GetCurrentClassLogger();

@@ -15,6 +15,7 @@ namespace Helpdesk.Data.Models
         public byte? HasCheckIn { get; set; }
         public byte? HasQueue { get; set; }
 
+        public virtual ICollection<Timespans> Timespans { get; set; }
         public virtual ICollection<Helpdeskunit> Helpdeskunit { get; set; }
     }
 }
