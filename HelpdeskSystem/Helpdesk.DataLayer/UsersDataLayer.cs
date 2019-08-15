@@ -11,7 +11,7 @@ using Helpdesk.Common.Extensions;
 namespace Helpdesk.DataLayer
 {
     /// <summary>
-    /// Used to handle any business logic relatedto users including CRUD, login and logout
+    /// Used to handle any databases interactions for users including CRUD, login and logout
     /// </summary>
     public class UsersDataLayer
     {

@@ -13,7 +13,6 @@ namespace Helpdesk.Data.Models
         public int ItemId { get; set; }
         public int StudentId { get; set; }
         public int TopicId { get; set; }
-        public string NickName { get; set; }
         public DateTime TimeAdded { get; set; }
         public byte? TimeHelped { get; set; }
         public byte? TimeRemoved { get; set; }

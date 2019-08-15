@@ -8,6 +8,9 @@ using System.Text;
 
 namespace Helpdesk.DataLayer
 {
+    /// <summary>
+    /// Used to handle any databases interactions for helpdesks including CRUD & timespans
+    /// </summary>
     public class HelpdeskDataLayer
     {
         /// <summary>
