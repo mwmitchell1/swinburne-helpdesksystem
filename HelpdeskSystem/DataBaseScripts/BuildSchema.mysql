@@ -40,7 +40,6 @@ CREATE TABLE QueueItem (
     ItemID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     StudentID INT NOT NULL,
     TopicID INT NOT NULL,
-    NickName VARCHAR(20) NOT NULL,
     TimeAdded DATETIME NOT NULL,
     TimeHelped BOOL,
     TimeRemoved BOOL,
