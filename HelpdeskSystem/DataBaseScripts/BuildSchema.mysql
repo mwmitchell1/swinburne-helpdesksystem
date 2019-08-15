@@ -1,3 +1,4 @@
+drop database HelpdeskSystem;
 create database HelpdeskSystem;
 
 use HelpdeskSystem;
@@ -81,12 +82,12 @@ CREATE TABLE HelpdeskUnit (
 
 CREATE TABLE TimeSpans (
     SpanID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    HelpdeskID INT,
+    HelpdeskID INT NOT NULL,
     Name VARCHAR(200),
     StartDate DATETIME,
-    EndDate DATETIME
+    EndDate DATETIME,
+    foreign key (HelpdeskID)
+    references HelpdeskSettings (HelpdeskID)
 );
 
 INSERT INTO User (Username, Password) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=');
-
-drop database HelpdeskSystem;
