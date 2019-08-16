@@ -12,8 +12,8 @@ CREATE TABLE User (
 CREATE TABLE HelpdeskSettings (
     HelpdeskID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     Name VARCHAR(50) NOT NULL,
-    HasCheckIn BOOL,
-    HasQueue BOOL
+    HasCheckIn BOOL NOT NULL,
+    HasQueue BOOL NOT NULL
 );
 
 CREATE TABLE Unit (
