@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Helpdesk.Common.Requests.Helpdesk
 {
-    public class AddHelpdeskReuqest : BaseRequest
+    public class AddHelpdeskRequest : BaseRequest
     {
         [Required (AllowEmptyStrings = false, ErrorMessage = "You must enter in a helpdesk name.")]
         public string Name { get; set; }

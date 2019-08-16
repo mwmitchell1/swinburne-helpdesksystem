@@ -14,6 +14,9 @@ using System.Text;
 
 namespace Helpdesk.Services
 {
+    /// <summary>
+    /// Used to handle business logic related to helpdesks and their report timespans
+    /// </summary>
     public class HelpdeskFacade
     {
         private static Logger s_logger = LogManager.GetCurrentClassLogger();
@@ -24,6 +27,85 @@ namespace Helpdesk.Services
         {
             _appSettings = new AppSettings();
         }
+
+        /// <summary>
+        /// This method is to handle adding helpdesk business logic
+        /// </summary>
+        /// <param name="request">This is the request with the info to add the helpdesk</param>
+        /// <returns>Returns a response with the id and indications of success</returns>
+        public AddHelpdeskResponse AddHelpdesk(AddHelpdeskRequest request)
+        {
+            var response = new AddHelpdeskResponse();
+
+            try
+            {
+                response = (AddHelpdeskResponse)request.CheckValidation(response);
+
+                if (response.Status == HttpStatusCode.BadRequest)
+                    return response;
+
+                var dataLayer = new HelpdeskDataLayer();
+                int? helpdeskId = dataLayer.AddHelpdesk(request);
+                if (helpdeskId.HasValue)
+                {
+                    response.HelpdeskID = helpdeskId.Value;
+                    response.Status = HttpStatusCode.OK;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to add helpdesk"));
+                s_logger.Error(ex, "Unable to add helpdesk.");
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// This method is to handle updating helpdesk business logic
+        /// </summary>
+        /// <param name="id">The id of the helpdesk to be updated</param>
+        /// <param name="request">This is the request with the info to update the helpdesk</param>
+        /// <returns>Returns a response which indicate the result</returns>
+        public UpdateHelpdeskResponse UpdateHelpdesk(int id, UpdateHelpdeskRequest request)
+        {
+            var response = new UpdateHelpdeskResponse();
+
+            try
+            {
+                response = (UpdateHelpdeskResponse)request.CheckValidation(response);
+
+                if (response.Status == HttpStatusCode.BadRequest)
+                    return response;
+
+                var dataLayer = new HelpdeskDataLayer();
+                bool result = dataLayer.UpdateHelpdesk(id, request);
+
+                if (result)
+                    response.Status = HttpStatusCode.OK;
+                else
+                {
+                    response.Status = HttpStatusCode.BadRequest;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Unable to update helpdesk."));
+                }
+            }
+            catch (NotFoundException ex)
+            {
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to update to find helpdesk"));
+                s_logger.Error(ex, "Unable to find helpdesk.");
+            }
+            catch (Exception ex)
+            {
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update helpdesk"));
+                s_logger.Error(ex, "Unable to update helpdesk.");
+            }
+
+            return response;
+        }
+
         public GetTimeSpansResponse GetTimeSpans()
         {
             throw new NotImplementedException();
@@ -76,7 +158,7 @@ namespace Helpdesk.Services
                 response.SpanId = (int)result;
                 response.Status = HttpStatusCode.OK;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to add timespan!");
                 response.Status = HttpStatusCode.InternalServerError;

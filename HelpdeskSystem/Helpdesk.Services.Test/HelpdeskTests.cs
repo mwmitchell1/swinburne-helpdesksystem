@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using Helpdesk.Common.DTOs;
 using Helpdesk.Common.Requests.Helpdesk;
 using Helpdesk.Common.Responses.Helpdesk;
 using Helpdesk.Common.Utilities;
+using Helpdesk.Data.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Helpdesk.Services.Test
@@ -11,6 +13,106 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class HelpdeskTests
     {
+        [TestMethod]
+        public void AddHelpdesk()
+        {
+            var request = new AddHelpdeskRequest()
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            var facade = new HelpdeskFacade();
+            var response = facade.AddHelpdesk(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.HelpdeskID > 0);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var helpdesk = context.Helpdesksettings.FirstOrDefault(p => p.HelpdeskId == response.HelpdeskID);
+
+                Assert.IsNotNull(helpdesk);
+            }
+        }
+
+        [TestMethod]
+        public void AddHelpdeskNoName()
+        {
+            var request = new AddHelpdeskRequest()
+            {
+                HasCheckIn = false,
+                HasQueue = true
+            };
+
+            var facade = new HelpdeskFacade();
+            var response = facade.AddHelpdesk(request);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
+        }
+
+        [TestMethod]
+        public void UpdateHelpdesk()
+        {
+            var request = new AddHelpdeskRequest()
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            var facade = new HelpdeskFacade();
+            var response = facade.AddHelpdesk(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.HelpdeskID > 0);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var helpdesk = context.Helpdesksettings.FirstOrDefault(p => p.HelpdeskId == response.HelpdeskID);
+
+                Assert.IsNotNull(helpdesk);
+            }
+
+            var updateRequest = new UpdateHelpdeskRequest()
+            {
+                HasCheckIn = true,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            var updateResponse = facade.UpdateHelpdesk(response.HelpdeskID, updateRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var helpdesk = context.Helpdesksettings.FirstOrDefault(p => p.HelpdeskId == response.HelpdeskID);
+
+                Assert.IsNotNull(helpdesk);
+                Assert.AreEqual(updateRequest.HasCheckIn, helpdesk.HasCheckIn);
+                Assert.AreEqual(updateRequest.HasQueue, helpdesk.HasQueue);
+                Assert.AreEqual(updateRequest.Name, helpdesk.Name);
+            }
+        }
+
+        [TestMethod]
+        public void UpdateNotFoundHelpdesk()
+        {
+            var facade = new HelpdeskFacade();
+            var updateRequest = new UpdateHelpdeskRequest()
+            {
+                HasCheckIn = true,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            var updateResponse = facade.UpdateHelpdesk(-1, updateRequest);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, updateResponse.Status);
+        }
+
         /// <summary>
         /// Tests adding a timespan to the database with a valid request.
         /// </summary>
