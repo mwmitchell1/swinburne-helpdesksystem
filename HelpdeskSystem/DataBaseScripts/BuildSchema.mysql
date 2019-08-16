@@ -90,3 +90,4 @@ CREATE TABLE TimeSpans (
 );
 
 INSERT INTO User (Username, Password) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=');
+INSERT INTO  HelpdeskSettings (Name, HasCheckIn, HasQueue) VALUES ('DummyHelpdeskSettings', TRUE, TRUE);

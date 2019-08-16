@@ -135,6 +135,7 @@ namespace Helpdesk.Services.Test
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.HelpdeskId = 1;
             addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
             DateTime startDate = DateTime.Today;
             DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
@@ -155,6 +156,7 @@ namespace Helpdesk.Services.Test
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.HelpdeskId = 1;
             addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
             DateTime startDate = DateTime.Today;
             DateTime endDate = new DateTime(startDate.Year - 1, startDate.Month, startDate.Day, 0, 0, 0);
@@ -175,6 +177,7 @@ namespace Helpdesk.Services.Test
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.HelpdeskId = 1;
             addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
             DateTime startDate = new DateTime(2018, 1, 1, 0, 0, 0);
             DateTime endDate = DateTime.Today;

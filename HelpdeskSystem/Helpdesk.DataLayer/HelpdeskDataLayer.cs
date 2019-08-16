@@ -76,6 +76,7 @@ namespace Helpdesk.DataLayer
             int? spanId = null;
 
             Timespans timespan = new Timespans();
+            timespan.HelpdeskId = request.HelpdeskId;
             timespan.Name = request.Name;
             timespan.StartDate = request.StartDate;
             timespan.EndDate = request.EndDate;
