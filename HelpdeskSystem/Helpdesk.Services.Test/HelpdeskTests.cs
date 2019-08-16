@@ -13,6 +13,9 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class HelpdeskTests
     {
+        /// <summary>
+        /// Ensures that adding a helpdesk works
+        /// </summary>
         [TestMethod]
         public void AddHelpdesk()
         {
@@ -37,6 +40,9 @@ namespace Helpdesk.Services.Test
             }
         }
 
+        /// <summary>
+        /// Ensures that the validation requires a name and prevents a helpdesk being added
+        /// </summary>
         [TestMethod]
         public void AddHelpdeskNoName()
         {
@@ -52,6 +58,10 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
         }
 
+
+        /// <summary>
+        /// Ensures that updating the helpdesk works correctly
+        /// </summary>
         [TestMethod]
         public void UpdateHelpdesk()
         {
@@ -97,6 +107,9 @@ namespace Helpdesk.Services.Test
             }
         }
 
+        /// <summary>
+        /// Used to ensure that updating a helpdesk that does not exist, errors in the correct way
+        /// </summary>
         [TestMethod]
         public void UpdateNotFoundHelpdesk()
         {

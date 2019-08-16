@@ -17,6 +17,11 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class HelpdeskController : BaseApiController
     {
+        /// <summary>
+        /// This method is the end point to be able to add a heldesk
+        /// </summary>
+        /// <param name="request">The request with the helpdesk information</param>
+        /// <returns>A reponse to indictae whether or not it was a success</returns>
         [HttpPost]
         [Route("")]
         public IActionResult AddHelpdesk([FromBody] AddHelpdeskRequest request)
@@ -52,6 +57,12 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// This method is the end point to be able to update a heldesk
+        /// </summary>
+        /// <param name="id">The id of the helpdesk to be update</param>
+        /// <param name="request">The request with the helpdesk information</param>
+        /// <returns>A reponse to indictae whether or not it was a success</returns>
         [HttpPatch]
         [Route("{id}")]
         public IActionResult AddHelpdesk([FromRoute] int id, [FromBody] UpdateHelpdeskRequest request)
