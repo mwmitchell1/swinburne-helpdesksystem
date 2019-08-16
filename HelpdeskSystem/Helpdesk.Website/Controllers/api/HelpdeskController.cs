@@ -17,6 +17,76 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class HelpdeskController : BaseApiController
     {
+        [HttpPost]
+        [Route("")]
+        public IActionResult AddHelpdesk([FromBody] AddHelpdeskRequest request)
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            if (request == null)
+                return BadRequest();
+
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var result = facade.AddHelpdesk(request);
+
+                switch (result.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(result);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(result));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to add helpdesk.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        [HttpPatch]
+        [Route("{id}")]
+        public IActionResult AddHelpdesk([FromRoute] int id, [FromBody] UpdateHelpdeskRequest request)
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            if (request == null)
+                return BadRequest();
+
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var result = facade.UpdateHelpdesk(id, request);
+
+                switch (result.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(result);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(result));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to update helpdesk.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
         [HttpGet]
         [Route("timespan")]
         public IActionResult GetTimeSpans()
