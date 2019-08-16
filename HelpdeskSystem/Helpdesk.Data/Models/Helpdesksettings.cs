@@ -12,8 +12,8 @@ namespace Helpdesk.Data.Models
 
         public int HelpdeskId { get; set; }
         public string Name { get; set; }
-        public byte? HasCheckIn { get; set; }
-        public byte? HasQueue { get; set; }
+        public bool HasCheckIn { get; set; }
+        public bool HasQueue { get; set; }
 
         public virtual ICollection<Helpdeskunit> Helpdeskunit { get; set; }
     }
