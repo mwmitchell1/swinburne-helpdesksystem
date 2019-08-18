@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Helpdesk.Website.Controllers.api
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("api/users")]
+    [Route("api/units")]
     [ApiController]
     public class UnitsController : BaseApiController
     {
