@@ -8,6 +8,10 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class UnitTests
     {
+        /// <summary>
+        /// Test retrieving a unit from the database using an id.
+        /// Retrieving the test unit id 1, named "Test Unit".
+        /// </summary>
         [TestMethod]
         public void GetUnit()
         {

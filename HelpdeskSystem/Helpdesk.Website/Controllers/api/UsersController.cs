@@ -30,14 +30,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UsersFacade();
-                var result = facade.GetUser(id);
+                var response = facade.GetUser(id);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
                         return Ok();
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.NotFound:
                         return NotFound();
                     case HttpStatusCode.InternalServerError:
@@ -62,14 +62,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UsersFacade();
-                var result = facade.GetUsers();
+                var response = facade.GetUsers();
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
                         return Ok();
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.NotFound:
                         return NotFound();
                     case HttpStatusCode.InternalServerError:
@@ -94,14 +94,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UsersFacade();
-                var result = facade.AddUser(request);
+                var response = facade.AddUser(request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok(result);
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -126,14 +126,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UsersFacade();
-                var result = facade.UpdateUser(id, request);
+                var response = facade.UpdateUser(id, request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
                         return Ok();
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -158,14 +158,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UsersFacade();
-                var result = facade.DeleteUser(id);
+                var response = facade.DeleteUser(id);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
                         return Ok();
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -197,9 +197,9 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UsersFacade();
-                var result = facade.LoginUser(request);
+                var response = facade.LoginUser(request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
                         {
@@ -214,11 +214,11 @@ namespace Helpdesk.Website.Controllers.api
                                 SameSite = SameSiteMode.Strict,
                             };
 
-                            Response.Cookies.Append("AuthToken", result.Token, cookie);
+                            Response.Cookies.Append("AuthToken", response.Token, cookie);
                             return Ok();
                         }
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
