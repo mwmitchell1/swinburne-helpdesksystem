@@ -20,6 +20,11 @@ namespace Helpdesk.Services
             _appSettings = new AppSettings();
         }
 
+        /// <summary>
+        /// Attempt to retrieve a unit from the database matching the provided id.
+        /// </summary>
+        /// <param name="id">The id of the unit to retrieve from the database.</param>
+        /// <returns></returns>
         public GetUnitResponse GetUnit(int id)
         {
             s_logger.Info("Getting unit by id...");

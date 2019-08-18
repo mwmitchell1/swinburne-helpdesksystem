@@ -35,14 +35,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.AddHelpdesk(request);
+                var response = facade.AddHelpdesk(request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok(result);
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -76,14 +76,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.UpdateHelpdesk(id, request);
+                var response = facade.UpdateHelpdesk(id, request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok(result);
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -128,14 +128,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.AddTimeSpan(request);
+                var response = facade.AddTimeSpan(request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok(result);
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -160,14 +160,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.UpdateTimeSpan(id, request);
+                var response = facade.UpdateTimeSpan(id, request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
                         return Ok();
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:

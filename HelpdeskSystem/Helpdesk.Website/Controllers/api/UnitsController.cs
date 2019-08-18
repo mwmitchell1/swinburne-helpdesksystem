@@ -13,6 +13,11 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class UnitsController : BaseApiController
     {
+        /// <summary>
+        /// Retrieve a unit from the database by id.
+        /// </summary>
+        /// <param name="id">The id of the unit to retrieve from the database.</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetUnit([FromRoute] int id)
@@ -23,14 +28,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UnitsFacade();
-                var result = facade.GetUnit(id);
+                var response = facade.GetUnit(id);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.NotFound:
                         return NotFound();
                     case HttpStatusCode.InternalServerError:
