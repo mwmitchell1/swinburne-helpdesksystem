@@ -1,83 +1,50 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthenticationService } from '../authentication/authentication.service';
-import { NavigationStart, Router } from '@angular/router';
-import { filter } from 'rxjs/operators';
 
+import { HelpdeskDataService } from '../helpdesk-data/helpdesk-data.service';
+import { RouteStateService } from '../helpers/route-state.service';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html'
   // styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
   isExpanded = false;
   public authenticationService: AuthenticationService;
   public userIsAuthorized: boolean;
-  public isAdminSection: boolean;
 
-  public selectedHelpdesk: object;
+  private dropdownLabel: string;
+  private adminLink: string;
+  private isAdminRoute: boolean;
 
-  private helpdesks = [
-    {
-      id: '01',
-      name: 'helpdesk-1'
-    },
-    {
-      id: '02',
-      name: 'helpdesk-2'
-    },
-    {
-      id: '03',
-      name: 'helpdesk-3'
-    }
-  ];
+  private activeHelpdeskSub;
+  private adminRouteSub;
 
-  constructor(private service: AuthenticationService, private router: Router) {
+  constructor(private service: AuthenticationService,
+              private helpdeskData: HelpdeskDataService,
+              private routeState: RouteStateService) {
     this.authenticationService = service;
     this.userIsAuthorized = this.authenticationService.isLoggedIn();
 
-    // Router navigation event
-    router.events.pipe(
-      filter(e => e instanceof NavigationStart)
-    ).subscribe(e => {
-      // @ts-ignore
-      const url = e.url.split('/').splice(1);
+    this.dropdownLabel = 'No helpdesk selected';
+    this.adminLink = 'admin';
+  }
 
-      // check if first section of url is 'admin'
-      this.isAdminSection = (url[0].toLowerCase() === 'admin');
+  ngOnInit(): void {
+    this.activeHelpdeskSub = this.helpdeskData.activeHelpdeskChange.subscribe((helpdesk) => {
+      this.dropdownLabel = helpdesk.name;
+      // this.adminLink = helpdesk.normalizedName + '/admin';
+    });
 
-      // if 3 sections and second is not empty
-      if (url.length > 1 && url[1] !== '') { this.setSelectedHelpdesk(url[1]); }
+    this.adminRouteSub = this.routeState.adminRouteChange.subscribe((isAdmin) => {
+      this.isAdminRoute = isAdmin;
     });
   }
 
-  collapse() {
-    this.isExpanded = false;
-  }
-
-  toggle() {
-    this.isExpanded = !this.isExpanded;
-  }
-
-  /**
-   * This function sets the currently selected helpdesk
-   * @param selected The name of the selected helpdesk
-   */
-  setSelectedHelpdesk(selected: string) {
-    this.helpdesks.forEach((helpdesk) => {
-      if (helpdesk.name.toLowerCase() === selected.toLowerCase()) {
-        this.selectedHelpdesk = helpdesk;
-        return;
-      }
-    });
-  }
-
-  /**
-   * This function checks if a helpdesk is currently selected
-   * @return boolean
-   */
-  helpdeskIsSelected(): boolean {
-    return !(typeof this.selectedHelpdesk === 'undefined');
+  ngOnDestroy(): void {
+    this.activeHelpdeskSub.destroy();
+    this.adminRouteSub.destroy();
   }
 
 }
