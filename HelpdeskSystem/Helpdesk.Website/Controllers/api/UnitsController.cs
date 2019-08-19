@@ -86,5 +86,42 @@ namespace Helpdesk.Website.Controllers.api
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
+
+        /// <summary>
+        /// Delete a unit from the database using its UnitID
+        /// </summary>
+        /// <param name="id">ID of the unit to be deleted</param>
+        /// <returns>Response which indicates success or failure</returns>
+        [HttpDelete]
+        [Route("{id}")]
+        public IActionResult DeleteUnit([FromRoute] int id)
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            try
+            {
+                var facade = new UnitsFacade();
+                var response = facade.DeleteUnit(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok();
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete unit.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 }
