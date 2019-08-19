@@ -150,6 +150,12 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Updates a specific timespan with the given information
+        /// </summary>
+        /// <param name="id">ID of the timespan to be updated</param>
+        /// <param name="request">Request containing the new timespan information</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpPatch]
         [Route("timespan/{id}")]
         public IActionResult UpdateTimeSpan([FromRoute] int id, [FromBody] UpdateTimeSpanRequest request)
