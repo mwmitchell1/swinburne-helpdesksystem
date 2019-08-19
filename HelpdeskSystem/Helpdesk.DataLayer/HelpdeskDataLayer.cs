@@ -110,7 +110,7 @@ namespace Helpdesk.DataLayer
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                Timespans timespan = context.Timespans.Single(t => t.SpanId == id);
+                Timespans timespan = context.Timespans.FirstOrDefault(t => t.SpanId == id);
 
                 if (timespan == null)
                 {

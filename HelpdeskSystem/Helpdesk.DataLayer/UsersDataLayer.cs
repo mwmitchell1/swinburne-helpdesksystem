@@ -46,6 +46,7 @@ namespace Helpdesk.DataLayer
         public UserDTO GetUser(int id)
         {
             UserDTO userDto = null;
+
             using (var context = new helpdesksystemContext())
             {
                 var user = context.User.FirstOrDefault(u => u.UserId == id);
@@ -90,7 +91,7 @@ namespace Helpdesk.DataLayer
         {
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                User user = context.User.Single(u => u.UserId == id);
+                User user = context.User.FirstOrDefault(u => u.UserId == id);
 
                 if (user == null)
                 {
