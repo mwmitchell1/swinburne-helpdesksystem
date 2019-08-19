@@ -4,6 +4,7 @@ using Helpdesk.Data.Models;
 using NLog;
 using Helpdesk.Common.DTOs;
 using System.Linq;
+using Helpdesk.Common.Extensions;
 
 namespace Helpdesk.DataLayer
 {
@@ -54,6 +55,26 @@ namespace Helpdesk.DataLayer
             }
 
             return unitDTOs;
+        }
+
+        /// <summary>
+        /// Deletes a specific unit
+        /// </summary>
+        /// <param name="id">ID of the unit to be deleted</param>
+        /// <returns>Indication of the result of the operation</returns>
+        public bool DeleteUnit(int id)
+        {
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var unit = context.Unit.FirstOrDefault(u => u.UnitId == id);
+
+                if (unit == null)
+                    throw new NotFoundException("Unable to find unit!");
+
+                context.Unit.Remove(unit);
+                context.SaveChanges();
+            }
+            return true;
         }
 
         /// <summary>

@@ -90,5 +90,36 @@ namespace Helpdesk.Services
 
             return response;
         }
+
+        /// <summary>
+        /// Attempts to delete a specific unit from the database
+        /// </summary>
+        /// <param name="id">ID of the unit to be deleted</param>
+        /// <returns>A response indicating the result of the operation</returns>
+        public DeleteUnitResponse DeleteUnit(int id)
+        {
+            var response = new DeleteUnitResponse();
+
+            try
+            {
+                var dataLayer = new UnitsDataLayer();
+                bool result = dataLayer.DeleteUnit(id);
+
+                if (result)
+                    response.Status = HttpStatusCode.OK;
+            }
+            catch(NotFoundException ex)
+            {
+                s_logger.Warn($"Unable to find the unit with id [{id}]");
+                response.Status = HttpStatusCode.NotFound;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete the unit.");
+                response.Status = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
     }
 }

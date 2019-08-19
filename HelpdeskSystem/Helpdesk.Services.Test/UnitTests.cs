@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Linq;
+using Helpdesk.Services;
 using Helpdesk.Common.Responses.Units;
 using Helpdesk.Data.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -58,6 +59,21 @@ namespace Helpdesk.Services.Test
             GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(2);
 
             Assert.AreEqual(HttpStatusCode.NotFound, getUnitsByHelpdeskIDResponse.Status);
+        }
+
+        //Test deleting a unit to be implemented when adding a unit is implemented
+
+        /// <summary>
+        /// Test deleting a unit that doesn't exist is handeled properly
+        /// </summary>
+        [TestMethod]
+        public void DeleteUnitNotFound()
+        {
+            UnitsFacade unitsFacade = new UnitsFacade();
+
+            DeleteUnitResponse deleteUnitResponse = unitsFacade.DeleteUnit(0);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, deleteUnitResponse.Status);
         }
 
     }
