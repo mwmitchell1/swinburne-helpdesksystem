@@ -20,6 +20,11 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class UsersController : BaseApiController
     {
+        /// <summary>
+        /// Gets a specific user from the database
+        /// </summary>
+        /// <param name="id">ID of the specific user</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetUser([FromRoute] int id)
@@ -52,6 +57,10 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Gets every user from the database
+        /// </summary>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
         [Route("")]
         public IActionResult GetUsers()
@@ -116,6 +125,12 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Updates a specific user with the given information
+        /// </summary>
+        /// <param name="id">ID of the user to be updated</param>
+        /// <param name="request">Request that contains the new user information</param>
+        /// <returns>A response which indicates success or failure</returns>
         [HttpPatch]
         [Route("{id}")]
         public IActionResult UpdateUser([FromRoute] int id, [FromBody] UpdateUserRequest request)

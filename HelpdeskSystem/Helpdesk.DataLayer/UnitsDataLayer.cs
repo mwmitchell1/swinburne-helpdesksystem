@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Helpdesk.Data.Models;
 using NLog;
 using Helpdesk.Common.DTOs;
@@ -28,6 +29,31 @@ namespace Helpdesk.DataLayer
             }
 
             return dto;
+        }
+
+        /// <summary>
+        /// Retrieves all units under a specific helpdesk id
+        /// </summary>
+        /// <param name="id">ID of the helpdesk to retrieve from</param>
+        /// <returns>A list of unit DTOs</returns>
+        public List<UnitDTO> GetUnitsByHelpdeskID(int id)
+        {
+            List<UnitDTO> unitDTOs = new List<UnitDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var helpdeskUnits = context.Helpdeskunit.ToList();
+
+                foreach (Helpdeskunit helpdeskUnit in helpdeskUnits)
+                {
+                    if (helpdeskUnit != null && helpdeskUnit.HelpdeskId == id)
+                    {
+                        unitDTOs.Add(DAO2DTO(context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId)));
+                    }
+                }
+            }
+
+            return unitDTOs;
         }
 
         /// <summary>
