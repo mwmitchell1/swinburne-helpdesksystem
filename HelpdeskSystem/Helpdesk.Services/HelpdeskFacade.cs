@@ -192,10 +192,16 @@ namespace Helpdesk.Services
                 bool result = dataLayer.UpdateTimeSpan(id, request);
 
                 if (result == false)
-                    throw new Exception("Unable to update timespan!");
+                    throw new NotFoundException("Unable to find timespan!");
 
                 response.result = result;
                 response.Status = HttpStatusCode.OK;
+            }
+            catch(NotFoundException ex)
+            {
+                s_logger.Error(ex, "Unable to find timespan!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to find timespan!"));
             }
             catch (Exception ex)
             {

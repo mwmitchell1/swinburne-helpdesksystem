@@ -188,5 +188,62 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.BadRequest, addTimeSpanResponse.Status);
         }
+
+        /// <summary>
+        /// Test updating a specific timespan's name, start date and end date
+        /// </summary>
+        [TestMethod]
+        public void UpdateTimespanFound()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
+            {
+                Name = "Semester 1",
+                StartDate = new DateTime(2019, 01, 01),
+                EndDate = new DateTime(2019, 06, 01),
+            };
+
+            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(6, updateTimespanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, updateTimespanResponse.Status);
+            Assert.IsTrue(updateTimespanResponse.result);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespan = context.Timespans.FirstOrDefault(u => u.SpanId == 6);
+
+                timespan.Name = "Semester 2";
+                timespan.StartDate = new DateTime(2019, 08, 01);
+                timespan.EndDate = new DateTime(2019, 11, 01);
+
+                context.SaveChanges();
+
+                timespan = context.Timespans.FirstOrDefault(u => u.SpanId == 6);
+
+                Assert.AreEqual(timespan.StartDate, new DateTime(2019, 08, 01));
+                Assert.AreEqual(timespan.Name, "Semester 2");
+            }
+        }
+
+        /// <summary>
+        /// Test updating a timespan that doesn't exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateTimespanNotFound()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
+            {
+                Name = "Semester 1",
+                StartDate = new DateTime(2019, 08, 01),
+                EndDate = new DateTime(2019, 11, 01)
+            };
+
+            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(0, updateTimespanRequest);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, updateTimespanResponse.Status);
+        }
     }
 }

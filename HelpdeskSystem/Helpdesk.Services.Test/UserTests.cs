@@ -3,7 +3,9 @@ using Helpdesk.Common.DTOs;
 using Helpdesk.Common.Requests.Users;
 using Helpdesk.Common.Responses.Users;
 using Helpdesk.Common.Utilities;
+using Helpdesk.Data.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace Helpdesk.Services.Test
 {
@@ -235,5 +237,133 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.NotFound, deleteResponse.Status);
         }
+
+        /// <summary>
+        /// Test getting every user from the database
+        /// </summary>
+        [TestMethod]
+        public void GetUsers()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            GetUsersResponse getUsersResponse = usersFacade.GetUsers();
+
+            Assert.AreEqual(HttpStatusCode.OK, getUsersResponse.Status);
+            Assert.AreEqual("Admin", getUsersResponse.Users[0].Username);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var users = context.User.ToList();
+
+                Assert.IsNotNull(users);
+            }
+        }
+
+        /// <summary>
+        /// Test getting a specific user from the database by their user id
+        /// </summary>
+        [TestMethod]
+        public void GetUserFound()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            GetUserResponse getUserResponse = usersFacade.GetUser(1);
+
+            Assert.AreEqual(HttpStatusCode.OK, getUserResponse.Status);
+            Assert.AreEqual("Admin", getUserResponse.User.Username);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var user = context.User.FirstOrDefault(u => u.UserId == 1);
+
+                Assert.IsNotNull(user);
+            }
+        }
+
+        /// <summary>
+        /// Test getting a user that doesn't exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void GetUserNotFound()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            GetUserResponse getUserResponse = usersFacade.GetUser(3);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, getUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test updating a specific user's username and password
+        /// </summary>
+        [TestMethod]
+        public void UpdateUserFound()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            UpdateUserRequest updateUserRequest = new UpdateUserRequest()
+            {
+                Username = "UpdatedUser",
+                Password = "UpdatedPassword"
+            };
+
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(6, updateUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, updateUserResponse.Status);
+            Assert.IsTrue(updateUserResponse.result);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var user = context.User.FirstOrDefault(u => u.UserId == 6);
+
+                user.Username = "6WW2R9Y1F7";
+                user.Password = "cMzZAHM41tgd07YnFiG5z5qX6gA=";
+
+                context.SaveChanges();
+
+                user = context.User.FirstOrDefault(u => u.UserId == 6);
+
+                Assert.AreEqual(user.Username, "6WW2R9Y1F7");
+            }
+        }
+
+        /// <summary>
+        /// Test trying to update a user that doesn't exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateUserNotFound()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            UpdateUserRequest updateUserRequest = new UpdateUserRequest()
+            {
+                Username = "UpdatedUser",
+                Password = "UpdatedPassword"
+            };
+
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(3, updateUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, updateUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test trying to update a user with a username that is too long is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateUserUsernameTooLong()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            UpdateUserRequest updateUserRequest = new UpdateUserRequest()
+            {
+                Username = AlphaNumericStringGenerator.GetString(21),
+                Password = "Password1"
+            };
+
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(8, updateUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, updateUserResponse.Status);
+        }
+
     }
 }
