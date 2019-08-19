@@ -9,20 +9,20 @@
         <ul class="navbar-nav ml-auto">
         <span class="navbar-text active">Helpdesk: </span>
           <li class="navbar__helpdesk-list nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-              {{ helpdeskIsSelected() ? selectedHelpdesk.name : 'Select Helpdesk' }}
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown">
+              {{ dropdownLabel }}
             </a>
             <div class="dropdown-menu">
               <a class="dropdown-item"
-                *ngFor="let helpdesk of helpdesks"
-                [routerLink]="[isAdminSection ? 'admin' : '', helpdesk.name]"
-                (click)="setSelectedHelpdesk(helpdesk.name)">{{ helpdesk.name }}</a>
+                *ngFor="let helpdesk of helpdeskData.getHelpdesks()"
+                [routerLink]="[isAdminRoute ? helpdesk.adminRoute : helpdesk.route]">
+                  {{ helpdesk.name }}
+              </a>
             </div>
           </li>
 
           <li class="nav-item">
-            <a class="nav-item nav-link"
-               [routerLink]="['admin', helpdeskIsSelected() ? selectedHelpdesk.name : '']">Admin</a>
+            <a class="nav-item nav-link" [routerLink]="[adminLink]">Admin</a>
           </li>
         </ul>
 

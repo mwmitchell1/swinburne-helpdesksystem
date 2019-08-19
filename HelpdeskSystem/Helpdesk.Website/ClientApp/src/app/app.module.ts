@@ -15,6 +15,9 @@ import { AuthenticationService } from './authentication/authentication.service';
 import { LogoutComponent } from './authentication/logout/logout.component';
 import { AdminComponent } from './admin/admin.component';
 
+import { HelpdeskDataService } from './helpdesk-data/helpdesk-data.service';
+import { RouteStateService } from './helpers/route-state.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -33,9 +36,9 @@ import { AdminComponent } from './admin/admin.component';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'login', component: LoginComponent, pathMatch: 'full' },
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
-      { path: ':helpdesk', component: HomeComponent, pathMatch: 'full' },
       { path: 'admin', component: AdminComponent, pathMatch: 'full' },
-      { path: 'admin/:helpdesk', component: AdminComponent, pathMatch: 'full' }
+      { path: ':helpdesk', component: HomeComponent, pathMatch: 'full' },
+      { path: ':helpdesk/admin', component: AdminComponent, pathMatch: 'full' }
     ])
   ],
   providers: [CookieService,
@@ -45,7 +48,9 @@ import { AdminComponent } from './admin/admin.component';
       multi: true,
     },
     AuthGuardService,
-    AuthenticationService],
+    AuthenticationService,
+    HelpdeskDataService,
+    RouteStateService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
