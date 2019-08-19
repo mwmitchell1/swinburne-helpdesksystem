@@ -45,8 +45,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.activeHelpdeskSub.destroy();
-    this.adminRouteSub.destroy();
+    this.activeHelpdeskSub.unsubscribe();
+    this.adminRouteSub.unsubscribe();
   }
 
 }
