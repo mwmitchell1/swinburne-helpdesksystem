@@ -19,7 +19,8 @@ export class RouteStateService {
             this.adminRouteChange.next(false);
             break;
           case 1:
-            if (!this.isAdmin(url[0])) { helpdesks.setActiveHelpdesk(url[0]); } else { this.adminRouteChange.next(false); }
+            if (!this.isAdmin(url[0])) { helpdesks.setActiveHelpdesk(url[0]); }
+            this.adminRouteChange.next(false);
             break;
           case 2:
           case 3: {
