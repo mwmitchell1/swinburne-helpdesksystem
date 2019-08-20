@@ -14,9 +14,13 @@ import { AuthGuardService } from './helpers/auth.guard.service';
 import { AuthenticationService } from './authentication/authentication.service';
 import { LogoutComponent } from './authentication/logout/logout.component';
 import { AdminComponent } from './admin/admin.component';
+import { ConfigurationComponent } from './admin/configuration/configuration.component';
 
 import { HelpdeskDataService } from './helpdesk-data/helpdesk-data.service';
 import { RouteStateService } from './helpers/route-state.service';
+import { UnitsComponent } from './admin/units/units.component';
+import { UsersComponent } from './admin/users/users.component';
+import { ReportingComponent } from './admin/reporting/reporting.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +29,11 @@ import { RouteStateService } from './helpers/route-state.service';
     HomeComponent,
     LoginComponent,
     LogoutComponent,
-    AdminComponent
+    AdminComponent,
+    ConfigurationComponent,
+    UnitsComponent,
+    UsersComponent,
+    ReportingComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -38,7 +46,15 @@ import { RouteStateService } from './helpers/route-state.service';
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
       { path: 'admin', component: AdminComponent, pathMatch: 'full' },
       { path: ':helpdesk', component: HomeComponent, pathMatch: 'full' },
-      { path: ':helpdesk/admin', component: AdminComponent, pathMatch: 'full' }
+      { path: ':helpdesk/admin', component: AdminComponent,
+        children: [
+          { path: '', redirectTo: 'configuration', pathMatch: 'full' },
+          { path: 'configuration', component: ConfigurationComponent, pathMatch: 'full' },
+          { path: 'units', component: UnitsComponent, pathMatch: 'full' },
+          { path: 'users', component: UsersComponent, pathMatch: 'full' },
+          { path: 'reporting', component: ReportingComponent, pathMatch: 'full' }
+        ]
+      },
     ])
   ],
   providers: [CookieService,
