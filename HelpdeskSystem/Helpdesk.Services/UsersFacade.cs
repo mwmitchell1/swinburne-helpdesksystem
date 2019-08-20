@@ -49,13 +49,19 @@ namespace Helpdesk.Services
 
                 List<UserDTO> users = dataLayer.GetUsers();
 
-                if (users[0] == null)
+                if (users.Count == 0)
                 {
-                    throw new Exception("Unable to get users!");
+                    throw new NotFoundException("No users found!");
                 }
 
                 response.Users = users;
                 response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Error(ex, "No users found!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No users found!"));
             }
             catch (Exception ex)
             {
@@ -85,14 +91,17 @@ namespace Helpdesk.Services
                 UserDTO user = dataLayer.GetUser(id);
 
                 if (user == null)
-                {
-                    response.Status = HttpStatusCode.NotFound;
-                }
-                else
-                {
-                    response.User = user;
-                    response.Status = HttpStatusCode.OK;
-                }
+                    throw new NotFoundException("Unable to find user!");
+              
+                response.User = user;
+                response.Status = HttpStatusCode.OK;
+
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Error(ex, "Unable to find user!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to find user!"));
             }
             catch (Exception ex)
             {
@@ -103,6 +112,11 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This method is responsible for adding a new user.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public AddUserResponse AddUser(AddUserRequest request)
         {
             s_logger.Info("Adding user...");
@@ -135,7 +149,7 @@ namespace Helpdesk.Services
                 response.UserId = (int)result;
                 response.Status = HttpStatusCode.OK;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to add user!");
                 response.Status = HttpStatusCode.InternalServerError;
@@ -177,11 +191,17 @@ namespace Helpdesk.Services
                 bool result = dataLayer.UpdateUser(id, request);
 
                 if (result == false)
-                    throw new Exception("Unable to update user!");
+                    throw new NotFoundException("Unable to find user!");
 
                 response.result = result;
                 response.Status = HttpStatusCode.OK;
 
+            }
+            catch(NotFoundException ex)
+            {
+                s_logger.Error(ex, "Unable to find user!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to find user!"));
             }
             catch (Exception ex)
             {
@@ -192,9 +212,35 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This method is responsible for handling the deletion of a user from the system
+        /// </summary>
+        /// <param name="id">The id of the user to be deleted</param>
+        /// <returns>A response that indicates whether or not the deletion was successful</returns>
         public DeleteUserResponse DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            var response = new DeleteUserResponse();
+
+            try
+            {
+                var dataLayer = new UsersDataLayer();
+                bool result = dataLayer.DeleteUser(id);
+
+                if (result)
+                    response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Warn($"Unable to find the user with id [{id}]");
+                response.Status = HttpStatusCode.NotFound;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete the user.");
+                response.Status = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
         }
 
         /// <summary>
@@ -205,7 +251,7 @@ namespace Helpdesk.Services
         /// they will use for authentication on success</returns>
         public LoginResponse LoginUser(LoginRequest request)
         {
-            s_logger.Info("Attempting to log in.");
+            s_logger.Info("Attempting to log in...");
 
             LoginResponse response = new LoginResponse();
 
@@ -251,7 +297,7 @@ namespace Helpdesk.Services
                         new Claim(ClaimTypes.Name, user.Username),
                         new Claim(ClaimTypes.Sid, user.UserId.ToString())
                     }),
-                    Expires = DateTime.Now.AddYears(1),
+                    Expires = DateTime.Now.AddHours(4),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
                 };
 

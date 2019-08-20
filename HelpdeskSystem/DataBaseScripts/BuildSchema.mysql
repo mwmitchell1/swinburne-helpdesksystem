@@ -1,3 +1,4 @@
+drop database HelpdeskSystem;
 create database HelpdeskSystem;
 
 use HelpdeskSystem;
@@ -11,8 +12,8 @@ CREATE TABLE User (
 CREATE TABLE HelpdeskSettings (
     HelpdeskID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     Name VARCHAR(50) NOT NULL,
-    HasCheckIn BOOL,
-    HasQueue BOOL
+    HasCheckIn BOOL NOT NULL,
+    HasQueue BOOL NOT NULL
 );
 
 CREATE TABLE Unit (
@@ -39,7 +40,6 @@ CREATE TABLE QueueItem (
     ItemID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     StudentID INT NOT NULL,
     TopicID INT NOT NULL,
-    NickName VARCHAR(20) NOT NULL,
     TimeAdded DATETIME NOT NULL,
     TimeHelped BOOL,
     TimeRemoved BOOL,
@@ -81,12 +81,14 @@ CREATE TABLE HelpdeskUnit (
 
 CREATE TABLE TimeSpans (
     SpanID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    HelpdeskID INT,
+    HelpdeskID INT NOT NULL,
     Name VARCHAR(200),
     StartDate DATETIME,
-    EndDate DATETIME
+    EndDate DATETIME,
+    foreign key (HelpdeskID)
+    references HelpdeskSettings (HelpdeskID)
 );
 
 INSERT INTO User (Username, Password) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=');
-
-drop database HelpdeskSystem;
+INSERT INTO  HelpdeskSettings (Name, HasCheckIn, HasQueue) VALUES ('Test Helpdesk', TRUE, TRUE);
+INSERT INTO Unit (Code, Name) VALUES ('COS00000', 'Test Unit');

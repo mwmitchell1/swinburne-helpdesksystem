@@ -7,7 +7,7 @@ namespace Helpdesk.Common.Requests.Users
 {
     public class AddUserRequest : BaseRequest
     {
-        [Required(AllowEmptyStrings = false)]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "{0} cannot be empty!")]
         [StringLength(20, ErrorMessage = "{0} cannot exceed {1} characters.")]
         public string Username { get; set; }
 

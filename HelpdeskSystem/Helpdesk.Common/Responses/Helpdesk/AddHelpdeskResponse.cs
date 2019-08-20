@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Helpdesk.Common.Responses.Helpdesk
 {
-    public class AddTimeSpanResponse : BaseResponse
+    public class AddHelpdeskResponse : BaseResponse
     {
-        public int SpanId { get; set; }
+        public int HelpdeskID { get; set; }
     }
 }
