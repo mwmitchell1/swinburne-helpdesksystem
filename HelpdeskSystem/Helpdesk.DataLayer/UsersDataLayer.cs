@@ -17,6 +17,11 @@ namespace Helpdesk.DataLayer
     {
         private static Logger s_Logger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// Used to add a user to the database.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public int? AddUser(AddUserRequest request)
         {
             int? userId = null;
@@ -41,6 +46,7 @@ namespace Helpdesk.DataLayer
         public UserDTO GetUser(int id)
         {
             UserDTO userDto = null;
+
             using (var context = new helpdesksystemContext())
             {
                 var user = context.User.FirstOrDefault(u => u.UserId == id);
@@ -85,7 +91,7 @@ namespace Helpdesk.DataLayer
         {
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                User user = context.User.Single(u => u.UserId == id);
+                User user = context.User.FirstOrDefault(u => u.UserId == id);
 
                 if (user == null)
                 {
@@ -100,9 +106,24 @@ namespace Helpdesk.DataLayer
             return true;
         }
 
+        /// <summary>
+        /// Used to delete the specified user from the database
+        /// </summary>
+        /// <param name="id">The id of the user to be deleted</param>
+        /// <returns>An indication of whether or not the deletion was successful</returns>
         public bool DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var user = context.User.FirstOrDefault(u => u.UserId == id);
+
+                if (user == null)
+                    throw new NotFoundException("User does not exist in the database");
+
+                context.User.Remove(user);
+                context.SaveChanges();
+            }
+            return true;
         }
 
         /// <summary>
@@ -130,7 +151,7 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="user">The DAO for the user</param>
         /// <returns>The DTO for the user</returns>
-        public UserDTO DAO2DTO(User user)
+        private UserDTO DAO2DTO(User user)
         {
             UserDTO userDTO = null;
 
@@ -147,7 +168,7 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="user">The DTO for the user</param>
         /// <returns>The DAO for the user</returns>
-        public User DTO2DAO(UserDTO userDTO)
+        private User DTO2DAO(UserDTO userDTO)
         {
             User user = null;
             user = new User();
