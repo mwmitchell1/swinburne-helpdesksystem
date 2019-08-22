@@ -13,24 +13,16 @@ export class RouteStateService {
       if (event instanceof NavigationEnd) {
         const url = event.url.split('/').splice(1);
 
-        switch (url.length) {
-          case 0:
-            helpdesks.clearActiveHelpdesk();
-            this.adminRouteChange.next(false);
-            break;
-          case 1:
-            if (!this.isAdmin(url[0])) { helpdesks.setActiveHelpdesk(url[0]); }
-            this.adminRouteChange.next(false);
-            break;
-          case 2:
-          case 3: {
-            if (this.isAdmin(url[1])) {
-              this.adminRouteChange.next(true);
-              helpdesks.setActiveHelpdesk(url[0]);
-            }
-          }
+        // check route for admin and set admin state
+        if (url[0].toLowerCase() === 'admin') {
+          this.adminRouteChange.next(true);
+        } else if (url[0].toLowerCase() === 'helpdesk') {
+          this.adminRouteChange.next(false);
         }
 
+        if (url.length > 1) {
+          helpdesks.setActiveHelpdesk(+url[1]);
+        }
       }
     });
   }

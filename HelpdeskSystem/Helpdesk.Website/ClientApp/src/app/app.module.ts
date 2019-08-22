@@ -41,20 +41,18 @@ import { ReportingComponent } from './admin/reporting/reporting.component';
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
+      { path: '', redirectTo: 'helpdesk', pathMatch: 'full' },
       { path: 'login', component: LoginComponent, pathMatch: 'full' },
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
-      { path: 'admin', component: AdminComponent, pathMatch: 'full' },
-      { path: ':helpdesk', component: HomeComponent, pathMatch: 'full' },
-      { path: ':helpdesk/admin', component: AdminComponent,
+      { path: 'helpdesk', component: HomeComponent, pathMatch: 'full' }, // change to SelectHelpdeskComponent
+      { path: 'helpdesk/:id', component: HomeComponent, pathMatch: 'full' }, // change to HelpdeskComponent
+      { path: 'admin/:id', component: AdminComponent,
         children: [
-          { path: '', redirectTo: 'configuration', pathMatch: 'full' },
           { path: 'configuration', component: ConfigurationComponent, pathMatch: 'full' },
           { path: 'units', component: UnitsComponent, pathMatch: 'full' },
           { path: 'users', component: UsersComponent, pathMatch: 'full' },
           { path: 'reporting', component: ReportingComponent, pathMatch: 'full' }
-        ]
-      },
+        ]}
     ])
   ],
   providers: [CookieService,
