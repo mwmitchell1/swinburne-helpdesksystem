@@ -32,15 +32,15 @@ export class HelpdeskDataService {
 
   /**
    * Returns a specific helpdesk
-   * @param name Normalized name of the helpdesk to return
+   * @param id Unique Id of the helpdesk to return
    * @return Helpdesk Matching helpdesk
    * @return null If no helpdesks match
    */
-  getHelpdeskByName(name: string): Helpdesk {
+  getHelpdeskById(id: number): Helpdesk {
     let h = null;
 
     this.helpdesks.forEach((helpdesk) => {
-      if (helpdesk.normalizedName.toLowerCase() === name.toLowerCase()) {
+      if (helpdesk.id === id) {
         h = helpdesk;
       }
     });
@@ -53,8 +53,8 @@ export class HelpdeskDataService {
    * @param name Normalized name of the active helpdesk
    * @return boolean True if helpdesk exists and can be set as active, otherwise False
    */
-  setActiveHelpdesk(name: string): boolean {
-    const helpdesk = this.getHelpdeskByName(name);
+  setActiveHelpdesk(id: number): boolean {
+    const helpdesk = this.getHelpdeskById(id);
 
     // if helpdesk was found by name, set active, return bool value of success
     if (helpdesk) {
