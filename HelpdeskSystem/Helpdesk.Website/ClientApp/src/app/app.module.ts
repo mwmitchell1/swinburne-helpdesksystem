@@ -49,7 +49,7 @@ import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
       { path: 'helpdesk', component: HomeComponent, pathMatch: 'full' }, // change to SelectHelpdeskComponent
       { path: 'helpdesk/:id', component: HomeComponent, pathMatch: 'full' }, // change to HelpdeskComponent
-      { path: 'admin/:id', component: AdminComponent,
+      { path: 'admin/:id', component: AdminComponent, canActivate: [AuthGuardService],
         children: [
           { path: 'configuration', component: ConfigurationComponent, pathMatch: 'full' },
           { path: 'units', component: UnitsComponent, pathMatch: 'full' },
