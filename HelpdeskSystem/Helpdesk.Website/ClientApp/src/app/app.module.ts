@@ -14,13 +14,15 @@ import { AuthGuardService } from './helpers/auth.guard.service';
 import { AuthenticationService } from './authentication/authentication.service';
 import { LogoutComponent } from './authentication/logout/logout.component';
 import { AdminComponent } from './admin/admin.component';
-import { ConfigurationComponent } from './admin/configuration/configuration.component';
 
 import { HelpdeskDataService } from './helpdesk-data/helpdesk-data.service';
 import { RouteStateService } from './helpers/route-state.service';
+
+import { ConfigurationComponent } from './admin/configuration/configuration.component';
 import { UnitsComponent } from './admin/units/units.component';
 import { UsersComponent } from './admin/users/users.component';
 import { ReportingComponent } from './admin/reporting/reporting.component';
+import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
 
 @NgModule({
   declarations: [
@@ -33,6 +35,7 @@ import { ReportingComponent } from './admin/reporting/reporting.component';
     ConfigurationComponent,
     UnitsComponent,
     UsersComponent,
+    NicknamesComponent,
     ReportingComponent
   ],
   imports: [
@@ -51,6 +54,7 @@ import { ReportingComponent } from './admin/reporting/reporting.component';
           { path: 'configuration', component: ConfigurationComponent, pathMatch: 'full' },
           { path: 'units', component: UnitsComponent, pathMatch: 'full' },
           { path: 'users', component: UsersComponent, pathMatch: 'full' },
+          { path: 'nicknames', component: NicknamesComponent, pathMatch: 'full' },
           { path: 'reporting', component: ReportingComponent, pathMatch: 'full' }
         ]}
     ])
