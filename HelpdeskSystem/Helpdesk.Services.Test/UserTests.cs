@@ -6,6 +6,9 @@ using Helpdesk.Common.Utilities;
 using Helpdesk.Data.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System;
 
 namespace Helpdesk.Services.Test
 {
@@ -299,31 +302,41 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void UpdateUserFound()
         {
+
             UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest();
+            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
+            addUserRequest.Password = "Password1";
+            addUserRequest.PasswordConfirm = "Password1";
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
+
+            string newPassword = AlphaNumericStringGenerator.GetString(10);
 
             UpdateUserRequest updateUserRequest = new UpdateUserRequest()
             {
-                Username = "UpdatedUser",
-                Password = "UpdatedPassword"
+                Username = AlphaNumericStringGenerator.GetString(10),
+                Password = newPassword
             };
 
-            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(6, updateUserRequest);
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(addUserResponse.UserId, updateUserRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, updateUserResponse.Status);
             Assert.IsTrue(updateUserResponse.result);
 
+            var hashedPassword = HashText(newPassword);
+
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var user = context.User.FirstOrDefault(u => u.UserId == 6);
+                var user = context.User.FirstOrDefault(u => u.UserId == addUserResponse.UserId);
 
-                user.Username = "6WW2R9Y1F7";
-                user.Password = "cMzZAHM41tgd07YnFiG5z5qX6gA=";
+                user = context.User.FirstOrDefault(u => u.UserId == addUserResponse.UserId);
 
-                context.SaveChanges();
-
-                user = context.User.FirstOrDefault(u => u.UserId == 6);
-
-                Assert.AreEqual(user.Username, "6WW2R9Y1F7");
+                Assert.AreEqual(updateUserRequest.Username, user.Username);
+                Assert.AreEqual(hashedPassword, user.Password);
             }
         }
 
@@ -341,7 +354,7 @@ namespace Helpdesk.Services.Test
                 Password = "UpdatedPassword"
             };
 
-            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(3, updateUserRequest);
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(-1, updateUserRequest);
 
             Assert.AreEqual(HttpStatusCode.NotFound, updateUserResponse.Status);
         }
@@ -365,5 +378,17 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.BadRequest, updateUserResponse.Status);
         }
 
+        /// <summary>
+        /// Used to hash passwords when a user logs in, is added to the system or has their password changed
+        /// </summary>
+        /// <param name="text">The password in plain text</param>
+        /// <returns>The hashed password</returns>
+        private string HashText(string text)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(text);
+            var sha1 = new SHA1CryptoServiceProvider();
+            var sha1data = sha1.ComputeHash(bytes);
+            return Convert.ToBase64String(sha1data);
+        }
     }
 }

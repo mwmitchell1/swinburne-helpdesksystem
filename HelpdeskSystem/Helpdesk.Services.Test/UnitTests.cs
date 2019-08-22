@@ -5,12 +5,120 @@ using Helpdesk.Services;
 using Helpdesk.Common.Responses.Units;
 using Helpdesk.Data.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Helpdesk.Common.Requests.Units;
+using System.Collections.Generic;
+using Helpdesk.Common.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Helpdesk.Services.Test
 {
     [TestClass]
     public class UnitTests
     {
+        /// <summary>
+        /// Test adding a unit to the database
+        /// </summary>
+        [TestMethod]
+        public void AddUnit()
+        {
+            UnitsFacade unitsFacade = new UnitsFacade();
+            var request = new AddUpdateUnitRequest()
+            {
+                HelpdeskID = 1,
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(5),
+            };
+            request.Topics.Add("Layouts");
+            request.Topics.Add("Lifecycle");
+
+            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
+            Assert.IsTrue(addUpdateUnitResponse.UnitID > 0);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == addUpdateUnitResponse.UnitID);
+                Assert.IsNotNull(unit);
+                Assert.IsTrue
+                (
+                    request.IsDeleted == unit.IsDeleted
+                    && request.Name == unit.Name
+                    && request.Topics.Count == unit.Topic.Count
+                    && unit.Topic.Count > 0
+                );
+            }
+        }
+
+        /// <summary>
+        /// Test updating a unit in a database
+        /// </summary>
+        [TestMethod]
+        public void UpdateUnit()
+        {
+            string name = AlphaNumericStringGenerator.GetString(5);
+            string code = AlphaNumericStringGenerator.GetString(8);
+
+            UnitsFacade unitsFacade = new UnitsFacade();
+            var request = new AddUpdateUnitRequest()
+            {
+                HelpdeskID = 1,
+                Code = code,
+                IsDeleted = false,
+                Name = name,
+            };
+            request.Topics.Add("Layouts");
+            request.Topics.Add("Lifecycle");
+
+            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
+            Assert.IsTrue(addUpdateUnitResponse.UnitID > 0);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == addUpdateUnitResponse.UnitID);
+                Assert.IsNotNull(unit);
+                Assert.IsTrue
+                (
+                    request.IsDeleted == unit.IsDeleted
+                    && request.Name == unit.Name
+                    && request.Topics.Count == unit.Topic.Count
+                    && unit.Topic.Count > 0
+                );
+            }
+
+            request = new AddUpdateUnitRequest()
+            {
+                UnitID = addUpdateUnitResponse.UnitID,
+                HelpdeskID = 1,
+                Code = code,
+                IsDeleted = false,
+                Name = name,
+            };
+
+            request.Topics.Add("Layouts");
+            request.Topics.Add("Externalisation");
+
+            addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == addUpdateUnitResponse.UnitID);
+                Assert.IsNotNull(unit);
+                Assert.IsTrue
+                (
+                    request.IsDeleted == unit.IsDeleted
+                    && request.Name == unit.Name
+                );
+
+                Assert.IsFalse(unit.Topic.FirstOrDefault(t => t.Name == "Layouts").IsDeleted);
+                Assert.IsFalse(unit.Topic.FirstOrDefault(t => t.Name == "Externalisation").IsDeleted);
+                Assert.IsTrue(unit.Topic.FirstOrDefault(t => t.Name == "Lifecycle").IsDeleted);
+            }
+        }
+
         /// <summary>
         /// Test retrieving a unit from the database using an id.
         /// Retrieving the test unit id 1, named "Test Unit".
@@ -24,7 +132,7 @@ namespace Helpdesk.Services.Test
             GetUnitResponse getUnitResponse = unitsFacade.GetUnit(unitId);
 
             Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
-            Assert.AreEqual("Test Unit" , getUnitResponse.Unit.Name);
+            Assert.AreEqual("Test Unit", getUnitResponse.Unit.Name);
         }
 
         /// <summary>

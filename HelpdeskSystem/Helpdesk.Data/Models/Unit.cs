@@ -15,6 +15,7 @@ namespace Helpdesk.Data.Models
         public int UnitId { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
+        public bool IsDeleted { get; set; }
 
         public virtual ICollection<Checkinhistory> Checkinhistory { get; set; }
         public virtual ICollection<Helpdeskunit> Helpdeskunit { get; set; }
