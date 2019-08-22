@@ -197,6 +197,18 @@ namespace Helpdesk.Services.Test
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.HelpdeskId = 1;
+            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
+            DateTime startDate = DateTime.Today;
+            DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
+            addTimeSpanRequest.StartDate = startDate;
+            addTimeSpanRequest.EndDate = endDate;
+
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+
             UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
             {
                 Name = "Semester 1",
@@ -204,25 +216,18 @@ namespace Helpdesk.Services.Test
                 EndDate = new DateTime(2019, 06, 01),
             };
 
-            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(6, updateTimespanRequest);
+            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(addTimeSpanResponse.SpanId, updateTimespanRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, updateTimespanResponse.Status);
             Assert.IsTrue(updateTimespanResponse.result);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var timespan = context.Timespans.FirstOrDefault(u => u.SpanId == 6);
+                var timespan = context.Timespans.FirstOrDefault(u => u.SpanId == addTimeSpanResponse.SpanId);
 
-                timespan.Name = "Semester 2";
-                timespan.StartDate = new DateTime(2019, 08, 01);
-                timespan.EndDate = new DateTime(2019, 11, 01);
-
-                context.SaveChanges();
-
-                timespan = context.Timespans.FirstOrDefault(u => u.SpanId == 6);
-
-                Assert.AreEqual(timespan.StartDate, new DateTime(2019, 08, 01));
-                Assert.AreEqual(timespan.Name, "Semester 2");
+                Assert.AreEqual(timespan.StartDate, updateTimespanRequest.StartDate);
+                Assert.AreEqual(timespan.Name, updateTimespanRequest.Name);
+                Assert.AreEqual(timespan.EndDate, updateTimespanRequest.EndDate);
             }
         }
 
