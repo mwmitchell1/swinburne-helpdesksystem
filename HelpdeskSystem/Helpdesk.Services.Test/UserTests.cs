@@ -385,19 +385,10 @@ namespace Helpdesk.Services.Test
         /// <returns>The hashed password</returns>
         private string HashText(string text)
         {
-            string result = string.Empty;
-            try
-            {
-                byte[] bytes = Encoding.ASCII.GetBytes(text);
-                var sha1 = new SHA1CryptoServiceProvider();
-                var sha1data = sha1.ComputeHash(bytes);
-                result = Convert.ToBase64String(sha1data);
-            }
-            catch (Exception ex)
-            {
-                result = string.Empty;
-            }
-            return result;
+            byte[] bytes = Encoding.ASCII.GetBytes(text);
+            var sha1 = new SHA1CryptoServiceProvider();
+            var sha1data = sha1.ComputeHash(bytes);
+            return Convert.ToBase64String(sha1data);
         }
     }
 }
