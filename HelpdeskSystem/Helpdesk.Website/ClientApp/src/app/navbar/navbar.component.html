@@ -16,13 +16,13 @@
         <ul class="navbar-nav ml-auto">
           <span class="navbar-text active">Current Helpdesk: </span>
           <li class="navbar__helpdesk-list nav-item dropdown">
-            <button class="btn btn-outline-primary dropdown-toggle ml-2" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-outline-primary dropdown-toggle ml-2" type="button" data-toggle="dropdown">
               {{ dropdownLabel }}
             </button>
             <div class="dropdown-menu">
               <a class="dropdown-item"
                 *ngFor="let helpdesk of helpdeskData.getHelpdesks()"
-                [routerLink]="[isAdminRoute ? helpdesk.adminRoute : helpdesk.route]">
+                [routerLink]="[dropdownPrefix, helpdesk.id]">
                   {{ helpdesk.name }}
               </a>
             </div>
