@@ -4,6 +4,8 @@ using System.Net;
 using Helpdesk.Common;
 using Helpdesk.Common.DTOs;
 using Helpdesk.Common.Extensions;
+using Helpdesk.Common.Requests.Helpdesk;
+using Helpdesk.Common.Requests.Units;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Units;
 using Helpdesk.DataLayer;
@@ -20,6 +22,63 @@ namespace Helpdesk.Services
         public UnitsFacade()
         {
             _appSettings = new AppSettings();
+        }
+
+        public AddUpdateUnitResponse AddOrUpdateUnit(AddUpdateUnitRequest request)
+        {
+            s_logger.Info("Adding unit to helpdesk");
+
+            var response = new AddUpdateUnitResponse();
+
+            try
+            {
+                response = (AddUpdateUnitResponse)request.CheckValidation(response);
+
+                if (response.Status == HttpStatusCode.BadRequest)
+                    return response;
+
+                var dataLayer = new UnitsDataLayer();
+                
+
+                if (request.UnitID == 0)
+                {
+                    int? result = dataLayer.AddUnit(request);
+
+                    if (!result.HasValue || result.Value == 0)
+                    {
+                        response.Status = HttpStatusCode.InternalServerError;
+                        response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to add unit, unknown error has occured."));
+                    }
+
+                    response.UnitID = result.Value;
+                }
+                else
+                {
+                    var existingUnit = dataLayer.GetUnitByNameAndHelpdeskId(request.Name, request.HelpdeskID);
+
+                    if (!existingUnit.IsDeleted)
+                    {
+                        bool updateResult = dataLayer.UpdateUnit(existingUnit.UnitId, request);
+                        response.UnitID = existingUnit.UnitId;
+                    }
+                    else
+                    {
+                        request.IsDeleted = false;
+                        bool updateResult = dataLayer.UpdateUnit(existingUnit.UnitId, request);
+                        response.UnitID = existingUnit.UnitId;
+                    }
+                }
+
+                response.Status = HttpStatusCode.OK;
+            }
+            catch(Exception ex)
+            {
+                s_logger.Error(ex, "Unable to add unti to system");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages = new List<StatusMessage>();
+            }
+
+            return response;
         }
 
         /// <summary>

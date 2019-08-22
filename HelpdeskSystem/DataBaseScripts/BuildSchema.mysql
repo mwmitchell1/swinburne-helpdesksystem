@@ -13,13 +13,15 @@ CREATE TABLE HelpdeskSettings (
     HelpdeskID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     Name VARCHAR(50) NOT NULL,
     HasCheckIn BOOL NOT NULL,
-    HasQueue BOOL NOT NULL
+    HasQueue BOOL NOT NULL,
+    IsDeleted BOOL NOT NULL DEFAULT(false)
 );
 
 CREATE TABLE Unit (
     UnitID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     Code VARCHAR(8) NOT NULL,
-    Name VARCHAR(50) NOT NULL
+    Name VARCHAR(50) NOT NULL,
+    IsDeleted BOOL NOT NULL DEFAULT(false)
 );
 
 CREATE TABLE NickNames (
@@ -32,6 +34,7 @@ CREATE TABLE Topic (
     TopicID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     UnitID INT NOT NULL,
     Name VARCHAR(50) NOT NULL,
+    IsDeleted BOOL NOT NULL DEFAULT(false),
     FOREIGN KEY (UnitID)
         REFERENCES Unit (UnitID)
 );
@@ -92,3 +95,4 @@ CREATE TABLE TimeSpans (
 INSERT INTO User (Username, Password) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=');
 INSERT INTO  HelpdeskSettings (Name, HasCheckIn, HasQueue) VALUES ('Test Helpdesk', TRUE, TRUE);
 INSERT INTO Unit (Code, Name) VALUES ('COS00000', 'Test Unit');
+INSERT INTO helpdeskunit (HelpdeskID, UnitID) VALUES(1,1)
