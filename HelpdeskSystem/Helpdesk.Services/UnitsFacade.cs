@@ -42,6 +42,24 @@ namespace Helpdesk.Services
 
                 if (request.UnitID == 0)
                 {
+                    UnitDTO unit = dataLayer.GetUnitByNameAndHelpdeskId(request.Name, request.HelpdeskID);
+
+                    if (unit != null)
+                    {
+                        response.Status = HttpStatusCode.BadRequest;
+                        response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Subject with that name already exists."));
+                        return response;
+                    }
+
+                    unit = dataLayer.GetUnitByCodeAndHelpdeskId(request.Code, request.HelpdeskID);
+
+                    if (unit != null)
+                    {
+                        response.Status = HttpStatusCode.BadRequest;
+                        response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Subject with that code already exists."));
+                        return response;
+                    }
+
                     int? result = dataLayer.AddUnit(request);
 
                     if (!result.HasValue || result.Value == 0)
@@ -54,7 +72,13 @@ namespace Helpdesk.Services
                 }
                 else
                 {
-                    var existingUnit = dataLayer.GetUnitByNameAndHelpdeskId(request.Name, request.HelpdeskID);
+                    var existingUnit = dataLayer.GetUnit(request.UnitID);
+
+                    if (existingUnit == null)
+                    {
+                        response.Status = HttpStatusCode.NotFound;
+                        return response;
+                    }
 
                     if (!existingUnit.IsDeleted)
                     {
@@ -95,7 +119,7 @@ namespace Helpdesk.Services
             try
             {
                 var dataLayer = new UnitsDataLayer();
-                UnitDTO result = dataLayer.GetUnit(id);
+                var result = dataLayer.GetUnit(id);
 
                 if (result != null)
                     response.Unit = result;

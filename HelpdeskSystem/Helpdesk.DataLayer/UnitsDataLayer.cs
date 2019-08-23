@@ -122,6 +122,28 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
+        /// Retrieves a unit from the database using provided unit code.
+        /// </summary>
+        /// <param name="code">The name of the unit to retrieve.</param>
+        /// <returns>The unit DTO</returns>
+        public UnitDTO GetUnitByCodeAndHelpdeskId(string code, int helpdeskId)
+        {
+            UnitDTO dto = null;
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var unitIds = context.Helpdeskunit.Where(hu => hu.HelpdeskId == helpdeskId).Select(u => u.UnitId).ToList();
+
+                var unit = context.Unit.Include("Helpdeskunit").FirstOrDefault(u => u.Code.Equals(code) && unitIds.Contains(u.UnitId));
+                if (unit != null)
+                {
+                    dto = DAO2DTO(unit);
+                }
+            }
+
+            return dto;
+        }
+
+        /// <summary>
         /// Retrieves all units under a specific helpdesk id
         /// </summary>
         /// <param name="id">ID of the helpdesk to retrieve from</param>
