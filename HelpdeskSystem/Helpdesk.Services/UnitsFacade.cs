@@ -119,7 +119,7 @@ namespace Helpdesk.Services
             try
             {
                 var dataLayer = new UnitsDataLayer();
-                UnitDTO result = dataLayer.GetUnit(id);
+                var result = dataLayer.GetUnit(id);
 
                 if (result != null)
                     response.Unit = result;
