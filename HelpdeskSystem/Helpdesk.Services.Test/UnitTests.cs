@@ -9,6 +9,8 @@ using Helpdesk.Common.Requests.Units;
 using System.Collections.Generic;
 using Helpdesk.Common.Utilities;
 using Microsoft.EntityFrameworkCore;
+using Helpdesk.Common.Requests.Helpdesk;
+using Helpdesk.Common.Responses.Helpdesk;
 
 namespace Helpdesk.Services.Test
 {
@@ -21,10 +23,22 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddUnit()
         {
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
             UnitsFacade unitsFacade = new UnitsFacade();
             var request = new AddUpdateUnitRequest()
             {
-                HelpdeskID = 1,
+                HelpdeskID = addHelpdeskResponse.HelpdeskID,
                 Code = AlphaNumericStringGenerator.GetString(8),
                 IsDeleted = false,
                 Name = AlphaNumericStringGenerator.GetString(5),
@@ -57,13 +71,25 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void UpdateUnit()
         {
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
             string name = AlphaNumericStringGenerator.GetString(5);
             string code = AlphaNumericStringGenerator.GetString(8);
 
             UnitsFacade unitsFacade = new UnitsFacade();
             var request = new AddUpdateUnitRequest()
             {
-                HelpdeskID = 1,
+                HelpdeskID = addHelpdeskResponse.HelpdeskID,
                 Code = code,
                 IsDeleted = false,
                 Name = name,
@@ -89,10 +115,10 @@ namespace Helpdesk.Services.Test
                 );
             }
 
-            request = new AddUpdateUnitRequest()
+            request = new AddUpdateUnitRequest
             {
                 UnitID = addUpdateUnitResponse.UnitID,
-                HelpdeskID = 1,
+                HelpdeskID = addHelpdeskResponse.HelpdeskID,
                 Code = code,
                 IsDeleted = false,
                 Name = name,
@@ -102,6 +128,9 @@ namespace Helpdesk.Services.Test
             request.Topics.Add("Externalisation");
 
             addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
+            Assert.IsTrue(addUpdateUnitResponse.UnitID > 0);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -126,13 +155,35 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void GetUnit()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
-            int unitId = 1;
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
 
-            GetUnitResponse getUnitResponse = unitsFacade.GetUnit(unitId);
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
+            AddUpdateUnitRequest addUnitRequest = new AddUpdateUnitRequest
+            {
+                HelpdeskID = addHelpdeskResponse.HelpdeskID,
+                Name = AlphaNumericStringGenerator.GetString(10),
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false
+            };
+
+            UnitsFacade unitsFacade = new UnitsFacade();
+            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(addUnitRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
+
+            GetUnitResponse getUnitResponse = unitsFacade.GetUnit(addUpdateUnitResponse.UnitID);
 
             Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
-            Assert.AreEqual("Test Unit", getUnitResponse.Unit.Name);
+            Assert.AreEqual(addUnitRequest.Name, getUnitResponse.Unit.Name);
         }
 
         /// <summary>
@@ -141,12 +192,39 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void GetUnitsByHelpdeskID()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
 
-            GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(1);
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
+            AddUpdateUnitRequest addUnitRequest = new AddUpdateUnitRequest
+            {
+                HelpdeskID = addHelpdeskResponse.HelpdeskID,
+                Name = AlphaNumericStringGenerator.GetString(10),
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false
+            };
+
+            UnitsFacade unitsFacade = new UnitsFacade();
+            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(addUnitRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
+
+            GetUnitResponse getUnitResponse = unitsFacade.GetUnit(addUnitRequest.HelpdeskID);
+
+            Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
+
+            GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(addHelpdeskResponse.HelpdeskID);
 
             Assert.AreEqual(HttpStatusCode.OK, getUnitsByHelpdeskIDResponse.Status);
-            Assert.AreEqual("Test Unit", getUnitsByHelpdeskIDResponse.Units[0].Name);
+            Assert.AreEqual(addUnitRequest.Name, getUnitsByHelpdeskIDResponse.Units[0].Name);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -164,7 +242,7 @@ namespace Helpdesk.Services.Test
         {
             UnitsFacade unitsFacade = new UnitsFacade();
 
-            GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(2);
+            GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(-1);
 
             Assert.AreEqual(HttpStatusCode.NotFound, getUnitsByHelpdeskIDResponse.Status);
         }
@@ -179,7 +257,7 @@ namespace Helpdesk.Services.Test
         {
             UnitsFacade unitsFacade = new UnitsFacade();
 
-            DeleteUnitResponse deleteUnitResponse = unitsFacade.DeleteUnit(0);
+            DeleteUnitResponse deleteUnitResponse = unitsFacade.DeleteUnit(-1);
 
             Assert.AreEqual(HttpStatusCode.NotFound, deleteUnitResponse.Status);
         }

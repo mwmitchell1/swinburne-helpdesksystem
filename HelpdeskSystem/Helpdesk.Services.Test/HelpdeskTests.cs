@@ -132,11 +132,23 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddTimespan()
         {
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
 
-            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
-            addTimeSpanRequest.HelpdeskId = 1;
-            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest
+            {
+                HelpdeskId = addHelpdeskResponse.HelpdeskID,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
             DateTime startDate = DateTime.Today;
             DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
             addTimeSpanRequest.StartDate = startDate;
@@ -155,9 +167,11 @@ namespace Helpdesk.Services.Test
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
-            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
-            addTimeSpanRequest.HelpdeskId = 1;
-            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest
+            {
+                HelpdeskId = -1,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
             DateTime startDate = DateTime.Today;
             DateTime endDate = new DateTime(startDate.Year - 1, startDate.Month, startDate.Day, 0, 0, 0);
             addTimeSpanRequest.StartDate = startDate;
@@ -176,9 +190,11 @@ namespace Helpdesk.Services.Test
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
-            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
-            addTimeSpanRequest.HelpdeskId = 1;
-            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest
+            {
+                HelpdeskId = -1,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
             DateTime startDate = new DateTime(2018, 1, 1, 0, 0, 0);
             DateTime endDate = DateTime.Today;
             addTimeSpanRequest.StartDate = startDate;
@@ -195,11 +211,23 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void UpdateTimespanFound()
         {
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
 
-            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
-            addTimeSpanRequest.HelpdeskId = 1;
-            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest
+            {
+                HelpdeskId = addHelpdeskResponse.HelpdeskID,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
             DateTime startDate = DateTime.Today;
             DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
             addTimeSpanRequest.StartDate = startDate;
@@ -209,9 +237,9 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
 
-            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
+            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest
             {
-                Name = "Semester 1",
+                Name = AlphaNumericStringGenerator.GetString(10),
                 StartDate = new DateTime(2019, 01, 01),
                 EndDate = new DateTime(2019, 06, 01),
             };
@@ -239,9 +267,9 @@ namespace Helpdesk.Services.Test
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
-            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
+            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest
             {
-                Name = "Semester 1",
+                Name = AlphaNumericStringGenerator.GetString(10),
                 StartDate = new DateTime(2019, 08, 01),
                 EndDate = new DateTime(2019, 11, 01)
             };
