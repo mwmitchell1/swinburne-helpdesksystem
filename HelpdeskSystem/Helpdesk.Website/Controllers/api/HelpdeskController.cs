@@ -17,6 +17,87 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class HelpdeskController : BaseApiController
     {
+        /// <summary>
+        /// This method is the end point to be able to add a heldesk
+        /// </summary>
+        /// <param name="request">The request with the helpdesk information</param>
+        /// <returns>A reponse to indictae whether or not it was a success</returns>
+        [HttpPost]
+        [Route("")]
+        public IActionResult AddHelpdesk([FromBody] AddHelpdeskRequest request)
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            if (request == null)
+                return BadRequest();
+
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.AddHelpdesk(request);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to add helpdesk.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// This method is the end point to be able to update a heldesk
+        /// </summary>
+        /// <param name="id">The id of the helpdesk to be update</param>
+        /// <param name="request">The request with the helpdesk information</param>
+        /// <returns>A reponse to indictae whether or not it was a success</returns>
+        [HttpPatch]
+        [Route("{id}")]
+        public IActionResult AddHelpdesk([FromRoute] int id, [FromBody] UpdateHelpdeskRequest request)
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            if (request == null)
+                return BadRequest();
+
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.UpdateHelpdesk(id, request);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to update helpdesk.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
         [HttpGet]
         [Route("timespan")]
         public IActionResult GetTimeSpans()
@@ -47,14 +128,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.AddTimeSpan(request);
+                var response = facade.AddTimeSpan(request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok(result);
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -69,6 +150,12 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Updates a specific timespan with the given information
+        /// </summary>
+        /// <param name="id">ID of the timespan to be updated</param>
+        /// <param name="request">Request containing the new timespan information</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpPatch]
         [Route("timespan/{id}")]
         public IActionResult UpdateTimeSpan([FromRoute] int id, [FromBody] UpdateTimeSpanRequest request)
@@ -79,14 +166,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.UpdateTimeSpan(id, request);
+                var response = facade.UpdateTimeSpan(id, request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
                         return Ok();
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:

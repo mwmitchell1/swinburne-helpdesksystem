@@ -7,7 +7,10 @@ namespace Helpdesk.Common.Requests.Helpdesk
 {
     public class AddTimeSpanRequest : BaseRequest
     {
-        [Required(AllowEmptyStrings = false)]
+        [Required]
+        public int? HelpdeskId { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "{0} cannot be empty!")]
         public string Name { get; set; }
 
         public DateTime? StartDate { get; set; }

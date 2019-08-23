@@ -5,14 +5,67 @@ using Helpdesk.Data.Models;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using Helpdesk.Common.Extensions;
 
 namespace Helpdesk.DataLayer
 {
     /// <summary>
-    /// Used to handle any databases interactions for helpdesks including CRUD & timespans
+    /// This is used to before CRUD actions for the helpdesks and timespans
     /// </summary>
     public class HelpdeskDataLayer
     {
+        /// <summary>
+        /// This method is used to add a new helpdesk to the database
+        /// </summary>
+        /// <param name="request">The information of the helpdesk</param>
+        /// <returns>The id of the helpdesk that was added</returns>
+        public int? AddHelpdesk(AddHelpdeskRequest request)
+        {
+            int? helpdeskId = null;
+
+            Helpdesksettings helpdesk = new Helpdesksettings();
+            helpdesk.Name = request.Name;
+            helpdesk.HasCheckIn = request.HasCheckIn;
+            helpdesk.HasQueue = request.HasQueue;
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Add(helpdesk);
+                context.SaveChanges();
+                helpdeskId = helpdesk.HelpdeskId;
+            }
+
+            return helpdeskId;
+        }
+   
+        /// <summary>
+        /// This method is used to update the relevent helpdesk
+        /// </summary>
+        /// <param name="id">The id of the helpdesk to be updated</param>
+        /// <param name="request">The information to update the helpdesk</param>
+        /// <returns>Result the indicates whether or not the update was successful</returns>
+        public bool UpdateHelpdesk(int id, UpdateHelpdeskRequest request)
+        {
+            bool result = false;
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Helpdesksettings helpdesk = context.Helpdesksettings.FirstOrDefault(p => p.HelpdeskId == id);
+
+                if (helpdesk == null)
+                    throw new NotFoundException($"Helpdesk with id [{id}] not found.");
+
+                helpdesk.Name = request.Name;
+                helpdesk.HasCheckIn = request.HasCheckIn;
+                helpdesk.HasQueue = request.HasQueue;
+
+                context.SaveChanges();
+                result = true;
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// This method adds a timespan to the database.
         /// </summary>
@@ -23,6 +76,7 @@ namespace Helpdesk.DataLayer
             int? spanId = null;
 
             Timespans timespan = new Timespans();
+            timespan.HelpdeskId = request.HelpdeskId;
             timespan.Name = request.Name;
             timespan.StartDate = request.StartDate;
             timespan.EndDate = request.EndDate;
@@ -56,7 +110,7 @@ namespace Helpdesk.DataLayer
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                Timespans timespan = context.Timespans.Single(t => t.SpanId == id);
+                Timespans timespan = context.Timespans.FirstOrDefault(t => t.SpanId == id);
 
                 if (timespan == null)
                 {
