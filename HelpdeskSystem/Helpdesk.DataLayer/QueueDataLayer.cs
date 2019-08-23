@@ -31,6 +31,8 @@ namespace Helpdesk.DataLayer
                 };
 
                 context.Queueitem.Add(item);
+                context.SaveChanges();
+
                 id = item.ItemId;
 
                 if (request.CheckInID.HasValue)
