@@ -112,6 +112,8 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("HelpdeskID")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+
                 entity.Property(e => e.HasCheckIn).HasColumnType("tinyint(1)");
 
                 entity.Property(e => e.HasQueue).HasColumnType("tinyint(1)");
@@ -260,6 +262,8 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("TopicID")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -283,6 +287,8 @@ namespace Helpdesk.Data.Models
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
                     .HasColumnType("int(11)");
+
+                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
 
                 entity.Property(e => e.Code)
                     .IsRequired()

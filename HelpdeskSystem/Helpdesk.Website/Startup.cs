@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 using System.Text;
 
 namespace Helpdesk.Website
@@ -55,6 +58,9 @@ namespace Helpdesk.Website
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddSingleton<IJobFactory, JobFactory>();
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
