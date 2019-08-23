@@ -16,6 +16,7 @@ namespace Helpdesk.Common.Requests.Units
         public string Name { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must enter in a code name.")]
+        [StringLength(8, ErrorMessage = "Code incorrect length", MinimumLength = 8)]
         public string Code { get; set; }
 
         public bool IsDeleted { get; set; }
