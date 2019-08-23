@@ -15,6 +15,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   public userIsAuthorized: boolean;
 
   private dropdownLabel: string;
+  private dropdownPrefix: string;
   private helpdeskLink: string;
   private adminLink: string;
   private isAdminRoute: boolean;
@@ -29,18 +30,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.userIsAuthorized = this.authenticationService.isLoggedIn();
 
     this.dropdownLabel = 'No helpdesk selected';
+    this.dropdownPrefix = 'helpdesk';
     this.adminLink = 'admin';
   }
 
   ngOnInit(): void {
     this.activeHelpdeskSub = this.helpdeskData.activeHelpdeskChange.subscribe((helpdesk) => {
       this.dropdownLabel = helpdesk.name;
-      this.helpdeskLink = helpdesk.normalizedName;
-      this.adminLink = this.helpdeskLink + '/admin';
+      this.helpdeskLink = 'helpdesk/' + helpdesk.id;
+      this.adminLink = 'admin/' + helpdesk.id;
     });
 
     this.adminRouteSub = this.routeState.adminRouteChange.subscribe((isAdmin) => {
       this.isAdminRoute = isAdmin;
+      this.dropdownPrefix = isAdmin ? 'admin' : 'helpdesk';
     });
   }
 
