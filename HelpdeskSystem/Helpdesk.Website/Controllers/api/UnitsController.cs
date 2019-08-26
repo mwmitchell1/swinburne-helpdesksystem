@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Net;
+using Helpdesk.Common.Requests.Units;
+using Helpdesk.Common.Responses.Units;
 using Helpdesk.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +15,42 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class UnitsController : BaseApiController
     {
+
+        [HttpPost]
+        [Route("")]
+        public IActionResult AddOrUpdateUnit([FromBody] AddUpdateUnitRequest request)
+        {
+            if (request == null)
+                return BadRequest();
+
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            try
+            {
+                var facade = new UnitsFacade();
+                var response = facade.AddOrUpdateUnit(request);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to add or update unit.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
         /// <summary>
         /// Retrieve a unit from the database by id.
         /// </summary>

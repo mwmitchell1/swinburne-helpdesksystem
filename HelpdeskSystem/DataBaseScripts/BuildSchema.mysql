@@ -14,14 +14,14 @@ CREATE TABLE HelpdeskSettings (
     Name VARCHAR(50) NOT NULL,
     HasCheckIn BOOL NOT NULL,
     HasQueue BOOL NOT NULL,
-    IsDeleted BOOL NOT NULL DEFAULT(false)
+    IsDeleted BOOL NOT NULL DEFAULT false
 );
 
 CREATE TABLE Unit (
     UnitID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     Code VARCHAR(8) NOT NULL,
     Name VARCHAR(50) NOT NULL,
-    IsDeleted BOOL NOT NULL DEFAULT(false)
+    IsDeleted BOOL NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE NickNames (
@@ -34,7 +34,7 @@ CREATE TABLE Topic (
     TopicID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     UnitID INT NOT NULL,
     Name VARCHAR(50) NOT NULL,
-    IsDeleted BOOL NOT NULL DEFAULT(false),
+    IsDeleted BOOL NOT NULL DEFAULT false,
     FOREIGN KEY (UnitID)
         REFERENCES Unit (UnitID)
 );
