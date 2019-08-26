@@ -21,7 +21,7 @@ export class AuthenticationService {
 
     /**
      * Used to call the login api
-     * @param loginRequest 
+     * @param loginRequest
      */
     loginUser(loginRequest) {
         return this.client.post<LoginRequest>(this.baseUrl + 'api/users/login', loginRequest)

@@ -16,7 +16,7 @@ export class RouteStateService {
         // check route for admin and set admin state
         if (url[0].toLowerCase() === 'admin') {
           this.adminRouteChange.next(true);
-        } else if (url[0].toLowerCase() === 'helpdesk') {
+        } else if (url[0].toLowerCase() === 'helpdesk' || url[0] === '') {
           this.adminRouteChange.next(false);
         }
 
