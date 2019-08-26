@@ -158,7 +158,12 @@ namespace Helpdesk.DataLayer
 
                 foreach (Helpdeskunit helpdeskUnit in helpdeskUnits)
                 {
-                    unitDTOs.Add(DAO2DTO(context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId)));
+                    var unit = context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId);
+
+                    if (!unit.IsDeleted)
+                    {
+                        unitDTOs.Add(DAO2DTO(unit));
+                    }
                 }
             }
 
