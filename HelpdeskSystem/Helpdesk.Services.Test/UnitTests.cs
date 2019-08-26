@@ -446,7 +446,48 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.NotFound, getUnitsByHelpdeskIDResponse.Status);
         }
 
-        //Test deleting a unit to be implemented when adding a unit is implemented
+        [TestMethod]
+        public void DeleteUnit()
+        {
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
+            AddUpdateUnitRequest addUnitRequest = new AddUpdateUnitRequest
+            {
+                HelpdeskID = addHelpdeskResponse.HelpdeskID,
+                Name = AlphaNumericStringGenerator.GetString(10),
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false
+            };
+
+            UnitsFacade unitsFacade = new UnitsFacade();
+
+            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(addUnitRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
+
+            DeleteUnitResponse deleteResponse = unitsFacade.DeleteUnit(addUpdateUnitResponse.UnitID);
+
+            Assert.AreEqual(HttpStatusCode.OK, deleteResponse.Status);
+
+            //Get unit response will return true even though unit is "deleted" because
+            //the function currently doesn't filter out deleted units, will change unit test
+            //when this is implemented, this is just to check that the IsDeleted property has
+            //successfully been updated
+            GetUnitResponse response = unitsFacade.GetUnit(addUpdateUnitResponse.UnitID);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.Unit.IsDeleted);
+        }
 
         /// <summary>
         /// Test deleting a unit that doesn't exist is handeled properly

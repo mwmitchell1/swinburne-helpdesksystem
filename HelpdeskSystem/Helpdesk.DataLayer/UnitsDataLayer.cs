@@ -250,7 +250,8 @@ namespace Helpdesk.DataLayer
                 if (unit == null)
                     throw new NotFoundException("Unable to find unit!");
 
-                context.Unit.Remove(unit);
+                unit.IsDeleted = true;
+
                 context.SaveChanges();
             }
             return true;
