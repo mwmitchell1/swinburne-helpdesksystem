@@ -45,16 +45,16 @@ namespace Helpdesk.DataLayer
         /// <returns>The user DTO</returns>
         public UserDTO GetUser(int id)
         {
-            UserDTO userDTO = null;
+            UserDTO userDto = null;
 
-            using (helpdesksystemContext context = new helpdesksystemContext())
+            using (var context = new helpdesksystemContext())
             {
                 var user = context.User.FirstOrDefault(u => u.UserId == id);
 
                 if (user != null)
-                    userDTO = DAO2DTO(user);
+                    userDto = DAO2DTO(user);
             }
-            return userDTO;
+            return userDto;
         }
 
         /// <summary>

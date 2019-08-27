@@ -106,84 +106,14 @@ namespace Helpdesk.Services
             return response;
         }
 
-        /// <summary>
-        /// This method is responsible for retrieving all timespans from the database
-        /// </summary>
-        /// <returns>The response that indicates if the operation was a success,
-        /// and the list of timespans</returns>
         public GetTimeSpansResponse GetTimeSpans()
         {
-            s_logger.Info("Getting timespans...");
-
-            GetTimeSpansResponse response = new GetTimeSpansResponse();
-
-            try
-            {
-                var dataLayer = new HelpdeskDataLayer();
-
-                List<TimeSpanDTO> timespans = dataLayer.GetTimeSpans();
-
-                if (timespans.Count == 0)
-                {
-                    throw new NotFoundException("No timespans found!");
-                }
-
-                response.Timespans = timespans;
-                response.Status = HttpStatusCode.OK;
-            }
-            catch (NotFoundException ex)
-            {
-                s_logger.Error(ex, "No timespans found!");
-                response.Status = HttpStatusCode.NotFound;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No timespans found!"));
-            }
-            catch (Exception ex)
-            {
-                s_logger.Error(ex, "Unable to get timespans!");
-                response.Status = HttpStatusCode.InternalServerError;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get timespans!"));
-            }
-            return response;
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// This method is responsible for getting a specific timespan from the database
-        /// </summary>
-        /// <param name="id">The SpanId of the specific timespan to be retrieved</param>
-        /// <returns>The response that indicates if the operation was a success,
-        /// and the details of the retrieved timespan if it was</returns>
         public GetTimeSpanResponse GetTimeSpan(int id)
         {
-            s_logger.Info("Getting timespan...");
-
-            GetTimeSpanResponse response = new GetTimeSpanResponse();
-
-            try
-            {
-                var dataLayer = new HelpdeskDataLayer();
-
-                TimeSpanDTO timespan = dataLayer.GetTimeSpan(id);
-
-                if (timespan == null)
-                    throw new NotFoundException("Unable to find timespan!");
-
-                response.Timespan = timespan;
-                response.Status = HttpStatusCode.OK;
-
-            }
-            catch (NotFoundException ex)
-            {
-                s_logger.Error(ex, "Unable to find timespan!");
-                response.Status = HttpStatusCode.NotFound;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to find timespan!"));
-            }
-            catch (Exception ex)
-            {
-                s_logger.Error(ex, "Unable to get timespan!");
-                response.Status = HttpStatusCode.InternalServerError;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get timespan!"));
-            }
-            return response;
+            throw new NotImplementedException();
         }
 
         /// <summary>
