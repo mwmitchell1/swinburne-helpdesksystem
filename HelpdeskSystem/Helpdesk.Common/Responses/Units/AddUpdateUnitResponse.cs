@@ -7,6 +7,5 @@ namespace Helpdesk.Common.Responses.Units
     public class AddUpdateUnitResponse : BaseResponse
     {
         public int UnitID { get; set; }
-        public int HelpDeskID { get; set; }
     }
 }
