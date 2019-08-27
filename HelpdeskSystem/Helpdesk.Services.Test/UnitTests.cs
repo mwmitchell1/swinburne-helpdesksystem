@@ -381,44 +381,47 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.NotFound, getUnitsByHelpdeskIDResponse.Status);
         }
 
-        /// <summary>
-        /// Test successful deletion of unit from the database.
-        /// </summary>
         [TestMethod]
         public void DeleteUnit()
         {
-            // Fill empty string parameters "" with auto-generated string.
-            testEntityFactory.PopulateEmptyStrings = true;
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
 
-            // Add test helpdesk.
-            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
 
-            // Check that helpdesk was created successfully.
-            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
-            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
 
-            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
-            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
-            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
+            AddUpdateUnitRequest addUnitRequest = new AddUpdateUnitRequest
+            {
+                HelpdeskID = addHelpdeskResponse.HelpdeskID,
+                Name = AlphaNumericStringGenerator.GetString(10),
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false
+            };
 
-            // Check that unit was created successfully.
-            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
-            Assert.IsTrue(unitData.Response.UnitID > 0);
-
-            // Test get, delete, get.
             UnitsFacade unitsFacade = new UnitsFacade();
 
-            // Get the unit that was just created.
-            GetUnitResponse getUnitResponse = unitsFacade.GetUnit(unitData.Response.UnitID);
-            Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
+            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(addUnitRequest);
 
-            // Delete the unit that was just created.
-            DeleteUnitResponse deleteUnitResponse = unitsFacade.DeleteUnit(unitData.Response.UnitID);
-            Assert.AreEqual(HttpStatusCode.OK, deleteUnitResponse.Status);
+            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
 
-            // Try getting the unit that was just deleted. Should be NotFound.
-            getUnitResponse = unitsFacade.GetUnit(unitData.Response.UnitID);
-            Assert.AreEqual(HttpStatusCode.NotFound, getUnitResponse.Status);
+            DeleteUnitResponse deleteResponse = unitsFacade.DeleteUnit(addUpdateUnitResponse.UnitID);
+
+            Assert.AreEqual(HttpStatusCode.OK, deleteResponse.Status);
+
+            //Get unit response will return true even though unit is "deleted" because
+            //the function currently doesn't filter out deleted units, will change unit test
+            //when this is implemented, this is just to check that the IsDeleted property has
+            //successfully been updated
+            GetUnitResponse response = unitsFacade.GetUnit(addUpdateUnitResponse.UnitID);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.Unit.IsDeleted);
         }
 
         /// <summary>

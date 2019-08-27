@@ -98,6 +98,10 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Gets every timespan from the database
+        /// </summary>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
         [Route("timespan")]
         public IActionResult GetTimeSpans()
@@ -105,9 +109,36 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetTimeSpans();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok();
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get timespans.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Gets a specific timespan from the database
+        /// </summary>
+        /// <param name="id">ID of the specific timespan</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
         [Route("timespan/{id}")]
         public IActionResult GetTimeSpan([FromRoute] int id)
@@ -115,7 +146,29 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetTimeSpan(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok();
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get timespan.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPost]
