@@ -90,5 +90,11 @@ namespace Helpdesk.Services.Test
                 Assert.AreEqual(request.SID, nicknames.Sid);
             }
         }
+        /*
+        public void UpdateQueueStatusHelped()
+        {
+            Queue
+        }
+        */
     }
 }
