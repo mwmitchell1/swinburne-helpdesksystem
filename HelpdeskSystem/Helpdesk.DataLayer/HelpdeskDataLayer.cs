@@ -89,47 +89,14 @@ namespace Helpdesk.DataLayer
             return spanId;
         }
 
-        /// <summary>
-        /// Used to retreve a timespan by its id
-        /// </summary>
-        /// <param name="id">The id of the timespan</param>
-        /// <returns>The timespan DTO</returns>
         public TimeSpanDTO GetTimeSpan(int id)
         {
-            TimeSpanDTO timespanDTO = null;
-
-            using (helpdesksystemContext context = new helpdesksystemContext())
-            {
-                var timespan = context.Timespans.FirstOrDefault(t => t.SpanId == id);
-
-                if (timespan != null)
-                    timespanDTO = DAO2DTO(timespan);
-            }
-            return timespanDTO;
+            throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// This method retrieves a list of all the timespans in the database
-        /// </summary>
-        /// <returns>A list of timespans retrieved from the database</returns>
         public List<TimeSpanDTO> GetTimeSpans()
         {
-            List<TimeSpanDTO> timespanDTOs = new List<TimeSpanDTO>();
-
-            using (helpdesksystemContext context = new helpdesksystemContext())
-            {
-                var timespans = context.Timespans.ToList();
-
-                foreach (Timespans timespan in timespans)
-                {
-                    if (timespan != null)
-                    {
-                        TimeSpanDTO timespanDTO = DAO2DTO(timespan);
-                        timespanDTOs.Add(timespanDTO);
-                    }
-                }
-            }
-            return timespanDTOs;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -162,43 +129,6 @@ namespace Helpdesk.DataLayer
         public bool DeleteTimeSpan(int id)
         {
             throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Converts the timespan DAO to a DTO to send to the front end
-        /// </summary>
-        /// <param name="timespan">The DAO for the timespan</param>
-        /// <returns>The DTO for the timespan</returns>
-        private TimeSpanDTO DAO2DTO(Timespans timespan)
-        {
-            TimeSpanDTO timespanDTO = null;
-
-            timespanDTO = new TimeSpanDTO();
-            timespanDTO.SpanId = timespan.SpanId;
-            timespanDTO.HelpdeskId = timespan.HelpdeskId;
-            timespanDTO.Name = timespan.Name;
-            timespanDTO.StartDate = timespan.StartDate;
-            timespanDTO.EndDate = timespan.EndDate;
-
-            return timespanDTO;
-        }
-
-        /// <summary>
-        /// Converts the timespan DTO to a DAO to interact with the database
-        /// </summary>
-        /// <param name="timespanDTO">The DTO for the timespan</param>
-        /// <returns>The DAO for the timespan</returns>
-        private Timespans DTO2DAO(TimeSpanDTO timespanDTO)
-        {
-            Timespans timespan = null;
-            timespan = new Timespans();
-            timespan.SpanId = timespanDTO.SpanId;
-            timespan.HelpdeskId = timespanDTO.HelpdeskId;
-            timespan.Name = timespanDTO.Name;
-            timespan.StartDate = timespanDTO.StartDate;
-            timespan.EndDate = timespanDTO.EndDate;
-
-            return timespan;
         }
     }
 }
