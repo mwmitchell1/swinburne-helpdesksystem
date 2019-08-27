@@ -193,7 +193,7 @@ namespace Helpdesk.Services
             }
             catch(NotFoundException ex)
             {
-                s_logger.Warn(ex, $"Unable to find the unit with id [{id}]");
+                s_logger.Warn($"Unable to find the unit with id [{id}]");
                 response.Status = HttpStatusCode.NotFound;
             }
             catch (Exception ex)
