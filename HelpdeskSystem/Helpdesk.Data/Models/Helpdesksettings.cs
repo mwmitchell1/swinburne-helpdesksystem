@@ -16,6 +16,7 @@ namespace Helpdesk.Data.Models
         public bool HasQueue { get; set; }
         public bool IsDeleted { get; set; }
 
+        public virtual ICollection<Timespans> Timespans { get; set; }
         public virtual ICollection<Helpdeskunit> Helpdeskunit { get; set; }
     }
 }
