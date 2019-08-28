@@ -1,4 +1,5 @@
 ﻿using Helpdesk.Common;
+using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests.Queue;
 using Helpdesk.Common.Requests.Students;
 using Helpdesk.Common.Responses;
@@ -18,8 +19,6 @@ namespace Helpdesk.Services
     public class QueueFacade
     {
         private static Logger s_logger = LogManager.GetCurrentClassLogger();
-
-        private readonly AppSettings _appSettings;
 
         /// <summary>
         /// This method is used to add an item to a queue
@@ -62,6 +61,12 @@ namespace Helpdesk.Services
 
                 response.ItemId = itemId;
                 response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Warn(ex, "Unable to add queue item");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to add queue item"));
             }
             catch (Exception ex)
             {
