@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using Helpdesk.Data.Models;
 using Helpdesk.Common.Requests.Queue;
+using System.Linq;
+using Helpdesk.Common.Extensions;
 
 namespace Helpdesk.DataLayer
 {
@@ -37,6 +39,11 @@ namespace Helpdesk.DataLayer
 
                 if (request.CheckInID.HasValue)
                 {
+                    Checkinhistory checkinhistory = context.Checkinhistory.FirstOrDefault(ci => ci.CheckInId == request.CheckInID.Value);
+
+                    if (checkinhistory == null)
+                        throw new NotFoundException($"Unable to find queue item with id [{request.CheckInID.Value}]");
+
                     Checkinqueueitem checkinqueueitem = new Checkinqueueitem()
                     {
                         CheckInId = request.CheckInID.Value,
