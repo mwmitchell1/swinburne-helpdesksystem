@@ -158,12 +158,7 @@ namespace Helpdesk.DataLayer
 
                 foreach (Helpdeskunit helpdeskUnit in helpdeskUnits)
                 {
-                    var unit = context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId);
-
-                    if (!unit.IsDeleted)
-                    {
-                        unitDTOs.Add(DAO2DTO(unit));
-                    }
+                    unitDTOs.Add(DAO2DTO(context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId)));
                 }
             }
 
@@ -251,7 +246,6 @@ namespace Helpdesk.DataLayer
                     throw new NotFoundException("Unable to find unit!");
 
                 unit.IsDeleted = true;
-
                 context.SaveChanges();
             }
             return true;

@@ -17,95 +17,61 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class UnitTests
     {
+        // Recommend setting testEntityFactory.PopulateEmptyStrings = true; at the start of each method
+        private readonly TestEntityFactory testEntityFactory = new TestEntityFactory();
+
         /// <summary>
         /// Test adding a unit to the database
         /// </summary>
         [TestMethod]
         public void AddUnit()
         {
-            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
-            {
-                HasCheckIn = false,
-                HasQueue = true,
-                Name = AlphaNumericStringGenerator.GetString(10)
-            };
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
-            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            UnitsFacade unitsFacade = new UnitsFacade();
-            var request = new AddUpdateUnitRequest()
-            {
-                HelpdeskID = addHelpdeskResponse.HelpdeskID,
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(5),
-            };
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Lifecycle");
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle"});
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
 
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
-
-            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
-            Assert.IsTrue(addUpdateUnitResponse.UnitID > 0);
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == addUpdateUnitResponse.UnitID);
+                int confirmId = unitData.Response.UnitID;
+                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == confirmId);
                 Assert.IsNotNull(unit);
                 Assert.IsTrue
                 (
-                    request.IsDeleted == unit.IsDeleted
-                    && request.Name == unit.Name
-                    && request.Code == unit.Code
-                    && request.Topics.Count == unit.Topic.Count
+                    unitData.Request.IsDeleted == unit.IsDeleted
+                    && unitData.Request.Name == unit.Name
+                    && unitData.Request.Code == unit.Code
+                    && unitData.Request.Topics.Count == unit.Topic.Count
                     && unit.Topic.Count > 0
                 );
             }
         }
 
         /// <summary>
-        /// Test adding a unit to the database with no code
-        /// </summary>
-        [TestMethod]
-        public void AddUnitNoCode()
-        {
-            UnitsFacade unitsFacade = new UnitsFacade();
-            var request = new AddUpdateUnitRequest()
-            {
-                HelpdeskID = 1,
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(5),
-            };
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Lifecycle");
-
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
-
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUpdateUnitResponse.Status);
-        }
-
-        /// <summary>
-        /// Test adding a unit to the database with no helpdesk
+        /// Test adding a unit to the database with no helpdesk id to reference.
         /// </summary>
         [TestMethod]
         public void AddUnitNoHelpdesk()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
-            var request = new AddUpdateUnitRequest()
-            {
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(5),
-            };
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Lifecycle");
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
-
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUpdateUnitResponse.Status);
+            // Create unit with null helpdesk id.
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, null);
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
         }
 
         /// <summary>
@@ -114,19 +80,48 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddUnitNoName()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
-            var request = new AddUpdateUnitRequest()
-            {
-                HelpdeskID = 1,
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false,
-            };
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Lifecycle");
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+            // Create unit with null name.
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, 1, null);
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
 
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUpdateUnitResponse.Status);
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = false;
+
+            // Create unit with empty name.
+            unitData = testEntityFactory.AddUpdateUnit(0, 1, "");
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
+        }
+
+        /// <summary>
+        /// Test adding a unit to the database with no code
+        /// </summary>
+        [TestMethod]
+        public void AddUnitNoCode()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Create unit with empty string for code.
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, 1, "", null);
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
+        }
+
+        /// <summary>
+        /// Test adding a unit to the database with wrong name length
+        /// </summary>
+        [TestMethod]
+        public void AddUnitNameWrongLength()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Create unit with empty string for code.
+            string name = AlphaNumericStringGenerator.GetString(100);
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, 1, name);
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
         }
 
         /// <summary>
@@ -135,20 +130,13 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddUnitCodeWrongLength()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
-            var request = new AddUpdateUnitRequest()
-            {
-                HelpdeskID = 1,
-                Code = AlphaNumericStringGenerator.GetString(10),
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(5),
-            };
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Lifecycle");
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
-
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUpdateUnitResponse.Status);
+            // Create unit with empty string for code.
+            string code = AlphaNumericStringGenerator.GetString(20);
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, 1, "", code);
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
         }
 
         /// <summary>
@@ -157,41 +145,29 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddUnitDupName()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
-            var request = new AddUpdateUnitRequest()
-            {
-                HelpdeskID = 1,
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(5),
-            };
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Lifecycle");
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
-            Assert.IsTrue(addUpdateUnitResponse.UnitID > 0);
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            using (helpdesksystemContext context = new helpdesksystemContext())
-            {
-                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == addUpdateUnitResponse.UnitID);
-                Assert.IsNotNull(unit);
-                Assert.IsTrue
-                (
-                    request.IsDeleted == unit.IsDeleted
-                    && request.Name == unit.Name
-                    && request.Code == unit.Code
-                    && request.Topics.Count == unit.Topic.Count
-                    && unit.Topic.Count > 0
-                );
-            }
+            // Create a unit.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
 
-            request.Code = AlphaNumericStringGenerator.GetString(8);
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
 
-            addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+            // Attempt to create unit with duplicate name.
+            unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, unitData.Request.Name, "", false, topics);
 
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUpdateUnitResponse.Status);
+            // Check that duplicate name yields bad request.
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
         }
 
         /// <summary>
@@ -200,41 +176,29 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddUnitDupCode()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
-            var request = new AddUpdateUnitRequest()
-            {
-                HelpdeskID = 1,
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(5),
-            };
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Lifecycle");
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
-            Assert.IsTrue(addUpdateUnitResponse.UnitID > 0);
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            using (helpdesksystemContext context = new helpdesksystemContext())
-            {
-                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == addUpdateUnitResponse.UnitID);
-                Assert.IsNotNull(unit);
-                Assert.IsTrue
-                (
-                    request.IsDeleted == unit.IsDeleted
-                    && request.Name == unit.Name
-                    && request.Code == unit.Code
-                    && request.Topics.Count == unit.Topic.Count
-                    && unit.Topic.Count > 0
-                );
-            }
+            // Create a unit.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
 
-            request.Name = AlphaNumericStringGenerator.GetString(10);
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
 
-            addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
+            // Attempt to create unit with duplicate name.
+            unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", unitData.Request.Code, false, topics);
 
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUpdateUnitResponse.Status);
+            // Check that duplicate name yields bad request.
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
         }
 
         /// <summary>
@@ -243,77 +207,57 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void UpdateUnit()
         {
-            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
-            {
-                HasCheckIn = false,
-                HasQueue = true,
-                Name = AlphaNumericStringGenerator.GetString(10)
-            };
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
-            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            string name = AlphaNumericStringGenerator.GetString(5);
-            string code = AlphaNumericStringGenerator.GetString(8);
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle"});
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
 
-            UnitsFacade unitsFacade = new UnitsFacade();
-            var request = new AddUpdateUnitRequest()
-            {
-                HelpdeskID = addHelpdeskResponse.HelpdeskID,
-                Code = code,
-                IsDeleted = false,
-                Name = name,
-            };
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Lifecycle");
-
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
-
-            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
-            Assert.IsTrue(addUpdateUnitResponse.UnitID > 0);
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == addUpdateUnitResponse.UnitID);
+                int confirmId = unitData.Response.UnitID;
+                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == confirmId);
                 Assert.IsNotNull(unit);
                 Assert.IsTrue
                 (
-                    request.IsDeleted == unit.IsDeleted
-                    && request.Name == unit.Name
-                    && request.Topics.Count == unit.Topic.Count
+                    unitData.Request.IsDeleted == unit.IsDeleted
+                    && unitData.Request.Name == unit.Name
+                    && unitData.Request.Code == unit.Code
+                    && unitData.Request.Topics.Count == unit.Topic.Count
                     && unit.Topic.Count > 0
                 );
             }
 
-            request = new AddUpdateUnitRequest
-            {
-                UnitID = addUpdateUnitResponse.UnitID,
-                HelpdeskID = addHelpdeskResponse.HelpdeskID,
-                Code = code,
-                IsDeleted = false,
-                Name = name,
-            };
+            // Update unit using id of previously created unit. Add "Externalisation" as topic. 
+            topics = new List<string>(new string[] { "Layouts", "Externalisation" });
+            TestDataUnit unitDataUpdate = testEntityFactory.AddUpdateUnit(unitData.Response.UnitID, helpdeskData.Response.HelpdeskID,
+                unitData.Request.Name, unitData.Request.Code, unitData.Request.IsDeleted, topics);
 
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Externalisation");
-
-            addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
-
-            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
-            Assert.IsTrue(addUpdateUnitResponse.UnitID > 0);
+            // Check that unit was updated successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitDataUpdate.Response.Status);
+            Assert.IsTrue(unitDataUpdate.Response.UnitID > 0);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == addUpdateUnitResponse.UnitID);
+                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == unitData.Response.UnitID);
                 Assert.IsNotNull(unit);
                 Assert.IsTrue
                 (
-                    request.IsDeleted == unit.IsDeleted
-                    && request.Name == unit.Name
+                    unitData.Request.IsDeleted == unit.IsDeleted
+                    && unitData.Request.Name == unit.Name
                 );
-
                 Assert.IsFalse(unit.Topic.FirstOrDefault(t => t.Name == "Layouts").IsDeleted);
                 Assert.IsFalse(unit.Topic.FirstOrDefault(t => t.Name == "Externalisation").IsDeleted);
                 Assert.IsTrue(unit.Topic.FirstOrDefault(t => t.Name == "Lifecycle").IsDeleted);
@@ -326,25 +270,20 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void UpdateUnitNotFound()
         {
-            string name = AlphaNumericStringGenerator.GetString(5);
-            string code = AlphaNumericStringGenerator.GetString(8);
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            UnitsFacade unitsFacade = new UnitsFacade();
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            AddUpdateUnitRequest request = new AddUpdateUnitRequest()
-            {
-                UnitID = 100000000,
-                HelpdeskID = 1,
-                Code = code,
-                IsDeleted = false,
-                Name = name,
-            };
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            request.Topics.Add("Layouts");
-            request.Topics.Add("Externalisation");
-
-            var addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(request);
-            Assert.AreEqual(HttpStatusCode.NotFound, addUpdateUnitResponse.Status);
+            // Create unit with non-existing id.
+            int maxInt = 2147483647;
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(maxInt, helpdeskData.Response.HelpdeskID);
+            Assert.AreEqual(HttpStatusCode.NotFound, unitData.Response.Status);
         }
 
         /// <summary>
@@ -354,35 +293,30 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void GetUnit()
         {
-            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
-            {
-                HasCheckIn = false,
-                HasQueue = true,
-                Name = AlphaNumericStringGenerator.GetString(10)
-            };
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
-            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            AddUpdateUnitRequest addUnitRequest = new AddUpdateUnitRequest
-            {
-                HelpdeskID = addHelpdeskResponse.HelpdeskID,
-                Name = AlphaNumericStringGenerator.GetString(10),
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false
-            };
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID);
 
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Get the unit that was just created.
             UnitsFacade unitsFacade = new UnitsFacade();
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(addUnitRequest);
+            GetUnitResponse getUnitResponse = unitsFacade.GetUnit(unitData.Response.UnitID);
 
-            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
-
-            GetUnitResponse getUnitResponse = unitsFacade.GetUnit(addUpdateUnitResponse.UnitID);
-
+            // Check that unit response is okay and that names match.
             Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
-            Assert.AreEqual(addUnitRequest.Name, getUnitResponse.Unit.Name);
+            Assert.AreEqual(unitData.Request.Name, getUnitResponse.Unit.Name);
         }
 
         /// <summary>
@@ -391,39 +325,37 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void GetUnitsByHelpdeskID()
         {
-            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
-            {
-                HasCheckIn = false,
-                HasQueue = true,
-                Name = AlphaNumericStringGenerator.GetString(10)
-            };
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
-            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            AddUpdateUnitRequest addUnitRequest = new AddUpdateUnitRequest
-            {
-                HelpdeskID = addHelpdeskResponse.HelpdeskID,
-                Name = AlphaNumericStringGenerator.GetString(10),
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false
-            };
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID);
 
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Create another unit.
+            TestDataUnit unitDataAgain = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID);
+
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitDataAgain.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Get all units that were just created.
             UnitsFacade unitsFacade = new UnitsFacade();
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(addUnitRequest);
-
-            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
-
-            GetUnitResponse getUnitResponse = unitsFacade.GetUnit(addUnitRequest.HelpdeskID);
-
-            Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
-
-            GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(addHelpdeskResponse.HelpdeskID);
+            GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(helpdeskData.Response.HelpdeskID);
 
             Assert.AreEqual(HttpStatusCode.OK, getUnitsByHelpdeskIDResponse.Status);
-            Assert.AreEqual(addUnitRequest.Name, getUnitsByHelpdeskIDResponse.Units[0].Name);
+            Assert.AreEqual(unitData.Request.Name, getUnitsByHelpdeskIDResponse.Units[0].Name);
+            Assert.AreEqual(unitDataAgain.Request.Name, getUnitsByHelpdeskIDResponse.Units[1].Name);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -439,54 +371,54 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void GetUnitsByHelpdeskIDNotFound()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(-1);
+            UnitsFacade unitsFacade = new UnitsFacade();
+            int maxInt = 2147483647;
+            GetUnitsByHelpdeskIDResponse getUnitsByHelpdeskIDResponse = unitsFacade.GetUnitsByHelpdeskID(maxInt);
 
             Assert.AreEqual(HttpStatusCode.NotFound, getUnitsByHelpdeskIDResponse.Status);
         }
 
+        /// <summary>
+        /// Test successful deletion of unit from the database.
+        /// </summary>
         [TestMethod]
         public void DeleteUnit()
         {
-            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
-            {
-                HasCheckIn = false,
-                HasQueue = true,
-                Name = AlphaNumericStringGenerator.GetString(10)
-            };
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
-            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            AddUpdateUnitRequest addUnitRequest = new AddUpdateUnitRequest
-            {
-                HelpdeskID = addHelpdeskResponse.HelpdeskID,
-                Name = AlphaNumericStringGenerator.GetString(10),
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false
-            };
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
 
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Test get, delete, get.
             UnitsFacade unitsFacade = new UnitsFacade();
 
-            AddUpdateUnitResponse addUpdateUnitResponse = unitsFacade.AddOrUpdateUnit(addUnitRequest);
+            // Get the unit that was just created.
+            GetUnitResponse getUnitResponse = unitsFacade.GetUnit(unitData.Response.UnitID);
+            Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
 
-            Assert.AreEqual(HttpStatusCode.OK, addUpdateUnitResponse.Status);
+            // Delete the unit that was just created.
+            DeleteUnitResponse deleteUnitResponse = unitsFacade.DeleteUnit(unitData.Response.UnitID);
+            Assert.AreEqual(HttpStatusCode.OK, deleteUnitResponse.Status);
 
-            DeleteUnitResponse deleteResponse = unitsFacade.DeleteUnit(addUpdateUnitResponse.UnitID);
-
-            Assert.AreEqual(HttpStatusCode.OK, deleteResponse.Status);
-
-            //Get unit response will return true even though unit is "deleted" because
-            //the function currently doesn't filter out deleted units, will change unit test
-            //when this is implemented, this is just to check that the IsDeleted property has
-            //successfully been updated
-            GetUnitResponse response = unitsFacade.GetUnit(addUpdateUnitResponse.UnitID);
-
-            Assert.AreEqual(HttpStatusCode.OK, response.Status);
-            Assert.IsTrue(response.Unit.IsDeleted);
+            // Try getting the unit that was just deleted. Should be NotFound.
+            getUnitResponse = unitsFacade.GetUnit(unitData.Response.UnitID);
+            Assert.AreEqual(HttpStatusCode.NotFound, getUnitResponse.Status);
         }
 
         /// <summary>
@@ -495,9 +427,12 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void DeleteUnitNotFound()
         {
-            UnitsFacade unitsFacade = new UnitsFacade();
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            DeleteUnitResponse deleteUnitResponse = unitsFacade.DeleteUnit(-1);
+            UnitsFacade unitsFacade = new UnitsFacade();
+            int maxInt = 2147483647;
+            DeleteUnitResponse deleteUnitResponse = unitsFacade.DeleteUnit(maxInt);
 
             Assert.AreEqual(HttpStatusCode.NotFound, deleteUnitResponse.Status);
         }
