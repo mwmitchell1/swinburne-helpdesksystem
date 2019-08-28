@@ -58,5 +58,39 @@ namespace Helpdesk.DataLayer
 
             return id.Value;
         }
+
+        public bool UpdateQueueItemStatus(UpdateQueueItemStatusRequest request)
+        {
+            bool result = false;
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Queueitem item = new Queueitem();
+
+                if (request.TimeHelped != null && request.TimeRemoved == null)
+                {
+                    // Update TimeHelped
+                    item.ItemId = request.ItemId;
+                    item.TimeHelped = request.TimeHelped;
+                    context.SaveChanges();
+                    result = true;
+                }
+                else if (request.TimeRemoved != null && request.TimeHelped == null)
+                {
+                    // Update TimeRemoved
+                    item.ItemId = request.ItemId;
+                    item.TimeRemoved = request.TimeRemoved;
+                    context.SaveChanges();
+                    result = true;
+                }
+                else
+                {
+                    // something went wrong. Shouldn't happen if the facade validation did its job.
+                    // Means both Helped and Removed values are assigned or null.
+                    result = false;
+                }
+            }
+            return result;
+        }
     }
 }

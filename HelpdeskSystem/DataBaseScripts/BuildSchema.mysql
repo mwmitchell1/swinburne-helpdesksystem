@@ -44,8 +44,8 @@ CREATE TABLE QueueItem (
     StudentID INT NOT NULL,
     TopicID INT NOT NULL,
     TimeAdded DATETIME NOT NULL,
-    TimeHelped BOOL,
-    TimeRemoved BOOL,
+    TimeHelped DATETIME,
+    TimeRemoved DATETIME,
     FOREIGN KEY (StudentID)
         REFERENCES NickNames (StudentID),
     FOREIGN KEY (TopicID)

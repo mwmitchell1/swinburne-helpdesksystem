@@ -205,10 +205,6 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("StudentID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.TimeHelped).HasColumnType("tinyint(1)");
-
-                entity.Property(e => e.TimeRemoved).HasColumnType("tinyint(1)");
-
                 entity.Property(e => e.TopicId)
                     .HasColumnName("TopicID")
                     .HasColumnType("int(11)");
