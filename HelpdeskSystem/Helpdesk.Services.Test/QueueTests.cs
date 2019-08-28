@@ -649,5 +649,26 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
         }
+
+        /// <summary>
+        /// Test getting every queue item from the database
+        /// </summary>
+        [TestMethod]
+        public void GetQueueItems()
+        {
+            QueueFacade queueFacade = new QueueFacade();
+
+            GetQueueItemsResponse getQueueItemsResponse = queueFacade.GetQueueItems();
+
+            Assert.AreEqual(HttpStatusCode.OK, getQueueItemsResponse.Status);
+            Assert.AreEqual(2, getQueueItemsResponse.QueueItems[0].ItemId);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var queueItems = context.Queueitem.ToList();
+
+                Assert.IsNotNull(queueItems);
+            }
+        }
     }
 }
