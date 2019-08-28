@@ -76,5 +76,40 @@ namespace Helpdesk.Services
             }
             return response;
         }
+
+        public UpdateQueueItemStatusResponse UpdateQueueItemStatus(UpdateQueueItemStatusRequest request)
+        {
+            UpdateQueueItemStatusResponse response = new UpdateQueueItemStatusResponse();
+
+            try
+            {
+                response = (UpdateQueueItemStatusResponse)request.CheckValidation(response);
+
+                if (response.Status == HttpStatusCode.BadRequest)
+                {
+                    return response;
+                }
+
+                QueueDataLayer dataLayer = new QueueDataLayer();
+                bool result = dataLayer.UpdateQueueItemStatus(request);
+
+                if (result)
+                {
+                    response.Status = HttpStatusCode.OK;
+                }
+                else
+                {
+                    response.Status = HttpStatusCode.BadRequest;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Unable to update queue item status."));
+                }
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to update queue item status.");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update queue item status."));
+            }
+            return response;
+        }
     }
 }

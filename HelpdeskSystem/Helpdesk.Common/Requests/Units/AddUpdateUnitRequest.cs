@@ -13,6 +13,7 @@ namespace Helpdesk.Common.Requests.Units
         public int HelpdeskID { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must enter in a unit name.")]
+        [StringLength(50, ErrorMessage = "Name incorrect length")]
         public string Name { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "You must enter in a code name.")]

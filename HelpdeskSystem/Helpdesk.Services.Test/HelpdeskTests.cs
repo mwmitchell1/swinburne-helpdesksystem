@@ -13,28 +13,22 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class HelpdeskTests
     {
+        private readonly TestEntityFactory testEntityFactory = new TestEntityFactory();
+
         /// <summary>
         /// Ensures that adding a helpdesk works
         /// </summary>
         [TestMethod]
         public void AddHelpdesk()
         {
-            var request = new AddHelpdeskRequest()
-            {
-                HasCheckIn = false,
-                HasQueue = true,
-                Name = AlphaNumericStringGenerator.GetString(10)
-            };
+            TestDataHelpdesk testEntityData = testEntityFactory.AddHelpdesk();
 
-            var facade = new HelpdeskFacade();
-            var response = facade.AddHelpdesk(request);
-
-            Assert.AreEqual(HttpStatusCode.OK, response.Status);
-            Assert.IsTrue(response.HelpdeskID > 0);
+            Assert.AreEqual(HttpStatusCode.OK, testEntityData.Response.Status);
+            Assert.IsTrue(testEntityData.Response.HelpdeskID > 0);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var helpdesk = context.Helpdesksettings.FirstOrDefault(p => p.HelpdeskId == response.HelpdeskID);
+                var helpdesk = context.Helpdesksettings.FirstOrDefault(p => p.HelpdeskId == testEntityData.Response.HelpdeskID);
 
                 Assert.IsNotNull(helpdesk);
             }
