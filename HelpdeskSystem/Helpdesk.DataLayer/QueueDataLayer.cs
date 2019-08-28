@@ -1,4 +1,5 @@
-﻿using Helpdesk.Common.Requests;
+﻿using Helpdesk.Common.DTOs;
+using Helpdesk.Common.Requests;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -91,6 +92,69 @@ namespace Helpdesk.DataLayer
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// This method retrieves a list of all the queue items in the database
+        /// </summary>
+        /// <returns>A list of queue items retrieved from the database</returns>
+        public List<QueueItemDTO> GetQueueItems()
+        {
+            List<QueueItemDTO> queueItemsList = new List<QueueItemDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var queueItems = context.Queueitem.ToList();
+
+                foreach (Queueitem queueItem in queueItems)
+                {
+                    if (queueItem != null)
+                    {
+                        QueueItemDTO queueItemDTO = DAO2DTO(queueItem);
+                        queueItemsList.Add(queueItemDTO);
+                    }
+                }
+            }
+            return queueItemsList;
+        }
+
+        /// <summary>
+        /// Converts the queue item DAO to a DTO to send to the front end
+        /// </summary>
+        /// <param name="queueItem">The DAO for the queue item</param>
+        /// <returns>The DTO for the queue item</returns>
+        private QueueItemDTO DAO2DTO(Queueitem queueItem)
+        {
+            QueueItemDTO queueItemDTO = null;
+
+            queueItemDTO = new QueueItemDTO();
+            queueItemDTO.ItemId = queueItem.ItemId;
+            queueItemDTO.StudentId = queueItem.StudentId;
+            queueItemDTO.TopicId = queueItem.TopicId;
+            queueItemDTO.TimeAdded = queueItem.TimeAdded;
+            queueItemDTO.TimeHelped = queueItem.TimeHelped;
+            queueItemDTO.TimeRemoved = queueItem.TimeRemoved;
+
+            return queueItemDTO;
+        }
+
+        /// <summary>
+        /// Converts the queue item DTO to a DAO to interact with the database
+        /// </summary>
+        /// <param name="queueItemDTO">The DTO for the queue item</param>
+        /// <returns>The DAO for the queue item</returns>
+        private Queueitem DTO2DAO(QueueItemDTO queueItemDTO)
+        {
+            Queueitem queueItem = null;
+            queueItem = new Queueitem();
+            queueItem.ItemId = queueItemDTO.ItemId;
+            queueItem.StudentId = queueItemDTO.StudentId;
+            queueItem.TopicId = queueItemDTO.TopicId;
+            queueItem.TimeAdded = queueItemDTO.TimeAdded;
+            queueItem.TimeHelped = queueItemDTO.TimeHelped;
+            queueItem.TimeRemoved = queueItemDTO.TimeRemoved;
+
+            return queueItem;
         }
     }
 }
