@@ -14,11 +14,13 @@
       </tr>
       </thead>
       <tbody>
-      <td>User</td>
-      <td>
-        <button class="btn btn-danger float-right ml-1">Delete</button>
-        <button class="btn btn-secondary float-right" data-toggle="modal" data-target="#modal-user-edit">Edit</button>
-      </td>
+        <tr *ngFor="let user of users">
+          <td>{{ user.username }}</td>
+          <td>
+            <button class="btn btn-danger float-right ml-1">Delete</button>
+            <button class="btn btn-secondary float-right" data-toggle="modal" data-target="#modal-user-edit">Edit</button>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
