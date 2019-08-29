@@ -22,7 +22,9 @@ import { ConfigurationComponent } from './admin/configuration/configuration.comp
 import { UnitsComponent } from './admin/units/units.component';
 import { UsersComponent } from './admin/users/users.component';
 import { ReportingComponent } from './admin/reporting/reporting.component';
-import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
+import { NicknamesComponent } from './admin/nicknames/nicknames.component';
+
+import { UsersService } from './admin/users/users.service';
 
 @NgModule({
   declarations: [
@@ -68,7 +70,8 @@ import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
     AuthGuardService,
     AuthenticationService,
     HelpdeskDataService,
-    RouteStateService],
+    RouteStateService,
+    UsersService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
