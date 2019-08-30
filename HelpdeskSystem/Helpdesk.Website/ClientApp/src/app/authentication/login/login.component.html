@@ -10,11 +10,13 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input name="loginRequest.Username" type="username" class="form-control" formControlName="username" id="username" required>
+                        <input name="loginRequest.Username" type="username" class="form-control"
+                            formControlName="username" id="username" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input name="loginRequest.Password" type="password" class="form-control" formControlName="password" id="password" required>
+                        <input name="loginRequest.Password" type="password" class="form-control"
+                            formControlName="password" id="password" required>
                     </div>
                 </div>
             </div>
@@ -26,5 +28,38 @@
                 </div>
             </div>
         </form>
+    </div>
+</div>
+
+<button id="open-set-password" [hidden]="true" data-toggle="modal" data-target="#modal-set-password"></button>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="modal-set-password" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="setpasswordModalLabel">Set Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="setPasswordForm" (ngSubmit)="setPassword(setPasswordForm.value)">
+                    <input type="hidden" class="form-control" id="modal-username" name="modal-username">
+                    <div class="form-group">
+                        <label for="modalPassword">Password</label>
+                        <input type="password" class="form-control" id="modalPassword" name="modalPassword">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
     </div>
 </div>
