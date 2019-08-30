@@ -25,47 +25,6 @@ import { UsersComponent } from './admin/users/users.component';
 import { ReportingComponent } from './admin/reporting/reporting.component';
 import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
 
-const customNotifierOptions: NotifierOptions = {
-  position: {
-		horizontal: {
-			position: 'left',
-			distance: 12
-		},
-		vertical: {
-			position: 'bottom',
-			distance: 12,
-			gap: 10
-		}
-	},
-  theme: 'material',
-  behaviour: {
-    autoHide: 5000,
-    onClick: 'hide',
-    onMouseover: 'pauseAutoHide',
-    showDismissButton: true,
-    stacking: 4
-  },
-  animations: {
-    enabled: true,
-    show: {
-      preset: 'slide',
-      speed: 300,
-      easing: 'ease'
-    },
-    hide: {
-      preset: 'fade',
-      speed: 300,
-      easing: 'ease',
-      offset: 50
-    },
-    shift: {
-      speed: 300,
-      easing: 'ease'
-    },
-    overlap: 150
-  }
-};
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -91,6 +50,7 @@ const customNotifierOptions: NotifierOptions = {
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
       { path: 'helpdesk', component: HomeComponent, pathMatch: 'full' }, // change to SelectHelpdeskComponent
       { path: 'helpdesk/:id', component: HomeComponent, pathMatch: 'full' }, // change to HelpdeskComponent
+      { path: 'admin', redirectTo: 'admin/1', pathMatch: 'full'},
       { path: 'admin/:id', component: AdminComponent, canActivate: [AuthGuardService],
         children: [
           { path: 'configuration', component: ConfigurationComponent, pathMatch: 'full' },
