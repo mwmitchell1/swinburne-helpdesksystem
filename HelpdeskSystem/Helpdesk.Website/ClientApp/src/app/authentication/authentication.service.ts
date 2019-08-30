@@ -31,7 +31,7 @@ export class AuthenticationService {
      * Used to call the logout api
      */
     logout() {
-        return this.client.get(this.baseUrl + 'api/users/logout').subscribe( error => console.error(error));
+        return this.client.get(this.baseUrl + 'api/users/logout');
     }
 
     /**
