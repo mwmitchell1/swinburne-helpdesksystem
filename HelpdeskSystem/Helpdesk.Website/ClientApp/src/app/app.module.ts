@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { NotifierModule, NotifierOptions } from 'angular-notifier'
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
@@ -51,6 +52,7 @@ import { UsersService } from './admin/users/users.service';
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
       { path: 'helpdesk', component: HomeComponent, pathMatch: 'full' }, // change to SelectHelpdeskComponent
       { path: 'helpdesk/:id', component: HomeComponent, pathMatch: 'full' }, // change to HelpdeskComponent
+      { path: 'admin', redirectTo: 'admin/1', pathMatch: 'full'},
       { path: 'admin/:id', component: AdminComponent, canActivate: [AuthGuardService],
         children: [
           { path: 'configuration', component: ConfigurationComponent, pathMatch: 'full' },
@@ -59,7 +61,8 @@ import { UsersService } from './admin/users/users.service';
           { path: 'nicknames', component: NicknamesComponent, pathMatch: 'full' },
           { path: 'reporting', component: ReportingComponent, pathMatch: 'full' }
         ]}
-    ])
+    ]),
+    NotifierModule
   ],
   providers: [CookieService,
     {
