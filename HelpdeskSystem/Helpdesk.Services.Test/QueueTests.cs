@@ -9,6 +9,7 @@ using Helpdesk.Data.Models;
 using System.Net;
 using System.Linq;
 using NLog;
+using Helpdesk.Common.DTOs;
 
 namespace Helpdesk.Services.Test
 {
@@ -18,6 +19,8 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class QueueTests
     {
+        private readonly TestEntityFactory testEntityFactory = new TestEntityFactory();
+
         private static Logger s_logger = LogManager.GetCurrentClassLogger(); 
 
         /// <summary>
@@ -649,5 +652,34 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
         }
+        /*
+        [TestMethod]
+        public void UpdateQueueItemStatus()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
+
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            UnitsFacade unitsFacade = new UnitsFacade();
+            UnitDTO unitDTO = unitsFacade.GetUnit(unitData.Response.UnitID).Unit;
+            Assert.IsTrue(unitDTO.)
+
+            //TestDataQueue queueData = testEntityFactory.AddQueueItem(null, )
+        }
+        */
     }
 }

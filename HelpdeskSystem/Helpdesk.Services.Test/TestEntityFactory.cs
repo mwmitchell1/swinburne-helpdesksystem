@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using Helpdesk.Common.Requests;
 using Helpdesk.Common.Requests.Helpdesk;
+using Helpdesk.Common.Requests.Queue;
 using Helpdesk.Common.Requests.Units;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Helpdesk;
+using Helpdesk.Common.Responses.Queue;
 using Helpdesk.Common.Responses.Units;
 using Helpdesk.Common.Utilities;
 
@@ -36,6 +38,17 @@ namespace Helpdesk.Services.Test
         }
         public AddUpdateUnitRequest Request { get; }
         public AddUpdateUnitResponse Response { get; }
+    }
+
+    public class TestDataQueue
+    {
+        public TestDataQueue(AddToQueueRequest request, AddToQueueResponse response)
+        {
+            Request = request;
+            Response = response;
+        }
+        public AddToQueueRequest Request { get; }
+        public AddToQueueResponse Response { get; }
     }
 
     /// <summary>
@@ -100,6 +113,29 @@ namespace Helpdesk.Services.Test
             var response = facade.AddOrUpdateUnit(request);
 
             TestDataUnit data = new TestDataUnit(request, response);
+            return data;
+        }
+
+        public TestDataQueue AddQueueItem(int? studentID = null, int? topicID = null, int? checkInID = null, string nickname = "", string sID = "")
+        {
+            var request = new AddToQueueRequest();
+
+            if (studentID != null) request.StudentID = studentID;
+            if (topicID != null) request.TopicID = (int)topicID;
+            if (checkInID != null) request.CheckInID = (int)checkInID;
+            if (nickname != null)
+            {
+                if (nickname == "" && PopulateEmptyStrings) request.Nickname = AlphaNumericStringGenerator.GetString(20); else request.Nickname = nickname;
+            }
+            if (sID != null)
+            {
+                if (sID == "" && PopulateEmptyStrings) request.SID = AlphaNumericStringGenerator.GetStudentIDString(); else request.SID = sID;
+            }
+
+            var facade = new QueueFacade();
+            var response = facade.AddToQueue(request);
+
+            TestDataQueue data = new TestDataQueue(request, response);
             return data;
         }
 
