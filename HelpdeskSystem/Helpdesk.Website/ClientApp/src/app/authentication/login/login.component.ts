@@ -48,13 +48,13 @@ export class LoginComponent implements OnInit {
 
     var isValid: boolean = true;
 
-    if (data.username == "")
+    if (!data.username)
     {
       this.notifier.notify('warning', 'You must enter your username');
       isValid = false;
     }
 
-    if (data.password == "")
+    if (!data.password)
     {
       this.notifier.notify('warning', 'You must enter your password');
       isValid = false;
