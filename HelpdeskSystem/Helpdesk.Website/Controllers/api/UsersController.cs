@@ -232,6 +232,8 @@ namespace Helpdesk.Website.Controllers.api
                             Response.Cookies.Append("AuthToken", response.Token, cookie);
                             return Ok();
                         }
+                    case HttpStatusCode.Accepted:
+                        return Accepted(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:

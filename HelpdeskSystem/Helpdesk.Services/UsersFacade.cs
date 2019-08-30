@@ -136,7 +136,9 @@ namespace Helpdesk.Services
 
                 if (dataLayer.GetUserByUsername(request.Username) != null)
                 {
-                    throw new Exception("Unable to add user! User already exists!");
+                    response.Status = HttpStatusCode.BadRequest;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Username already exists"));
+                    return response;
                 }
 
                 int? result = dataLayer.AddUser(request);
@@ -284,6 +286,12 @@ namespace Helpdesk.Services
                     response.Status = HttpStatusCode.BadRequest;
                     response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Unable to login username or password is incorrect"));
                     s_logger.Warn($"Unable to login as a username [ {request.Username} ], username or password is incorrect.");
+                    return response;
+                }
+
+                if (user.FirstTime)
+                {
+                    response.Status = HttpStatusCode.Accepted;
                     return response;
                 }
 

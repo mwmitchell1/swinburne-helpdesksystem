@@ -24,14 +24,14 @@ export class AuthenticationService {
      * @param loginRequest
      */
     loginUser(loginRequest) {
-        return this.client.post<LoginRequest>(this.baseUrl + 'api/users/login', loginRequest)
+        return this.client.post<LoginResponse>(this.baseUrl + 'api/users/login', loginRequest)
     }
 
     /**
      * Used to call the logout api
      */
     logout() {
-        return this.client.get(this.baseUrl + 'api/users/logout').subscribe( error => console.error(error));
+        return this.client.get(this.baseUrl + 'api/users/logout');
     }
 
     /**
