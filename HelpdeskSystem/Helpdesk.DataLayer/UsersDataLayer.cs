@@ -54,6 +54,8 @@ namespace Helpdesk.DataLayer
 
                 if (user != null)
                     userDTO = DAO2DTO(user);
+                else
+                    throw new NotFoundException("Unable to find user.");
             }
             return userDTO;
         }
