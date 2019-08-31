@@ -29,6 +29,7 @@ namespace Helpdesk.DataLayer
             User user = new User();
             user.Username = request.Username;
             user.Password = request.Password;
+            user.FirstTime = true;
             using (var context = new helpdesksystemContext())
             {
                 context.User.Add(user);
@@ -53,6 +54,8 @@ namespace Helpdesk.DataLayer
 
                 if (user != null)
                     userDTO = DAO2DTO(user);
+                else
+                    throw new NotFoundException("Unable to find user.");
             }
             return userDTO;
         }
@@ -99,7 +102,12 @@ namespace Helpdesk.DataLayer
                 }
 
                 user.Username = request.Username;
-                user.Password = request.Password;
+
+                if (!string.IsNullOrEmpty(request.Password))
+                {
+                    user.Password = request.Password;
+                }
+                user.FirstTime = false;
 
                 context.SaveChanges();
             }
@@ -159,6 +167,7 @@ namespace Helpdesk.DataLayer
             userDTO.UserId = user.UserId;
             userDTO.Username = user.Username;
             userDTO.Password = user.Password;
+            userDTO.FirstTime = user.FirstTime;
 
             return userDTO;
         }
@@ -175,6 +184,7 @@ namespace Helpdesk.DataLayer
             user.UserId = userDTO.UserId;
             user.Username = userDTO.Username;
             user.Password = userDTO.Password;
+            user.FirstTime = userDTO.FirstTime;
 
             return user;
         }

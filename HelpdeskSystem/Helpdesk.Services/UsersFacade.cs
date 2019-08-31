@@ -136,7 +136,9 @@ namespace Helpdesk.Services
 
                 if (dataLayer.GetUserByUsername(request.Username) != null)
                 {
-                    throw new Exception("Unable to add user! User already exists!");
+                    response.Status = HttpStatusCode.BadRequest;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Username already exists"));
+                    return response;
                 }
 
                 int? result = dataLayer.AddUser(request);
@@ -217,13 +219,22 @@ namespace Helpdesk.Services
         /// </summary>
         /// <param name="id">The id of the user to be deleted</param>
         /// <returns>A response that indicates whether or not the deletion was successful</returns>
-        public DeleteUserResponse DeleteUser(int id)
+        public DeleteUserResponse DeleteUser(int id, string currentUser)
         {
             var response = new DeleteUserResponse();
 
             try
             {
                 var dataLayer = new UsersDataLayer();
+
+                UserDTO user = dataLayer.GetUser(id);
+
+                if (user.Username == currentUser)
+                {
+                    response.Status = HttpStatusCode.Forbidden;
+                    return response;
+                }
+
                 bool result = dataLayer.DeleteUser(id);
 
                 if (result)
@@ -284,6 +295,12 @@ namespace Helpdesk.Services
                     response.Status = HttpStatusCode.BadRequest;
                     response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Unable to login username or password is incorrect"));
                     s_logger.Warn($"Unable to login as a username [ {request.Username} ], username or password is incorrect.");
+                    return response;
+                }
+
+                if (user.FirstTime)
+                {
+                    response.Status = HttpStatusCode.Accepted;
                     return response;
                 }
 

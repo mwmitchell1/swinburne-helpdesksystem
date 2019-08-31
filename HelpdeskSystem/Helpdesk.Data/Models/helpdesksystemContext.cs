@@ -309,6 +309,13 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("UserID")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.FirstTime)
+                .HasColumnName("FirstTime")
+                .HasColumnType("tinyint(1)");
+
+                entity.Property(e => e.Password)
+                    .IsRequired();
+
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .IsUnicode(false);
