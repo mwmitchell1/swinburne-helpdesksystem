@@ -4,6 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { NotifierModule, NotifierOptions } from 'angular-notifier'
+import * as $ from 'jquery';
+import * as bootstrap from "bootstrap";
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
