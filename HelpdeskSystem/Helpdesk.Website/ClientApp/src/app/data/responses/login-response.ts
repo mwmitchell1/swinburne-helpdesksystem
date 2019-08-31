@@ -5,4 +5,5 @@ import { BaseResponse } from "./base-response";
  */
 export class LoginResponse extends BaseResponse {
     public Token: string;
+    public userId: string;
 }

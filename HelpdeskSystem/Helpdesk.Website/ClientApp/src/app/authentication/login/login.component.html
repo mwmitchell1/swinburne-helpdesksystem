@@ -45,14 +45,15 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" class="form-control" id="modalUsername" name="modalUsername">
+                    <input type="hidden" class="form-control" formControlName="modalUsername" id="modalUsername" name="modalUsername">
+                    <input type="hidden" class="form-control" formControlName="modalUserId" id="modalUserId" name="modalUserId">
                     <div class="form-group">
                         <label for="modalPassword">Password</label>
-                        <input type="password" class="form-control" id="modalPassword" name="modalPassword">
+                        <input type="password" class="form-control" formControlName="modalPassword" id="modalPassword" name="modalPassword">
                     </div>
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword">
+                        <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword" name="confirmPassword">
                     </div>
                 </div>
                 <div class="modal-footer">
