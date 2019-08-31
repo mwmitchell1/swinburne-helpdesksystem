@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { RouterStateSnapshot, Router } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
 import { HelpdeskDataService } from '../../helpdesk-data/helpdesk-data.service';
+import { NotifierService } from 'angular-notifier';
 
 @Component({
   selector: 'app-logout',
@@ -13,16 +14,23 @@ import { HelpdeskDataService } from '../../helpdesk-data/helpdesk-data.service';
  */
 export class LogoutComponent implements OnInit {
 
-  constructor(private userService: AuthenticationService,
-              private router: Router,
-              private helpdeskData: HelpdeskDataService) { }
+  constructor(private authService: AuthenticationService,
+    private router: Router,
+    private helpdeskData: HelpdeskDataService,
+    private notifierService: NotifierService) { }
 
   /**
    * This function calls the log out function in the auth service
    */
   ngOnInit() {
-    this.userService.logout();
-    // Navigate to helpdesk view of active helpdesk
-    this.router.navigateByUrl('/helpdesk/' + this.helpdeskData.getActiveHelpdesk().id);
+    this.authService.logout().subscribe(
+      result => {
+        // Navigate to helpdesk view of active helpdesk
+        this.router.navigateByUrl('/helpdesk/' + this.helpdeskData.getActiveHelpdesk().id);
+      },
+      error => {
+        this.notifierService.notify('error', 'Unable to log out.')
+      }
+    );
   }
 }

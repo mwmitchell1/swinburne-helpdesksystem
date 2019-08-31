@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { LoginRequest } from 'src/app/data/requests/login-request';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
 import { NotifierService } from 'angular-notifier';
+import { UpateUserRequest } from 'src/app/data/requests/users/update-request';
 
 @Component({
   selector: 'app-login',
@@ -29,9 +30,9 @@ export class LoginComponent implements OnInit {
     this.notifier = notifierSerive;
 
     this.setPasswordForm = this.builder.group({
-      modalUsername: '',
-      modalPassword: '',
-      confirmPassword: ''
+      modalUsername: new FormControl(''),
+      modalPassword: new FormControl(''),
+      confirmPassword: new FormControl('')
     });
 
     this.loginForm = this.builder.group({
@@ -76,7 +77,7 @@ export class LoginComponent implements OnInit {
         this.router.navigateByUrl(this.returnUrl);
       }
       else if (result.status == 202) {
-        this.setPasswordForm.modalUsername = loginRequest.Username;
+        this.setPasswordForm.patchValue({ modalUsername: loginRequest.Username });
         document.getElementById("open-set-password").click();
       }
     },
@@ -116,13 +117,18 @@ export class LoginComponent implements OnInit {
     if (!isValid)
       return;
 
-    // this.service.loginUser(updateUserRequest).subscribe(result => {
-    //   if (result.status == 200) {
-    //     this.router.navigateByUrl(this.returnUrl);
-    //   }
-    // },
-    //   error => {
-    //       this.notifier.notify('error', 'Unable to login please contact admin.')  
-    //   });
+    const updateUserRequest = new UpateUserRequest;
+    updateUserRequest.Username = data.modalUsername;
+    updateUserRequest.Password = data.modalPassword;
+
+    this.service.loginUser(updateUserRequest).subscribe(result => {
+      if (result.status == 200) {
+        $('#modal-set-password').modal('hide');
+        this.loginForm.patchValue({username: data.modalUsername, password: ''})
+      }
+    },
+      error => {
+        this.notifier.notify('error', 'Unable to login please contact admin.')
+      });
   }
 }
