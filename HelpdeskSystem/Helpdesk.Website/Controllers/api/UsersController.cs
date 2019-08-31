@@ -232,7 +232,7 @@ namespace Helpdesk.Website.Controllers.api
                             };
 
                             Response.Cookies.Append("AuthToken", response.Token, cookie);
-                            return Ok();
+                            return Ok(response);
                         }
                     case HttpStatusCode.Accepted:
                         return Accepted(response);
