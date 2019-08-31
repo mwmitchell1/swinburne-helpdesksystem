@@ -1,1 +1,118 @@
 <h2>Users</h2>
+
+<div>
+  <button class="btn btn-primary" data-toggle="modal" data-target="#modal-user-add">Add User</button>
+</div>
+
+<div class="row mt-3">
+  <div class="col-6">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Username</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.username }}</td>
+          <td>
+            <button class="btn btn-danger float-right ml-1" data-toggle="modal"
+              data-target="#modal-user-delete" (click)="setupDelete(user.id)">Delete</button>
+            <button class="btn btn-secondary float-right" data-toggle="modal"
+              data-target="#modal-user-edit">Edit</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="modal-user-add" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add a new user</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="user-add-username">Username</label>
+            <input type="text" class="form-control" id="user-add-username" name="user-add-username">
+          </div>
+
+          <div class="form-group">
+            <label for="user-add-password">Password</label>
+            <input type="password" class="form-control" id="user-add-password" name="user-add-password">
+          </div>
+
+          <div class="form-group">
+            <label for="user-add-password-confirm">Confirm Password</label>
+            <input type="password" class="form-control" id="user-add-password-confirm" name="user-add-password-confirm">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Add User</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="modal-user-edit" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit a user</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="user-edit-username">Username</label>
+            <input type="text" class="form-control" id="user-edit-username" name="user-edit-username">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal fade" id="modal-user-delete" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form [formGroup]="deleteForm" (ngSubmit)="deleteUser(deleteForm.value); modal-user-delete.hide()">
+        <input type="hidden" id="userId" name="userId"/>
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Delete a user</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Are you sure you want to delete this user?
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+          <button type="submit" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

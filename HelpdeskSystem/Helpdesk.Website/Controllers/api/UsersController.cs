@@ -40,7 +40,7 @@ namespace Helpdesk.Website.Controllers.api
                 switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.NotFound:
@@ -76,7 +76,7 @@ namespace Helpdesk.Website.Controllers.api
                 switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.NotFound:
@@ -173,12 +173,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UsersFacade();
-                var response = facade.DeleteUser(id);
+                var response = facade.DeleteUser(id, GetUsername());
 
                 switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
+                    case HttpStatusCode.Forbidden:
+                        return Forbid();
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
@@ -190,7 +192,7 @@ namespace Helpdesk.Website.Controllers.api
             }
             catch (Exception ex)
             {
-                s_logger.Error(ex, "Unable to delete galaxy.");
+                s_logger.Error(ex, "Unable to delete user.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
@@ -232,6 +234,8 @@ namespace Helpdesk.Website.Controllers.api
                             Response.Cookies.Append("AuthToken", response.Token, cookie);
                             return Ok();
                         }
+                    case HttpStatusCode.Accepted:
+                        return Accepted(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
@@ -243,7 +247,7 @@ namespace Helpdesk.Website.Controllers.api
             }
             catch (Exception ex)
             {
-                s_logger.Error(ex, "Unable to add galaxy.");
+                s_logger.Error(ex, "Unable to login user.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
