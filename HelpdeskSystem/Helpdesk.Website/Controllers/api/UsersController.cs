@@ -66,7 +66,7 @@ namespace Helpdesk.Website.Controllers.api
         public IActionResult GetUsers()
         {
             if (!IsAuthorized())
-                 return Unauthorized();
+                return Unauthorized();
 
             try
             {
@@ -131,12 +131,13 @@ namespace Helpdesk.Website.Controllers.api
         /// <param name="id">ID of the user to be updated</param>
         /// <param name="request">Request that contains the new user information</param>
         /// <returns>A response which indicates success or failure</returns>
+        [AllowAnonymous]
         [HttpPatch]
         [Route("{id}")]
         public IActionResult UpdateUser([FromRoute] int id, [FromBody] UpdateUserRequest request)
         {
-            if (!IsAuthorized())
-                return Unauthorized();
+            //if (!IsAuthorized())
+            //    return Unauthorized();
 
             try
             {
@@ -146,7 +147,7 @@ namespace Helpdesk.Website.Controllers.api
                 switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:

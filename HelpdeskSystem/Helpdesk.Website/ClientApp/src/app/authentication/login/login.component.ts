@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
 import { NotifierService } from 'angular-notifier';
 import { UpateUserRequest } from 'src/app/data/requests/users/update-request';
+import { UsersService } from 'src/app/admin/users/users.service';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,7 @@ export class LoginComponent implements OnInit {
 
   constructor(private builder: FormBuilder,
     private service: AuthenticationService,
+    private userService: UsersService,
     private route: ActivatedRoute,
     private router: Router,
     notifierSerive: NotifierService) {
@@ -32,7 +34,8 @@ export class LoginComponent implements OnInit {
     this.setPasswordForm = this.builder.group({
       modalUsername: new FormControl(''),
       modalPassword: new FormControl(''),
-      confirmPassword: new FormControl('')
+      confirmPassword: new FormControl(''),
+      modalUserId: new FormControl('')
     });
 
     this.loginForm = this.builder.group({
@@ -77,7 +80,8 @@ export class LoginComponent implements OnInit {
         this.router.navigateByUrl(this.returnUrl);
       }
       else if (result.status == 202) {
-        this.setPasswordForm.patchValue({ modalUsername: loginRequest.Username });
+        this.setPasswordForm.patchValue({ modalUsername: loginRequest.Username, modalUserId: result.userId });
+        
         document.getElementById("open-set-password").click();
       }
     },
@@ -93,11 +97,6 @@ export class LoginComponent implements OnInit {
 
   setPassword(data) {
     var isValid: boolean = true;
-
-    if (!data.modalUsername) {
-      this.notifier.notify('warning', 'You must enter your username');
-      isValid = false;
-    }
 
     if (!data.modalPassword) {
       this.notifier.notify('warning', 'You must enter your password');
@@ -121,7 +120,7 @@ export class LoginComponent implements OnInit {
     updateUserRequest.Username = data.modalUsername;
     updateUserRequest.Password = data.modalPassword;
 
-    this.service.loginUser(updateUserRequest).subscribe(result => {
+    this.userService.updateUser(updateUserRequest, data.modalUserId).subscribe(result => {
       if (result.status == 200) {
         $('#modal-set-password').modal('hide');
         this.loginForm.patchValue({username: data.modalUsername, password: ''})

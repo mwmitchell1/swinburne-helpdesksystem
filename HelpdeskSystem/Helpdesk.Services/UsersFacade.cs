@@ -185,7 +185,7 @@ namespace Helpdesk.Services
 
                 var dataLayer = new UsersDataLayer();
 
-                if (dataLayer.GetUserByUsername(request.Username) != null)
+                if (dataLayer.GetUserByUsername(request.Username).UserId != id)
                 {
                     throw new Exception("Unable to update user! User with username " + request.Username + "already exists!");
                 }
@@ -301,6 +301,7 @@ namespace Helpdesk.Services
                 if (user.FirstTime)
                 {
                     response.Status = HttpStatusCode.Accepted;
+                    response.UserId = user.UserId;
                     return response;
                 }
 

@@ -291,7 +291,7 @@ namespace Helpdesk.Services.Test
         {
             UsersFacade usersFacade = new UsersFacade();
 
-            GetUserResponse getUserResponse = usersFacade.GetUser(3);
+            GetUserResponse getUserResponse = usersFacade.GetUser(-1);
 
             Assert.AreEqual(HttpStatusCode.NotFound, getUserResponse.Status);
         }
