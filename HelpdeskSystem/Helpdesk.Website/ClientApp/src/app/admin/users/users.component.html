@@ -38,28 +38,33 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        <form>
+
+      <!-- Modal body and footer wrapped in form -->
+      <form (ngSubmit)="addUser()" #addUserForm="ngForm">
+        <div class="modal-body">
           <div class="form-group">
             <label for="user-add-username">Username</label>
-            <input type="text" class="form-control" id="user-add-username" name="user-add-username">
+            <input type="text" class="form-control" id="user-add-username" name="user-add-username"
+                   required [(ngModel)]="userToAdd.Username" >
+            <small class="form-text text-muted">Password will be the same as username until first login.</small>
           </div>
 
-          <div class="form-group">
-            <label for="user-add-password">Password</label>
-            <input type="password" class="form-control" id="user-add-password" name="user-add-password">
-          </div>
 
-          <div class="form-group">
-            <label for="user-add-password-confirm">Confirm Password</label>
-            <input type="password" class="form-control" id="user-add-password-confirm" name="user-add-password-confirm">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Add User</button>
-      </div>
+<!--          <div class="form-group">-->
+<!--            <label for="user-add-password">Password</label>-->
+<!--            <input type="password" class="form-control" id="user-add-password" name="user-add-password">-->
+<!--          </div>-->
+
+<!--          <div class="form-group">-->
+<!--            <label for="user-add-password-confirm">Confirm Password</label>-->
+<!--            <input type="password" class="form-control" id="user-add-password-confirm" name="user-add-password-confirm">-->
+<!--          </div>-->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Add User</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -95,7 +100,7 @@
 <div class="modal fade" id="modal-user-delete" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <form [formGroup]="deleteForm" (ngSubmit)="deleteUser(deleteForm.value); modal-user-delete.hide()">
+      <form [formGroup]="deleteForm" (ngSubmit)="deleteUser(deleteForm.value)">
         <input type="hidden" id="userId" name="userId"/>
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Delete a user</h5>

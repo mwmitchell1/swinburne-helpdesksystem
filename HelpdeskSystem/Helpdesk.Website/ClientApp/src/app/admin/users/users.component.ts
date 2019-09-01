@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+
 import { UsersService } from './users.service';
 import { User } from './user.model';
 import { NotifierService } from 'angular-notifier';
 import { FormBuilder, FormControl } from '@angular/forms';
+import { AddUserRequest } from '../../data/requests/users/add-request';
 
 @Component({
   selector: 'app-admin-users',
@@ -11,12 +13,16 @@ import { FormBuilder, FormControl } from '@angular/forms';
 export class UsersComponent {
   private users: User[];
   deleteForm;
+  activeUsername: string;
+  private readonly userToAdd: AddUserRequest;
 
   constructor(private usersService: UsersService
     , private notifierService: NotifierService
     , private builder: FormBuilder) {
     // this.users = usersService.getUsers();
     // this.users = [];
+    this.userToAdd = new AddUserRequest();
+
     this.updateUserList();
 
     this.deleteForm = this.builder.group({
@@ -60,5 +66,27 @@ export class UsersComponent {
           this.notifierService.notify('warning', 'You cannot delete this user');
         }
       });
+  }
+
+  // TODO: modify POST /api/users endpoint to return consistent response objects
+  // 'already exists' error returns different response object structure
+  addUser() {
+    console.log('adding user', this.userToAdd);
+    this.usersService.addUser(this.userToAdd).subscribe(
+      result => {
+        console.log('result', result);
+        this.notifierService.notify('success', 'User added successfully!');
+      }
+      // error => {
+      //   this.notifierService.notify('error', error.status + ' ' + error.error);
+      //   console.log('error', error);
+      //
+      //   if (typeof(error) === 'string') {
+      //     this.notifierService.notify('error', error);
+      //   } else {
+      //     this.notifierService.notify('error', error.error.errors[0]);
+      //   }
+      // }
+    );
   }
 }
