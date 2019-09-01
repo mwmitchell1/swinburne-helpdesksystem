@@ -61,6 +61,13 @@ namespace Helpdesk.Services.Test
             PopulateEmptyStrings = populateEmptyStrings;
         }
 
+        public TestEntityFactory()
+        {
+            HelpdeskFacade = new HelpdeskFacade();
+            UnitsFacade = new UnitsFacade();
+            QueueFacade = new QueueFacade();
+        }
+
         /// <summary>
         /// Adds a test helpdesk in the database.
         /// </summary>
@@ -76,8 +83,7 @@ namespace Helpdesk.Services.Test
             request.HasCheckIn = (bool)hasCheckin;
             request.HasQueue = (bool)hasQueue;
 
-            var facade = new HelpdeskFacade();
-            var response = facade.AddHelpdesk(request);
+            var response = HelpdeskFacade.AddHelpdesk(request);
 
             TestDataHelpdesk data = new TestDataHelpdesk(request, response);
             return data;
@@ -109,8 +115,7 @@ namespace Helpdesk.Services.Test
             if (isDeleted != null) request.IsDeleted = (bool)isDeleted;
             if (topics != null) request.Topics = topics;
 
-            var facade = new UnitsFacade();
-            var response = facade.AddOrUpdateUnit(request);
+            var response = UnitsFacade.AddOrUpdateUnit(request);
 
             TestDataUnit data = new TestDataUnit(request, response);
             return data;
@@ -132,8 +137,7 @@ namespace Helpdesk.Services.Test
                 if (sID == "" && PopulateEmptyStrings) request.SID = AlphaNumericStringGenerator.GetStudentIDString(); else request.SID = sID;
             }
 
-            var facade = new QueueFacade();
-            var response = facade.AddToQueue(request);
+            var response = QueueFacade.AddToQueue(request);
 
             TestDataQueue data = new TestDataQueue(request, response);
             return data;
@@ -143,5 +147,9 @@ namespace Helpdesk.Services.Test
         // GETTERS & SETTERS
 
         public bool PopulateEmptyStrings { get; set; }
+
+        public HelpdeskFacade HelpdeskFacade { get; }
+        public UnitsFacade UnitsFacade { get; }
+        public QueueFacade QueueFacade { get; }
     }
 }

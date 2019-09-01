@@ -3,6 +3,9 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { NotifierModule, NotifierOptions } from 'angular-notifier'
+import * as $ from 'jquery';
+import * as bootstrap from "bootstrap";
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
@@ -22,7 +25,9 @@ import { ConfigurationComponent } from './admin/configuration/configuration.comp
 import { UnitsComponent } from './admin/units/units.component';
 import { UsersComponent } from './admin/users/users.component';
 import { ReportingComponent } from './admin/reporting/reporting.component';
-import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
+import { NicknamesComponent } from './admin/nicknames/nicknames.component';
+
+import { UsersService } from './admin/users/users.service';
 
 @NgModule({
   declarations: [
@@ -49,7 +54,8 @@ import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
       { path: 'helpdesk', component: HomeComponent, pathMatch: 'full' }, // change to SelectHelpdeskComponent
       { path: 'helpdesk/:id', component: HomeComponent, pathMatch: 'full' }, // change to HelpdeskComponent
-      { path: 'admin/:id', component: AdminComponent,
+      { path: 'admin', redirectTo: 'admin/1', pathMatch: 'full'},
+      { path: 'admin/:id', component: AdminComponent, canActivate: [AuthGuardService],
         children: [
           { path: 'configuration', component: ConfigurationComponent, pathMatch: 'full' },
           { path: 'units', component: UnitsComponent, pathMatch: 'full' },
@@ -57,7 +63,8 @@ import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
           { path: 'nicknames', component: NicknamesComponent, pathMatch: 'full' },
           { path: 'reporting', component: ReportingComponent, pathMatch: 'full' }
         ]}
-    ])
+    ]),
+    NotifierModule
   ],
   providers: [CookieService,
     {
@@ -68,7 +75,8 @@ import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
     AuthGuardService,
     AuthenticationService,
     HelpdeskDataService,
-    RouteStateService],
+    RouteStateService,
+    UsersService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

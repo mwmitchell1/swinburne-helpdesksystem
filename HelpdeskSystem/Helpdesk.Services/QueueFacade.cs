@@ -1,4 +1,5 @@
 ﻿using Helpdesk.Common;
+using Helpdesk.Common.DTOs;
 using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests.Queue;
 using Helpdesk.Common.Requests.Students;
@@ -96,6 +97,7 @@ namespace Helpdesk.Services
                 if (result)
                 {
                     response.Status = HttpStatusCode.OK;
+                    response.Result = true;
                 }
                 else
                 {
@@ -108,6 +110,47 @@ namespace Helpdesk.Services
                 s_logger.Error(ex, "Unable to update queue item status.");
                 response.Status = HttpStatusCode.InternalServerError;
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update queue item status."));
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// This method is responsible for retrieving all queue items from the database
+        /// </summary>
+        /// <returns>The response that indicates if the operation was a success,
+        /// and the list of queue items</returns>
+        public GetQueueItemsResponse GetQueueItems()
+        {
+            s_logger.Info("Getting queue items...");
+
+            GetQueueItemsResponse response = new GetQueueItemsResponse();
+
+            try
+            {
+                var dataLayer = new QueueDataLayer();
+
+                //Can update to a DTO if a DTO for queue items is created
+                List<QueueItemDTO> queueItems = dataLayer.GetQueueItems();
+
+                if (queueItems.Count == 0)
+                {
+                    throw new NotFoundException("No queue items found!");
+                }
+
+                response.QueueItems = queueItems;
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Error(ex, "No queue items found!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No queue items found!"));
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get queue items!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get queue items!"));
             }
             return response;
         }
