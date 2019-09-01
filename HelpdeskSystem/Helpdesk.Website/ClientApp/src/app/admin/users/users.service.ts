@@ -3,8 +3,10 @@ import { HttpClient } from '@angular/common/http';
 
 import { User } from './user.model';
 import { DeleteUserResponse } from 'src/app/data/responses/users/delete-response';
-import { UpateUserRequest } from 'src/app/data/requests/users/update-request';
+import { UpdateUserRequest } from 'src/app/data/requests/users/update-request';
 import { UpdateUserResponse } from 'src/app/data/responses/users/update-response';
+import { AddUserRequest } from '../../data/requests/users/add-request';
+import { AddUserResponse } from "../../data/responses/users/add-response";
 
 @Injectable()
 export class UsersService {
@@ -22,7 +24,13 @@ export class UsersService {
     return this.http.delete<DeleteUserResponse>('/api/users/' + id)
   }
 
-  updateUser(request: UpateUserRequest, id: number) {
+
+  addUser(request: AddUserRequest) {
+    return this.http.post<AddUserResponse>('/api/users/', request);
+  }
+
+
+  updateUser(request: UpdateUserRequest, id: number) {
     return this.http.patch<UpdateUserResponse>('/api/users/' + id, request);
   }
 }
