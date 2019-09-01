@@ -219,7 +219,7 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
 
-            DeleteUserResponse deleteResponse = usersFacade.DeleteUser(addUserResponse.UserId);
+            DeleteUserResponse deleteResponse = usersFacade.DeleteUser(addUserResponse.UserId, "Admin");
 
             Assert.AreEqual(HttpStatusCode.OK, deleteResponse.Status);
 
@@ -236,7 +236,7 @@ namespace Helpdesk.Services.Test
         {
             UsersFacade usersFacade = new UsersFacade();
 
-            DeleteUserResponse deleteResponse = usersFacade.DeleteUser(0);
+            DeleteUserResponse deleteResponse = usersFacade.DeleteUser(-1, "Admin");
 
             Assert.AreEqual(HttpStatusCode.NotFound, deleteResponse.Status);
         }
@@ -291,7 +291,7 @@ namespace Helpdesk.Services.Test
         {
             UsersFacade usersFacade = new UsersFacade();
 
-            GetUserResponse getUserResponse = usersFacade.GetUser(3);
+            GetUserResponse getUserResponse = usersFacade.GetUser(-1);
 
             Assert.AreEqual(HttpStatusCode.NotFound, getUserResponse.Status);
         }
