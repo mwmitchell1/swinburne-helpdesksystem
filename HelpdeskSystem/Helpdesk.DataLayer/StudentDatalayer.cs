@@ -60,6 +60,30 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
+        /// Used to edit the specified student's nickname in the databse with the request's information
+        /// </summary>
+        /// <param name="id">The StudentID of the student to be updated</param>
+        /// <param name="request">The request that contains the student's new nickname</param>
+        /// <returns>A boolean that indicates whether the operation was a success</returns>
+        public bool EditStudentNickname(int id, EditStudentNicknameRequest request)
+        {
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Nicknames nickname = context.Nicknames.FirstOrDefault(n => n.StudentId == id);
+
+                if (nickname == null)
+                {
+                    return false;
+                }
+
+                nickname.NickName = request.Nickname;
+
+                context.SaveChanges();
+            }
+            return true;
+        }
+
+        /// <summary>
         /// Converts the nickname DAO to a DTO to send to the front end
         /// </summary>
         /// <param name="nickname">The DAO for the nickname</param>

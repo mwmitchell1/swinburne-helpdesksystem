@@ -118,22 +118,21 @@ namespace Helpdesk.Services
         /// </summary>
         /// <returns>The response that indicates if the operation was a success,
         /// and the list of queue items</returns>
-        public GetQueueItemsResponse GetQueueItems()
+        public GetQueueItemsByHelpdeskIDResponse GetQueueItemsByHelpdeskID(int id)
         {
-            s_logger.Info("Getting queue items...");
+            s_logger.Info("Getting queue items by helpdesk id...");
 
-            GetQueueItemsResponse response = new GetQueueItemsResponse();
+            GetQueueItemsByHelpdeskIDResponse response = new GetQueueItemsByHelpdeskIDResponse();
 
             try
             {
                 var dataLayer = new QueueDataLayer();
 
-                //Can update to a DTO if a DTO for queue items is created
-                List<QueueItemDTO> queueItems = dataLayer.GetQueueItems();
+                List<QueueItemDTO> queueItems = dataLayer.GetQueueItemsByHelpdeskID(id);
 
                 if (queueItems.Count == 0)
                 {
-                    throw new NotFoundException("No queue items found!");
+                    throw new NotFoundException("No queue items found under helpdesk "+id);
                 }
 
                 response.QueueItems = queueItems;
