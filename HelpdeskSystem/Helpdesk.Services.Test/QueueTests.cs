@@ -9,6 +9,7 @@ using Helpdesk.Data.Models;
 using System.Net;
 using System.Linq;
 using NLog;
+using Microsoft.EntityFrameworkCore;
 
 namespace Helpdesk.Services.Test
 {
@@ -651,24 +652,110 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// Test getting every queue item from the database
+        /// Test getting every queue item from a specific helpdesk from the database
         /// </summary>
         [TestMethod]
-        public void GetQueueItems()
+        public void GetQueueItemsByHelpdeskID()
         {
-            QueueFacade queueFacade = new QueueFacade();
+            Helpdesksettings helpdesk = new Helpdesksettings()
+            {
+                HasQueue = true,
+                HasCheckIn = false,
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
 
-            GetQueueItemsResponse getQueueItemsResponse = queueFacade.GetQueueItems();
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
 
-            Assert.AreEqual(HttpStatusCode.OK, getQueueItemsResponse.Status);
-            Assert.AreEqual(2, getQueueItemsResponse.QueueItems[0].ItemId);
+            Topic topic = new Topic()
+            {
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var queueItems = context.Queueitem.ToList();
+                context.Helpdesksettings.Add(helpdesk);
+                context.Unit.Add(unit);
+                context.SaveChanges();
 
-                Assert.IsNotNull(queueItems);
+                Helpdeskunit helpdeskunit = new Helpdeskunit()
+                {
+                    HelpdeskId = helpdesk.HelpdeskId,
+                    UnitId = unit.UnitId
+                };
+
+                context.Helpdeskunit.Add(helpdeskunit);
+                context.SaveChanges();
+
+                topic.UnitId = unit.UnitId;
+                context.Topic.Add(topic);
+                context.SaveChanges();
             }
+
+            AddToQueueRequest request = new AddToQueueRequest()
+            {
+                Nickname = AlphaNumericStringGenerator.GetString(10),
+                SID = AlphaNumericStringGenerator.GetStudentIDString(),
+                TopicID = topic.TopicId,
+            };
+
+            QueueFacade facade = new QueueFacade();
+
+            AddToQueueResponse response = facade.AddToQueue(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+
+            GetQueueItemsByHelpdeskIDResponse testResponse = facade.GetQueueItemsByHelpdeskID(helpdesk.HelpdeskId);
+
+            Assert.AreEqual(HttpStatusCode.OK, testResponse.Status);
+            Assert.AreEqual(request.StudentID, testResponse.QueueItems[0].StudentId);
+        }
+
+        /// <summary>
+        /// Test getting every queue item from a specific helpdesk with no queue items from the database
+        /// is handeled properly
+        /// </summary>
+        [TestMethod]
+        public void GetQueueItemsByHelpdeskIDNoUnits()
+        {
+            Helpdesksettings helpdesk = new Helpdesksettings()
+            {
+                HasQueue = true,
+                HasCheckIn = false,
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Helpdesksettings.Add(helpdesk);
+                context.SaveChanges();
+            }
+
+            QueueFacade facade = new QueueFacade();
+
+            GetQueueItemsByHelpdeskIDResponse testResponse = facade.GetQueueItemsByHelpdeskID(helpdesk.HelpdeskId);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, testResponse.Status);
+        }
+
+        /// <summary>
+        /// Test getting every queue item from a specific helpdesk that doesn't exist is handeled properly
+        /// </summary>
+        [TestMethod]
+        public void GetQueueItemsByHelpdeskIDNoHelpdesk()
+        {
+            QueueFacade facade = new QueueFacade();
+
+            GetQueueItemsByHelpdeskIDResponse testResponse = facade.GetQueueItemsByHelpdeskID(-1);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, testResponse.Status);
         }
     }
 }

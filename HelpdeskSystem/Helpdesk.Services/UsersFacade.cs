@@ -176,6 +176,7 @@ namespace Helpdesk.Services
             try
             {
                 response = (UpdateUserResponse)request.CheckValidation(response);
+
                 if (response.Status == HttpStatusCode.BadRequest)
                 {
                     return response;
@@ -185,7 +186,7 @@ namespace Helpdesk.Services
 
                 var dataLayer = new UsersDataLayer();
 
-                if (dataLayer.GetUserByUsername(request.Username).UserId != id)
+                if (dataLayer.GetUserByUsername(request.Username)!=null && dataLayer.GetUserByUsername(request.Username).UserId != id)
                 {
                     throw new Exception("Unable to update user! User with username " + request.Username + "already exists!");
                 }

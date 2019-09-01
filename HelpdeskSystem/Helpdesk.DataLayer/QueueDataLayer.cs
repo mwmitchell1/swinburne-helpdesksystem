@@ -7,6 +7,7 @@ using Helpdesk.Data.Models;
 using Helpdesk.Common.Requests.Queue;
 using System.Linq;
 using Helpdesk.Common.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Helpdesk.DataLayer
 {
@@ -98,24 +99,26 @@ namespace Helpdesk.DataLayer
         /// This method retrieves a list of all the queue items in the database
         /// </summary>
         /// <returns>A list of queue items retrieved from the database</returns>
-        public List<QueueItemDTO> GetQueueItems()
+        public List<QueueItemDTO> GetQueueItemsByHelpdeskID(int id)
         {
-            List<QueueItemDTO> queueItemsList = new List<QueueItemDTO>();
+            List<QueueItemDTO> queueItemDTOs = new List<QueueItemDTO>();
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var queueItems = context.Queueitem.ToList();
+                var unitIDs = context.Helpdeskunit.Include("Helpdeskunit").Where(hu => hu.HelpdeskId == id).Select(u => u.UnitId);
+                var topicIDs = context.Topic.Where(t => unitIDs.Contains(t.UnitId)).Select(ti => ti.TopicId).ToList();
+                var queueItems = context.Queueitem.Where(qi => topicIDs.Contains(qi.TopicId)).ToList();
 
                 foreach (Queueitem queueItem in queueItems)
                 {
                     if (queueItem != null)
                     {
                         QueueItemDTO queueItemDTO = DAO2DTO(queueItem);
-                        queueItemsList.Add(queueItemDTO);
+                        queueItemDTOs.Add(queueItemDTO);
                     }
                 }
             }
-            return queueItemsList;
+            return queueItemDTOs;
         }
 
         /// <summary>

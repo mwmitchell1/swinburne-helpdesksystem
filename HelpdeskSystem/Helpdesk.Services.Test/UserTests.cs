@@ -350,7 +350,7 @@ namespace Helpdesk.Services.Test
 
             UpdateUserRequest updateUserRequest = new UpdateUserRequest()
             {
-                Username = "UpdatedUser",
+                Username = AlphaNumericStringGenerator.GetString(9),
                 Password = "UpdatedPassword"
             };
 
