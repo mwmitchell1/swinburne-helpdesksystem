@@ -35,14 +35,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.AddHelpdesk(request);
+                var response = facade.AddHelpdesk(request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok(result);
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -76,14 +76,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.UpdateHelpdesk(id, request);
+                var response = facade.UpdateHelpdesk(id, request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok(result);
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -98,6 +98,10 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Gets every timespan from the database
+        /// </summary>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
         [Route("timespan")]
         public IActionResult GetTimeSpans()
@@ -105,9 +109,36 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetTimeSpans();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get timespans.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Gets a specific timespan from the database
+        /// </summary>
+        /// <param name="id">ID of the specific timespan</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
         [Route("timespan/{id}")]
         public IActionResult GetTimeSpan([FromRoute] int id)
@@ -115,7 +146,29 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetTimeSpan(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get timespan.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPost]
@@ -128,14 +181,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.AddTimeSpan(request);
+                var response = facade.AddTimeSpan(request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok(result);
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -150,6 +203,12 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Updates a specific timespan with the given information
+        /// </summary>
+        /// <param name="id">ID of the timespan to be updated</param>
+        /// <param name="request">Request containing the new timespan information</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpPatch]
         [Route("timespan/{id}")]
         public IActionResult UpdateTimeSpan([FromRoute] int id, [FromBody] UpdateTimeSpanRequest request)
@@ -160,14 +219,14 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new HelpdeskFacade();
-                var result = facade.UpdateTimeSpan(id, request);
+                var response = facade.UpdateTimeSpan(id, request);
 
-                switch (result.Status)
+                switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
-                        return BadRequest(BuildBadRequestMessage(result));
+                        return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:

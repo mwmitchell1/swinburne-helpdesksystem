@@ -49,13 +49,19 @@ namespace Helpdesk.Services
 
                 List<UserDTO> users = dataLayer.GetUsers();
 
-                if (users[0] == null)
+                if (users.Count == 0)
                 {
-                    throw new Exception("Unable to get users!");
+                    throw new NotFoundException("No users found!");
                 }
 
                 response.Users = users;
                 response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Error(ex, "No users found!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No users found!"));
             }
             catch (Exception ex)
             {
@@ -85,14 +91,17 @@ namespace Helpdesk.Services
                 UserDTO user = dataLayer.GetUser(id);
 
                 if (user == null)
-                {
-                    response.Status = HttpStatusCode.NotFound;
-                }
-                else
-                {
-                    response.User = user;
-                    response.Status = HttpStatusCode.OK;
-                }
+                    throw new NotFoundException("Unable to find user!");
+              
+                response.User = user;
+                response.Status = HttpStatusCode.OK;
+
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Error(ex, "Unable to find user!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to find user!"));
             }
             catch (Exception ex)
             {
@@ -124,10 +133,12 @@ namespace Helpdesk.Services
                 request.Password = HashText(request.Password);
 
                 var dataLayer = new UsersDataLayer();
-                
+
                 if (dataLayer.GetUserByUsername(request.Username) != null)
                 {
-                    throw new Exception("Unable to add user! User already exists!");
+                    response.Status = HttpStatusCode.BadRequest;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Username already exists"));
+                    return response;
                 }
 
                 int? result = dataLayer.AddUser(request);
@@ -140,7 +151,7 @@ namespace Helpdesk.Services
                 response.UserId = (int)result;
                 response.Status = HttpStatusCode.OK;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to add user!");
                 response.Status = HttpStatusCode.InternalServerError;
@@ -165,6 +176,7 @@ namespace Helpdesk.Services
             try
             {
                 response = (UpdateUserResponse)request.CheckValidation(response);
+
                 if (response.Status == HttpStatusCode.BadRequest)
                 {
                     return response;
@@ -174,7 +186,7 @@ namespace Helpdesk.Services
 
                 var dataLayer = new UsersDataLayer();
 
-                if (dataLayer.GetUserByUsername(request.Username) != null)
+                if (dataLayer.GetUserByUsername(request.Username)!=null && dataLayer.GetUserByUsername(request.Username).UserId != id)
                 {
                     throw new Exception("Unable to update user! User with username " + request.Username + "already exists!");
                 }
@@ -182,11 +194,17 @@ namespace Helpdesk.Services
                 bool result = dataLayer.UpdateUser(id, request);
 
                 if (result == false)
-                    throw new Exception("Unable to update user!");
+                    throw new NotFoundException("Unable to find user!");
 
                 response.result = result;
                 response.Status = HttpStatusCode.OK;
 
+            }
+            catch(NotFoundException ex)
+            {
+                s_logger.Error(ex, "Unable to find user!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to find user!"));
             }
             catch (Exception ex)
             {
@@ -202,13 +220,22 @@ namespace Helpdesk.Services
         /// </summary>
         /// <param name="id">The id of the user to be deleted</param>
         /// <returns>A response that indicates whether or not the deletion was successful</returns>
-        public DeleteUserResponse DeleteUser(int id)
+        public DeleteUserResponse DeleteUser(int id, string currentUser)
         {
             var response = new DeleteUserResponse();
 
             try
             {
                 var dataLayer = new UsersDataLayer();
+
+                UserDTO user = dataLayer.GetUser(id);
+
+                if (user.Username == currentUser)
+                {
+                    response.Status = HttpStatusCode.Forbidden;
+                    return response;
+                }
+
                 bool result = dataLayer.DeleteUser(id);
 
                 if (result)
@@ -269,6 +296,13 @@ namespace Helpdesk.Services
                     response.Status = HttpStatusCode.BadRequest;
                     response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Unable to login username or password is incorrect"));
                     s_logger.Warn($"Unable to login as a username [ {request.Username} ], username or password is incorrect.");
+                    return response;
+                }
+
+                if (user.FirstTime)
+                {
+                    response.Status = HttpStatusCode.Accepted;
+                    response.UserId = user.UserId;
                     return response;
                 }
 
