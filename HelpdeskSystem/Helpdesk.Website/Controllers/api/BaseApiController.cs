@@ -77,5 +77,22 @@ namespace Helpdesk.Website.Controllers.api
             }
             return result;
         }
+
+        protected string GetUsername()
+        {
+            string username = "";
+
+            try
+            {
+                var identity = HttpContext.User.Identity as ClaimsIdentity;
+                username = identity.Name;
+            }
+            catch(Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get username from identity.");
+            }
+
+            return username;
+        }
     }
 }

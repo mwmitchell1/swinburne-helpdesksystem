@@ -112,6 +112,8 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("HelpdeskID")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+
                 entity.Property(e => e.HasCheckIn).HasColumnType("tinyint(1)");
 
                 entity.Property(e => e.HasQueue).HasColumnType("tinyint(1)");
@@ -169,8 +171,7 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
-                    .HasColumnType("int(11)")
-                    .ValueGeneratedNever();
+                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.NickName)
                     .IsRequired()
@@ -200,18 +201,9 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("ItemID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.NickName)
-                    .IsRequired()
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
                     .HasColumnType("int(11)");
-
-                entity.Property(e => e.TimeHelped).HasColumnType("tinyint(1)");
-
-                entity.Property(e => e.TimeRemoved).HasColumnType("tinyint(1)");
 
                 entity.Property(e => e.TopicId)
                     .HasColumnName("TopicID")
@@ -247,6 +239,12 @@ namespace Helpdesk.Data.Models
                 entity.Property(e => e.Name)
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Helpdesksettings)
+                    .WithMany(p => p.Timespans)
+                    .HasForeignKey(d => d.HelpdeskId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("helpdesksetting_ibfk_1");
             });
 
             modelBuilder.Entity<Topic>(entity =>
@@ -259,6 +257,8 @@ namespace Helpdesk.Data.Models
                 entity.Property(e => e.TopicId)
                     .HasColumnName("TopicID")
                     .HasColumnType("int(11)");
+
+                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -284,6 +284,8 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("UnitID")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+
                 entity.Property(e => e.Code)
                     .IsRequired()
                     .HasMaxLength(8)
@@ -306,6 +308,13 @@ namespace Helpdesk.Data.Models
                 entity.Property(e => e.UserId)
                     .HasColumnName("UserID")
                     .HasColumnType("int(11)");
+
+                entity.Property(e => e.FirstTime)
+                .HasColumnName("FirstTime")
+                .HasColumnType("tinyint(1)");
+
+                entity.Property(e => e.Password)
+                    .IsRequired();
 
                 entity.Property(e => e.Password)
                     .IsRequired()

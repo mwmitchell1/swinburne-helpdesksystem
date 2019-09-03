@@ -11,7 +11,7 @@ using Helpdesk.Common.Extensions;
 namespace Helpdesk.DataLayer
 {
     /// <summary>
-    /// Used to handle any business logic relatedto users including CRUD, login and logout
+    /// Used to handle any databases interactions for users including CRUD, login and logout
     /// </summary>
     public class UsersDataLayer
     {
@@ -29,6 +29,7 @@ namespace Helpdesk.DataLayer
             User user = new User();
             user.Username = request.Username;
             user.Password = request.Password;
+            user.FirstTime = true;
             using (var context = new helpdesksystemContext())
             {
                 context.User.Add(user);
@@ -45,15 +46,18 @@ namespace Helpdesk.DataLayer
         /// <returns>The user DTO</returns>
         public UserDTO GetUser(int id)
         {
-            UserDTO userDto = null;
-            using (var context = new helpdesksystemContext())
+            UserDTO userDTO = null;
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
             {
                 var user = context.User.FirstOrDefault(u => u.UserId == id);
 
                 if (user != null)
-                    userDto = DAO2DTO(user);
+                    userDTO = DAO2DTO(user);
+                else
+                    throw new NotFoundException("Unable to find user.");
             }
-            return userDto;
+            return userDTO;
         }
 
         /// <summary>
@@ -90,7 +94,7 @@ namespace Helpdesk.DataLayer
         {
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                User user = context.User.Single(u => u.UserId == id);
+                User user = context.User.FirstOrDefault(u => u.UserId == id);
 
                 if (user == null)
                 {
@@ -98,7 +102,12 @@ namespace Helpdesk.DataLayer
                 }
 
                 user.Username = request.Username;
-                user.Password = request.Password;
+
+                if (!string.IsNullOrEmpty(request.Password))
+                {
+                    user.Password = request.Password;
+                }
+                user.FirstTime = false;
 
                 context.SaveChanges();
             }
@@ -158,6 +167,7 @@ namespace Helpdesk.DataLayer
             userDTO.UserId = user.UserId;
             userDTO.Username = user.Username;
             userDTO.Password = user.Password;
+            userDTO.FirstTime = user.FirstTime;
 
             return userDTO;
         }
@@ -174,6 +184,7 @@ namespace Helpdesk.DataLayer
             user.UserId = userDTO.UserId;
             user.Username = userDTO.Username;
             user.Password = userDTO.Password;
+            user.FirstTime = userDTO.FirstTime;
 
             return user;
         }

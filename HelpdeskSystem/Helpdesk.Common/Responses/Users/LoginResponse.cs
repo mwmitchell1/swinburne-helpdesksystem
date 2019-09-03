@@ -11,5 +11,7 @@ namespace Helpdesk.Common.Responses.Users
     public class LoginResponse : BaseResponse
     {
         public string Token { get; set; }
+
+        public int? UserId { get; set; }
     }
 }

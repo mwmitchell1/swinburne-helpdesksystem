@@ -13,28 +13,22 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class HelpdeskTests
     {
+        private readonly TestEntityFactory testEntityFactory = new TestEntityFactory();
+
         /// <summary>
         /// Ensures that adding a helpdesk works
         /// </summary>
         [TestMethod]
         public void AddHelpdesk()
         {
-            var request = new AddHelpdeskRequest()
-            {
-                HasCheckIn = false,
-                HasQueue = true,
-                Name = AlphaNumericStringGenerator.GetString(10)
-            };
+            TestDataHelpdesk testEntityData = testEntityFactory.AddHelpdesk();
 
-            var facade = new HelpdeskFacade();
-            var response = facade.AddHelpdesk(request);
-
-            Assert.AreEqual(HttpStatusCode.OK, response.Status);
-            Assert.IsTrue(response.HelpdeskID > 0);
+            Assert.AreEqual(HttpStatusCode.OK, testEntityData.Response.Status);
+            Assert.IsTrue(testEntityData.Response.HelpdeskID > 0);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var helpdesk = context.Helpdesksettings.FirstOrDefault(p => p.HelpdeskId == response.HelpdeskID);
+                var helpdesk = context.Helpdesksettings.FirstOrDefault(p => p.HelpdeskId == testEntityData.Response.HelpdeskID);
 
                 Assert.IsNotNull(helpdesk);
             }
@@ -135,6 +129,7 @@ namespace Helpdesk.Services.Test
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.HelpdeskId = 1;
             addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
             DateTime startDate = DateTime.Today;
             DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
@@ -155,6 +150,7 @@ namespace Helpdesk.Services.Test
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.HelpdeskId = 1;
             addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
             DateTime startDate = DateTime.Today;
             DateTime endDate = new DateTime(startDate.Year - 1, startDate.Month, startDate.Day, 0, 0, 0);
@@ -175,6 +171,7 @@ namespace Helpdesk.Services.Test
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.HelpdeskId = 1;
             addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
             DateTime startDate = new DateTime(2018, 1, 1, 0, 0, 0);
             DateTime endDate = DateTime.Today;
@@ -184,6 +181,149 @@ namespace Helpdesk.Services.Test
             AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
 
             Assert.AreEqual(HttpStatusCode.BadRequest, addTimeSpanResponse.Status);
+        }
+
+        /// <summary>
+        /// Test updating a specific timespan's name, start date and end date
+        /// </summary>
+        [TestMethod]
+        public void UpdateTimespanFound()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
+            addTimeSpanRequest.HelpdeskId = 1;
+            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
+            DateTime startDate = DateTime.Today;
+            DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
+            addTimeSpanRequest.StartDate = startDate;
+            addTimeSpanRequest.EndDate = endDate;
+
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+
+            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
+            {
+                Name = "Semester 1",
+                StartDate = new DateTime(2019, 01, 01),
+                EndDate = new DateTime(2019, 06, 01),
+            };
+
+            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(addTimeSpanResponse.SpanId, updateTimespanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, updateTimespanResponse.Status);
+            Assert.IsTrue(updateTimespanResponse.result);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespan = context.Timespans.FirstOrDefault(u => u.SpanId == addTimeSpanResponse.SpanId);
+
+                Assert.AreEqual(timespan.StartDate, updateTimespanRequest.StartDate);
+                Assert.AreEqual(timespan.Name, updateTimespanRequest.Name);
+                Assert.AreEqual(timespan.EndDate, updateTimespanRequest.EndDate);
+            }
+        }
+
+        /// <summary>
+        /// Test updating a timespan that doesn't exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateTimespanNotFound()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
+            {
+                Name = "Semester 1",
+                StartDate = new DateTime(2019, 08, 01),
+                EndDate = new DateTime(2019, 11, 01)
+            };
+
+            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(0, updateTimespanRequest);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, updateTimespanResponse.Status);
+        }
+
+        /// <summary>
+        /// Test getting every timespan from the database
+        /// </summary>
+        [TestMethod]
+        public void GetTimespans()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            GetTimeSpansResponse getTimespansResponse = helpdeskFacade.GetTimeSpans();
+
+            Assert.AreEqual(HttpStatusCode.OK, getTimespansResponse.Status);
+            Assert.AreEqual(1, getTimespansResponse.Timespans[0].SpanId);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespans = context.Timespans.ToList();
+
+                Assert.IsNotNull(timespans);
+            }
+        }
+
+        /// <summary>
+        /// Test getting a specific timespan from the database by their span id
+        /// </summary>
+        [TestMethod]
+        public void GetTimespanFound()
+        {
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest
+            {
+                HelpdeskId = addHelpdeskResponse.HelpdeskID,
+                Name = "TestName"
+            };
+            DateTime startDate = DateTime.Today;
+            DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
+            addTimeSpanRequest.StartDate = startDate;
+            addTimeSpanRequest.EndDate = endDate;
+
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+
+            GetTimeSpanResponse getTimespanResponse = helpdeskFacade.GetTimeSpan(addTimeSpanResponse.SpanId);
+
+            Assert.AreEqual(HttpStatusCode.OK, getTimespanResponse.Status);
+            Assert.AreEqual("TestName", getTimespanResponse.Timespan.Name);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespan = context.Timespans.FirstOrDefault(t => t.SpanId == addTimeSpanResponse.SpanId);
+
+                Assert.IsNotNull(timespan);
+                Assert.AreEqual(addHelpdeskResponse.HelpdeskID, timespan.HelpdeskId);
+                Assert.AreEqual("TestName", timespan.Name);
+            }
+        }
+
+        /// <summary>
+        /// Test getting a timespan that doesn't exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void GetTimespanNotFound()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            GetTimeSpanResponse getTimespanResponse = helpdeskFacade.GetTimeSpan(-1);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, getTimespanResponse.Status);
         }
     }
 }

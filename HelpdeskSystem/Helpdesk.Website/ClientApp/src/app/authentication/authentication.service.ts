@@ -1,8 +1,8 @@
-import { HttpClient } from "@angular/common/http";
-import { Inject, Injectable } from "@angular/core";
-import { LoginResponse } from "../data/responses/login-response";
-import { LoginRequest } from "../data/requests/login-request";
-import { CookieService } from "ngx-cookie-service";
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable } from '@angular/core';
+import { LoginResponse } from '../data/responses/login-response';
+import { LoginRequest } from '../data/requests/login-request';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
     providedIn: 'root',
@@ -21,23 +21,23 @@ export class AuthenticationService {
 
     /**
      * Used to call the login api
-     * @param loginRequest 
+     * @param loginRequest
      */
     loginUser(loginRequest) {
-        return this.client.post<LoginRequest>(this.baseUrl + 'api/users/login', loginRequest)
+        return this.client.post<LoginResponse>(this.baseUrl + 'api/users/login', loginRequest)
     }
 
     /**
      * Used to call the logout api
      */
     logout() {
-        return this.client.get(this.baseUrl + 'api/users/logout').subscribe( error => console.error(error));
+        return this.client.get(this.baseUrl + 'api/users/logout');
     }
 
     /**
      * Used to check if the user is logged in by checking if they have an auth token
      */
     isLoggedIn() {
-        return this.cookieService.get('AuthToken') != "";
+        return this.cookieService.get('AuthToken') !== '';
     }
 }
