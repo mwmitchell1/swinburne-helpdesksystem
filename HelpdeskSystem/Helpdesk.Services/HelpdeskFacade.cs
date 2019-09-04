@@ -63,6 +63,94 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
+        /// Used to return all of the active helpdesks
+        /// </summary>
+        /// <returns>A response indicating the success and a list of active helpdesks</returns>
+        public GetHelpdesksResponse GetActiveHelpdesks()
+        {
+            var response = new GetHelpdesksResponse();
+
+            try
+            {
+                var dataLayer = new HelpdeskDataLayer();
+                response.Helpdesks = dataLayer.GetActiveHelpdesks();
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to get helpdesk"));
+                s_logger.Warn(ex, "Unable to find helpdesks.");
+            }
+            catch (Exception ex)
+            {
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get helpdesks"));
+                s_logger.Error(ex, "Unable to get helpdesks.");
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// Used to return all of the helpdesks
+        /// </summary>
+        /// <returns>A response indicating the success and a list of helpdesks</returns>
+        public GetHelpdesksResponse GetHelpdesks()
+        {
+            var response = new GetHelpdesksResponse();
+
+            try
+            {
+                var dataLayer = new HelpdeskDataLayer();
+                response.Helpdesks = dataLayer.GetHelpdesks();
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to get helpdesk"));
+                s_logger.Warn(ex, "Unable to find helpdesks.");
+            }
+            catch (Exception ex)
+            {
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get helpdesks"));
+                s_logger.Error(ex, "Unable to get helpdesks.");
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// Used to get a helpdesk using it's id
+        /// </summary>
+        /// <param name="id">The id of the helpdesk to be retreived</param>
+        /// <returns>A response indicating the success and helpdesk DTO or null</returns>
+        public GetHelpdeskResponse GetHelpdesk(int id)
+        {
+            var response = new GetHelpdeskResponse();
+
+            try
+            {
+                var dataLayer = new HelpdeskDataLayer();
+                response.Helpdesk = dataLayer.GetHelpdesk(id);
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to get helpdesk"));
+                s_logger.Error(ex, $"Unable to find helpdesk with id [{id}].");
+            }
+            catch (Exception ex)
+            {
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get helpdesk"));
+                s_logger.Error(ex, $"Unable to get helpdesk with id [{id}].");
+            }
+            return response;
+        }
+
+        /// <summary>
         /// This method is to handle updating helpdesk business logic
         /// </summary>
         /// <param name="id">The id of the helpdesk to be updated</param>

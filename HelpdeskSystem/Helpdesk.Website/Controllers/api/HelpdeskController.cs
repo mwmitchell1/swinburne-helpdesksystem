@@ -17,6 +17,110 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class HelpdeskController : BaseApiController
     {
+
+        /// <summary>
+        /// Used to retreive all of the helpdesks
+        /// </summary>
+        /// <returns>A reponse to indictae whether or not it was a success 
+        /// with a list of helpdesks</returns>
+        [HttpGet]
+        [Route("")]
+        public IActionResult GetHelpdesks()
+        {
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetHelpdesks();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get helpdesks.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Used to retreive all of the active helpdesks
+        /// </summary>
+        /// <returns>A reponse to indictae whether or not it was a success 
+        /// with a list of active helpdesks</returns>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("active")]
+        public IActionResult GetActiveHelpdesks()
+        {
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetActiveHelpdesks();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get active helpdesks.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Used to get the information for a specific helpdesk
+        /// </summary>
+        /// <param name="id">The id of the helpdesk to be retreived</param>
+        /// <returns>A response indicating the success and helpdesk DTO or null</returns>
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetHelpdesk([FromRoute] int id)
+        {
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetHelpdesk(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get helpdesk.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
         /// <summary>
         /// This method is the end point to be able to add a heldesk
         /// </summary>
