@@ -145,7 +145,7 @@ namespace Helpdesk.Website.Controllers.api
                 switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
