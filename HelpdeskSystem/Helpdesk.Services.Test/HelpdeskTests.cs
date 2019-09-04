@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Helpdesk.Common.DTOs;
@@ -50,6 +51,72 @@ namespace Helpdesk.Services.Test
             var response = facade.AddHelpdesk(request);
 
             Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
+        }
+
+        [TestMethod]
+        public void GetHelpdesks()
+        {
+            var factory = new TestEntityFactory();
+
+            var data = factory.AddHelpdesk(AlphaNumericStringGenerator.GetString(10));
+
+            var facade = new HelpdeskFacade();
+            var response = facade.GetHelpdesks();
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.Helpdesks.Count > 0);
+        }
+
+        [TestMethod]
+        public void GetActiveHelpdesks()
+        {
+            var factory = new TestEntityFactory();
+
+            var hd1 = factory.AddHelpdesk(AlphaNumericStringGenerator.GetString(10));
+            var hd2 = factory.AddHelpdesk(AlphaNumericStringGenerator.GetString(10));
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var helpdesk = context.Helpdesksettings.FirstOrDefault(hd => hd.HelpdeskId == hd2.Response.HelpdeskID);
+
+                helpdesk.IsDeleted = true;
+                context.SaveChanges();
+            }
+
+            var facade = new HelpdeskFacade();
+            var response = facade.GetActiveHelpdesks();
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.Helpdesks.Count > 0);
+
+            List<int> helpdeskIds = response.Helpdesks.Select(hd => hd.HelpdeskID).ToList();
+
+            Assert.IsTrue(helpdeskIds.Contains(hd1.Response.HelpdeskID));
+            Assert.IsTrue(!helpdeskIds.Contains(hd2.Response.HelpdeskID));
+        }
+
+        [TestMethod]
+        public void GetHelpdeskSuccess()
+        {
+            var factory = new TestEntityFactory();
+
+            var data = factory.AddHelpdesk(AlphaNumericStringGenerator.GetString(10));
+
+            var facade = new HelpdeskFacade();
+            var response = facade.GetHelpdesk(data.Response.HelpdeskID);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsNotNull(response.Helpdesk);
+        }
+
+        [TestMethod]
+        public void GetHelpdeskNotFound()
+        {
+            var facade = new HelpdeskFacade();
+            var response = facade.GetHelpdesk(-1);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
+            Assert.IsNull(response.Helpdesk);
         }
 
 
