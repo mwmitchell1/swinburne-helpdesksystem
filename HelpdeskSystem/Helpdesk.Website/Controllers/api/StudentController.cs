@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Helpdesk.Common.Requests.Queue;
+using Helpdesk.Common.Requests.Students;
 using Helpdesk.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -13,29 +13,31 @@ using Microsoft.AspNetCore.Mvc;
 namespace Helpdesk.Website.Controllers.api
 {
     /// <summary>
-    /// Used as the access point for any features relating to the queue
+    /// Used as the access point for any features relating to students
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("api/queue")]
+    [Route("api/student")]
     [ApiController]
-    public class QueueController : BaseApiController
+    public class StudentController : BaseApiController
     {
-       /// <summary>
-       /// Retrieves queue items from the database by helpdesk id
-       /// </summary>
-       /// <param name="id">The id of the helpdesk</param>
-       /// <returns>Response which indicates success or failure</returns>
-        [HttpGet]
-        [Route("helpdesk/{id}")]
-        public IActionResult GetQueueItemsByHelpdeskID([FromRoute] int id)
+        /// <summary>
+        /// Edits a specific student's nickname with the given information
+        /// </summary>
+        /// <param name="id">ID of the student to be updated</param>
+        /// <param name="request">Request that contains the new nickname</param>
+        /// <returns>A response which indicates success or failure</returns>
+        [AllowAnonymous]
+        [HttpPatch]
+        [Route("nickname/{id}")]
+        public IActionResult EditStudentNickname([FromRoute] int id, [FromBody] EditStudentNicknameRequest request)
         {
             if (!IsAuthorized())
                 return Unauthorized();
 
             try
             {
-                var facade = new QueueFacade();
-                var response = facade.GetQueueItemsByHelpdeskID(id);
+                var facade = new StudentFacade();
+                var response = facade.EditStudentNickname(id, request);
 
                 switch (response.Status)
                 {
@@ -43,16 +45,16 @@ namespace Helpdesk.Website.Controllers.api
                         return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
-                    case HttpStatusCode.NotFound:
-                        return NotFound();
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
                 }
                 s_logger.Fatal("This code should be unreachable, unknown result has occured.");
             }
             catch (Exception ex)
             {
-                s_logger.Error(ex, "Unable to get queue items.");
+                s_logger.Error(ex, "Unable to edit student's nickname.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }

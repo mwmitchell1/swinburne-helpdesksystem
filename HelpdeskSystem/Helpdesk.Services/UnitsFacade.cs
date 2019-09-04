@@ -148,6 +148,7 @@ namespace Helpdesk.Services
             try
             {
                 var dataLayer = new UnitsDataLayer();
+
                 List<UnitDTO> units = dataLayer.GetUnitsByHelpdeskID(id);
 
                 if(units.Count==0)
