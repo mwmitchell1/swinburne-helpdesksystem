@@ -6,6 +6,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Helpdesk.Common.Extensions;
+using System.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 namespace Helpdesk.DataLayer
 {
@@ -78,6 +81,48 @@ namespace Helpdesk.DataLayer
                     helpdeskDTOs.Add(DAO2DTO(helpdesk));
             }
             return helpdeskDTOs;
+        }
+
+        /// <summary>
+        /// Used to get a datatable with all of the helpdesk records
+        /// </summary>
+        /// <returns>Datatable with the helpdesk records</returns>
+        public DataTable GetHelpdesksAsDataTable()
+        {
+            DataTable helpdesks = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "getallhelpdesks";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            helpdesks.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return helpdesks;
         }
 
         /// <summary>
