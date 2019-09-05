@@ -9,6 +9,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Net;
 using System.Text;
 
@@ -368,6 +369,33 @@ namespace Helpdesk.Services
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update timespan!"));
             }
             return response;
+        }
+
+
+        /// <summary>
+        /// Used to get a Zip file of all of the database tables as CSVs
+        /// </summary>
+        public void ExportDatabase()
+        {
+            try
+            {
+                var helpdeskDataLayer = new HelpdeskDataLayer();
+                var unitDataLayer = new UnitsDataLayer();
+                var usersDataLayer = new UsersDataLayer();
+                var topicsDataLayer = new TopicsDataLayer();
+                var studentDataLayer = new StudentDatalayer();
+                var queueDataLayer = new QueueDataLayer();
+
+                DataTable helpdesks = helpdeskDataLayer.GetHelpdesksAsDataTable();
+                DataTable units = unitDataLayer.GetUnitsAsDataTable();
+                DataTable topics = topicsDataLayer.GetTopicsAsDataTable();
+                DataTable students = studentDataLayer.GetStudentsAsDataTable();
+                DataTable queuesItems = queueDataLayer.GetQueueItemsAsDataTable();
+            }
+            catch(Exception ex)
+            {
+                s_logger.Error(ex, "Unable to generate database export");
+            }
         }
 
         public DeleteTimeSpanResponse DeleteTimeSpan(int id)
