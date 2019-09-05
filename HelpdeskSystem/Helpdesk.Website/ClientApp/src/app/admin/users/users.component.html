@@ -42,11 +42,13 @@
       <!-- Modal body and footer wrapped in form -->
       <form (ngSubmit)="addUser()" #addUserForm="ngForm">
         <div class="modal-body">
+          <div class="alert alert-info">Password will be the same as username until first login.</div>
           <div class="form-group">
             <label for="user-add-username">Username</label>
-            <input type="text" class="form-control" id="user-add-username" name="user-add-username"
-                   required [(ngModel)]="userToAdd.Username" >
-            <small class="form-text text-muted">Password will be the same as username until first login.</small>
+            <input type="text" class="form-control" [ngClass]="{'is-invalid': errorMsg}" id="user-add-username" name="user-add-username"
+                   required [(ngModel)]="userToAdd.Username" (blur)="errorMsg = ''">
+<!--            <small class="form-text text-muted">Password will be the same as username until first login.</small>-->
+            <div class="invalid-feedback d-block" *ngIf="errorMsg">{{ errorMsg }}</div>
           </div>
 
 
