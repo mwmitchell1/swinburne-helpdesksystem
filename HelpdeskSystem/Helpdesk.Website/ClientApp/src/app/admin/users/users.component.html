@@ -40,31 +40,20 @@
       </div>
 
       <!-- Modal body and footer wrapped in form -->
-      <form (ngSubmit)="addUser()" #addUserForm="ngForm">
+      <form (ngSubmit)="addUser(addUserForm)" #addUserForm="ngForm">
         <div class="modal-body">
           <div class="alert alert-info">Password will be the same as username until first login.</div>
           <div class="form-group">
             <label for="user-add-username">Username</label>
-            <input type="text" class="form-control" [ngClass]="{'is-invalid': errorMsg}" id="user-add-username" name="user-add-username"
-                   required [(ngModel)]="userToAdd.Username" (blur)="errorMsg = ''">
-<!--            <small class="form-text text-muted">Password will be the same as username until first login.</small>-->
-            <div class="invalid-feedback d-block" *ngIf="errorMsg">{{ errorMsg }}</div>
+            <input type="text" class="form-control" [ngClass]="{'is-invalid': !(username.valid || username.pristine)}"
+                   id="user-add-username" name="user-add-username"
+                   required maxlength="20" [(ngModel)]="userToAdd.Username" #username="ngModel">
+            <div class="invalid-feedback" [hidden]="username.valid || username.pristine">Username is required</div>
           </div>
-
-
-<!--          <div class="form-group">-->
-<!--            <label for="user-add-password">Password</label>-->
-<!--            <input type="password" class="form-control" id="user-add-password" name="user-add-password">-->
-<!--          </div>-->
-
-<!--          <div class="form-group">-->
-<!--            <label for="user-add-password-confirm">Confirm Password</label>-->
-<!--            <input type="password" class="form-control" id="user-add-password-confirm" name="user-add-password-confirm">-->
-<!--          </div>-->
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Add User</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!addUserForm.form.valid">Add User</button>
         </div>
       </form>
     </div>
