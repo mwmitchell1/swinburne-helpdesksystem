@@ -6,8 +6,8 @@ export class AddUserRequest {
   public PasswordConfirm: string;
 
   constructor() {
-    this.Password = 'Password1';
-    this.PasswordConfirm = 'Password1';
+    // this.Password = this.Username;
+    // this.PasswordConfirm = this.Username;
   }
 
 }
