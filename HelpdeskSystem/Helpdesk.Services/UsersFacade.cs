@@ -130,14 +130,18 @@ namespace Helpdesk.Services
                 {
                     return response;
                 }
+
+                if (string.IsNullOrEmpty(request.Password))
+                    request.Password = request.Username;
+
                 request.Password = HashText(request.Password);
 
                 var dataLayer = new UsersDataLayer();
 
                 if (dataLayer.GetUserByUsername(request.Username) != null)
                 {
-                    response.Status = HttpStatusCode.BadRequest;
-                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Username already exists"));
+                    response.Status = HttpStatusCode.Forbidden;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.Forbidden, "Username already exists"));
                     return response;
                 }
 
