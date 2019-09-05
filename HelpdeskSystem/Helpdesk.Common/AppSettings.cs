@@ -16,6 +16,8 @@ namespace Helpdesk.Common
 
         public string AppSecret { get; set; }
 
+        public string DatabaseBackupDestination { get; set; }
+
         public AppSettings()
         {
             var configurationBuilder = new ConfigurationBuilder();
@@ -26,6 +28,7 @@ namespace Helpdesk.Common
 
             DefaultConnection = root.GetConnectionString("DefaultConnection");
             AppSecret = root.GetSection("AppSettings").GetSection("Secret").Value;
+            DatabaseBackupDestination = root.GetSection("AppSettings").GetSection("DatabaseBackupDestination").Value;
 
             var appSetting = root.GetSection("ApplicationSettings");
         }

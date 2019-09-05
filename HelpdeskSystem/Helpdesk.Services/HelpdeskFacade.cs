@@ -4,6 +4,7 @@ using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests.Helpdesk;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Helpdesk;
+using Helpdesk.Common.Utilities;
 using Helpdesk.DataLayer;
 using NLog;
 using System;
@@ -375,27 +376,49 @@ namespace Helpdesk.Services
         /// <summary>
         /// Used to get a Zip file of all of the database tables as CSVs
         /// </summary>
-        public void ExportDatabase()
+        public bool ExportDatabase()
         {
+            bool result = false;
+
             try
             {
-                var helpdeskDataLayer = new HelpdeskDataLayer();
-                var unitDataLayer = new UnitsDataLayer();
-                var usersDataLayer = new UsersDataLayer();
-                var topicsDataLayer = new TopicsDataLayer();
-                var studentDataLayer = new StudentDatalayer();
-                var queueDataLayer = new QueueDataLayer();
+                FileProccessing proccessing = new FileProccessing();
 
-                DataTable helpdesks = helpdeskDataLayer.GetHelpdesksAsDataTable();
-                DataTable units = unitDataLayer.GetUnitsAsDataTable();
-                DataTable topics = topicsDataLayer.GetTopicsAsDataTable();
-                DataTable students = studentDataLayer.GetStudentsAsDataTable();
-                DataTable queuesItems = queueDataLayer.GetQueueItemsAsDataTable();
+                DateTime now = DateTime.Now;
+
+                string exportName = $"databaseexport_{now.Year}{now.Month}{now.Day}_{now.Hour}{now.Minute}{now.Second}";
+
+                string fullZipPath = proccessing.CreateZip(_appSettings.DatabaseBackupDestination, exportName);
+
+                if (string.IsNullOrEmpty(fullZipPath))
+                {
+                    s_logger.Error("Unable to create empty zip");
+                    return result;
+                }
+                else
+                {
+                    var helpdeskDataLayer = new HelpdeskDataLayer();
+                    var unitDataLayer = new UnitsDataLayer();
+                    var usersDataLayer = new UsersDataLayer();
+                    var topicsDataLayer = new TopicsDataLayer();
+                    var studentDataLayer = new StudentDatalayer();
+                    var queueDataLayer = new QueueDataLayer();
+
+                    DataTable helpdesks = helpdeskDataLayer.GetHelpdesksAsDataTable();
+                    DataTable helpdeskUnits = helpdeskDataLayer.GetHelpdeskUnitsAsDataTable();
+                    DataTable users = usersDataLayer.GetUsersAsDataTable();
+                    DataTable units = unitDataLayer.GetUnitsAsDataTable();
+                    DataTable topics = topicsDataLayer.GetTopicsAsDataTable();
+                    DataTable students = studentDataLayer.GetStudentsAsDataTable();
+                    DataTable queuesItems = queueDataLayer.GetQueueItemsAsDataTable();
+                }
             }
             catch(Exception ex)
             {
                 s_logger.Error(ex, "Unable to generate database export");
+                result = false;
             }
+            return result;
         }
 
         public DeleteTimeSpanResponse DeleteTimeSpan(int id)

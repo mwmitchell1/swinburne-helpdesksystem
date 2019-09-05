@@ -126,6 +126,48 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
+        /// Used to get a datatable with all of the helpdeskunit records
+        /// </summary>
+        /// <returns>Datatable with the helpdeskunit records</returns>
+        public DataTable GetHelpdeskUnitsAsDataTable()
+        {
+            DataTable helpdeskunits = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "getallhelpdeskunits";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            helpdeskunits.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return helpdeskunits;
+        }
+
+        /// <summary>
         /// Used to retreive all the active helpdesks
         /// </summary>
         /// <returns>The list of all the active helpdesks as DTOs</returns>
