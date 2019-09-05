@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using Helpdesk.Common.DTOs;
 using Helpdesk.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NLog;
 
@@ -26,6 +29,48 @@ namespace Helpdesk.DataLayer
                 }
             }
             return topicDTOs;
+        }
+
+        /// <summary>
+        /// Used to get a datatable with all of the topic records
+        /// </summary>
+        /// <returns>Datatable with the topic records</returns>
+        public DataTable GetTopicsAsDataTable()
+        {
+            DataTable topics = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "getalltopics";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            topics.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return topics;
         }
 
         private TopicDTO DAO2DTO(Topic topic)

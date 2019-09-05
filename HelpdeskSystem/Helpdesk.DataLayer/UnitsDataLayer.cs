@@ -178,7 +178,7 @@ namespace Helpdesk.DataLayer
         /// <returns>Datatable with the unit records</returns>
         public DataTable GetUnitsAsDataTable()
         {
-            DataTable helpdesks = new DataTable();
+            DataTable units = new DataTable();
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -196,7 +196,7 @@ namespace Helpdesk.DataLayer
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {
-                            helpdesks.Load(reader);
+                            units.Load(reader);
                         }
                     }
                 }
@@ -211,7 +211,7 @@ namespace Helpdesk.DataLayer
                 }
             }
 
-            return helpdesks;
+            return units;
         }
 
         /// <summary>
