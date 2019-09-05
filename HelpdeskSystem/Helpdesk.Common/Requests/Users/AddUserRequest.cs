@@ -11,20 +11,13 @@ namespace Helpdesk.Common.Requests.Users
         [StringLength(20, ErrorMessage = "{0} cannot exceed {1} characters.")]
         public string Username { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "{0} cannot be empty!")]
         public string Password { get; set; }
 
-        [Required(AllowEmptyStrings = false, ErrorMessage = "{0} cannot be empty!")]
         public string PasswordConfirm { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var results = new List<ValidationResult>();
-
-            if (!Password.Equals(PasswordConfirm))
-            {
-                results.Add(new ValidationResult("Password confirmation must match password!"));
-            }
 
             return results;
         }
