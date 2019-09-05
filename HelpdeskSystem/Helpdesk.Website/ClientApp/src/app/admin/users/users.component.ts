@@ -13,14 +13,12 @@ import { AddUserRequest } from '../../data/requests/users/add-request';
 export class UsersComponent {
   private users: User[];
   deleteForm;
-  errorMsg: string;
   private readonly userToAdd: AddUserRequest;
 
   constructor(private usersService: UsersService
     , private notifierService: NotifierService
     , private builder: FormBuilder) {
-    // this.users = usersService.getUsers();
-    // this.users = [];
+
     this.userToAdd = new AddUserRequest();
 
     this.updateUserList();
@@ -68,37 +66,31 @@ export class UsersComponent {
       });
   }
 
-  // TODO: modify POST /api/users endpoint to return consistent response objects
-  // 'already exists' error returns different response object structure
-  addUser() {
-    this.errorMsg = '';
-
-    // TODO: Modify POST /api/users endpoint to only require username
-    this.userToAdd.Password = this.userToAdd.Username;
-    this.userToAdd.PasswordConfirm = this.userToAdd.Password;
+  addUser(form) {
 
     console.log('adding user', this.userToAdd);
     this.usersService.addUser(this.userToAdd).subscribe(
       result => {
-        console.log('result', result);
+        // console.log('result', result);
         this.notifierService.notify('success', 'User added successfully!');
         // TODO Refactor to avoid using updateUserList - getting all users to update one user
         this.updateUserList();
 
         // close modal
         $('#modal-user-add').modal('hide');
-        // clean username
-        this.userToAdd.Username = '';
+
+        // reset form
+        form.reset();
       },
       error => {
-        // // this.notifierService.notify('error', error.status + ' ' + error.error);
         // console.log('error', error);
-        //
-        //
-        // if (typeof error.error.errors === 'undefined') {
-        //   this.errorMsg = error.error;
-        // }
-        this.notifierService.notify('error', 'Unable to add user, please contact helpdesk admin');
+
+        if (error.status === 403) {
+          this.notifierService.notify('warning', 'User already exists.');
+        } else {
+          this.notifierService.notify('error', 'Unable to add user, please contact helpdesk admin');
+        }
+
       }
     );
   }
