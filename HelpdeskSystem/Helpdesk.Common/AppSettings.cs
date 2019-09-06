@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Helpdesk.Common
@@ -18,6 +19,8 @@ namespace Helpdesk.Common
 
         public string DatabaseBackupDestination { get; set; }
 
+        public Dictionary<string, string> Jobs { get; set; } = new Dictionary<string, string>();
+
         public AppSettings()
         {
             var configurationBuilder = new ConfigurationBuilder();
@@ -31,6 +34,7 @@ namespace Helpdesk.Common
             DatabaseBackupDestination = root.GetSection("AppSettings").GetSection("DatabaseBackupDestination").Value;
 
             var appSetting = root.GetSection("ApplicationSettings");
+            Jobs.Add("ExportDatabaseJob", root.GetSection("Jobs").GetSection("ExportDatabaseJob").Value);
         }
 
     }

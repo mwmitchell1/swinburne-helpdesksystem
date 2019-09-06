@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 
@@ -253,11 +255,7 @@ namespace Helpdesk.Services
                 var dataLayer = new HelpdeskDataLayer();
 
                 TimeSpanDTO timespan = dataLayer.GetTimeSpan(id);
-
-                if (timespan == null)
-                    throw new NotFoundException("Unable to find timespan!");
-
-                response.Timespan = timespan;
+                response.Timespan = timespan ?? throw new NotFoundException("Unable to find timespan!");
                 response.Status = HttpStatusCode.OK;
 
             }
@@ -386,7 +384,7 @@ namespace Helpdesk.Services
 
                 DateTime now = DateTime.Now;
 
-                string exportName = $"databaseexport_{now.Year}{now.Month}{now.Day}_{now.Hour}{now.Minute}{now.Second}";
+                string exportName = $"databaseexport_{now.ToString("yyyyddMM_HHmmss")}";
 
                 string fullZipPath = proccessing.CreateZip(_appSettings.DatabaseBackupDestination, exportName);
 
@@ -405,12 +403,27 @@ namespace Helpdesk.Services
                     var queueDataLayer = new QueueDataLayer();
 
                     DataTable helpdesks = helpdeskDataLayer.GetHelpdesksAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "helpdesks", helpdesks);
+
                     DataTable helpdeskUnits = helpdeskDataLayer.GetHelpdeskUnitsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "helpdeskunits", helpdeskUnits);
+
                     DataTable users = usersDataLayer.GetUsersAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "users", users);
+
                     DataTable units = unitDataLayer.GetUnitsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "units", units);
+
                     DataTable topics = topicsDataLayer.GetTopicsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "topics", topics);
+
                     DataTable students = studentDataLayer.GetStudentsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "students", students);
+
                     DataTable queuesItems = queueDataLayer.GetQueueItemsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "queueItems", queuesItems);
+
+                    result = true;
                 }
             }
             catch(Exception ex)

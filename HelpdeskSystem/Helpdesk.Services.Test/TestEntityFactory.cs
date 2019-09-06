@@ -83,7 +83,6 @@ namespace Helpdesk.Services.Test
         public TestDataUnit AddUpdateUnit(int unitID = 0, int? helpdeskID = null, string name = "", string code = "", bool? isDeleted = false, List<string> topics = null)
         {
             var request = new AddUpdateUnitRequest();
-            if (unitID != 0) request.UnitID = unitID; // Updating an existing helpdesk.
             if (helpdeskID != null) request.HelpdeskID = (int)helpdeskID;
             if (name != null)
             {
@@ -97,7 +96,7 @@ namespace Helpdesk.Services.Test
             if (topics != null) request.Topics = topics;
 
             var facade = new UnitsFacade();
-            var response = facade.AddOrUpdateUnit(request);
+            var response = facade.AddOrUpdateUnit(unitID, request);
 
             TestDataUnit data = new TestDataUnit(request, response);
             return data;
