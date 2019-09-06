@@ -24,7 +24,7 @@ namespace Helpdesk.Services
             _appSettings = new AppSettings();
         }
 
-        public AddUpdateUnitResponse AddOrUpdateUnit(AddUpdateUnitRequest request)
+        public AddUpdateUnitResponse AddOrUpdateUnit(int id, AddUpdateUnitRequest request)
         {
             s_logger.Info("Adding unit to helpdesk");
 
@@ -40,7 +40,7 @@ namespace Helpdesk.Services
                 var dataLayer = new UnitsDataLayer();
                 
 
-                if (request.UnitID == 0)
+                if (id == 0)
                 {
                     UnitDTO unit = dataLayer.GetUnitByNameAndHelpdeskId(request.Name, request.HelpdeskID);
 
@@ -72,7 +72,7 @@ namespace Helpdesk.Services
                 }
                 else
                 {
-                    var existingUnit = dataLayer.GetUnit(request.UnitID);
+                    var existingUnit = dataLayer.GetUnit(id);
 
                     if (existingUnit == null)
                     {
