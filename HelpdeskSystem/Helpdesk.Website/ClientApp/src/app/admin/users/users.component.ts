@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+
 import { UsersService } from './users.service';
 import { User } from './user.model';
 import { NotifierService } from 'angular-notifier';
 import { FormBuilder, FormControl } from '@angular/forms';
+import { AddUserRequest } from '../../data/requests/users/add-request';
 
 @Component({
   selector: 'app-admin-users',
@@ -11,12 +13,14 @@ import { FormBuilder, FormControl } from '@angular/forms';
 export class UsersComponent {
   private users: User[];
   deleteForm;
+  private readonly userToAdd: AddUserRequest;
 
   constructor(private usersService: UsersService
     , private notifierService: NotifierService
     , private builder: FormBuilder) {
-    // this.users = usersService.getUsers();
-    // this.users = [];
+
+    this.userToAdd = new AddUserRequest();
+
     this.updateUserList();
 
     this.deleteForm = this.builder.group({
@@ -60,5 +64,34 @@ export class UsersComponent {
           this.notifierService.notify('warning', 'You cannot delete this user');
         }
       });
+  }
+
+  addUser(form) {
+
+    console.log('adding user', this.userToAdd);
+    this.usersService.addUser(this.userToAdd).subscribe(
+      result => {
+        // console.log('result', result);
+        this.notifierService.notify('success', 'User added successfully!');
+        // TODO Refactor to avoid using updateUserList - getting all users to update one user
+        this.updateUserList();
+
+        // close modal
+        $('#modal-user-add').modal('hide');
+
+        // reset form
+        form.reset();
+      },
+      error => {
+        // console.log('error', error);
+
+        if (error.status === 403) {
+          this.notifierService.notify('warning', 'User already exists.');
+        } else {
+          this.notifierService.notify('error', 'Unable to add user, please contact helpdesk admin');
+        }
+
+      }
+    );
   }
 }
