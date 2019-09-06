@@ -71,60 +71,6 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// Test adding a user with an empty password string.
-        /// </summary>
-        [TestMethod]
-        public void AddUserEmptyPassword()
-        {
-            UsersFacade usersFacade = new UsersFacade();
-
-            AddUserRequest addUserRequest = new AddUserRequest();
-            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
-            addUserRequest.Password = "";
-            addUserRequest.PasswordConfirm = "Password1";
-
-            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
-
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUserResponse.Status);
-        }
-
-        /// <summary>
-        /// Test adding a user with an empty password confirmation string.
-        /// </summary>
-        [TestMethod]
-        public void AddUserEmptyPasswordConfirm()
-        {
-            UsersFacade usersFacade = new UsersFacade();
-
-            AddUserRequest addUserRequest = new AddUserRequest();
-            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
-            addUserRequest.Password = "Password1";
-            addUserRequest.PasswordConfirm = "";
-
-            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
-
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUserResponse.Status);
-        }
-
-        /// <summary>
-        /// Test adding a user where the password and password confirmation fields do not match.
-        /// </summary>
-        [TestMethod]
-        public void AddUserPasswordMismatch()
-        {
-            UsersFacade usersFacade = new UsersFacade();
-
-            AddUserRequest addUserRequest = new AddUserRequest();
-            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
-            addUserRequest.Password = "Password1";
-            addUserRequest.PasswordConfirm = "Password2";
-
-            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
-
-            Assert.AreEqual(HttpStatusCode.BadRequest, addUserResponse.Status);
-        }
-
-        /// <summary>
         /// Used to ensure that a user with valid credentials is logged in and receives a token
         /// </summary>
         [TestMethod]
