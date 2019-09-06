@@ -397,7 +397,9 @@ namespace Helpdesk.Services.Test
         public void GetDatabaseExport()
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
-            helpdeskFacade.ExportDatabase();
+            bool result = helpdeskFacade.ExportDatabase();
+
+            Assert.IsTrue(result);
         }
     }
 }

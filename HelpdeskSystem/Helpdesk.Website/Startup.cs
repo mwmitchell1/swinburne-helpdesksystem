@@ -61,6 +61,17 @@ namespace Helpdesk.Website
 
             services.AddSingleton<IJobFactory, JobFactory>();
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+
+            services.AddHostedService<QuartzHostedService>();
+
+            services.AddSingleton<ExportDatabaseJob>();
+            services.AddSingleton(
+                new JobSchedule(
+                    typeof(ExportDatabaseJob)
+                    , appSettings.Jobs["ExportDatabaseJob"]
+                    )
+            );
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

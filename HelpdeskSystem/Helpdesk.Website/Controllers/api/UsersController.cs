@@ -140,9 +140,6 @@ namespace Helpdesk.Website.Controllers.api
         [Route("{id}")]
         public IActionResult UpdateUser([FromRoute] int id, [FromBody] UpdateUserRequest request)
         {
-            //if (!IsAuthorized())
-            //    return Unauthorized();
-
             try
             {
                 var facade = new UsersFacade();

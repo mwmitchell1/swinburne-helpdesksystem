@@ -27,16 +27,18 @@ namespace Helpdesk.Common.Utilities
 
             try
             {
-                fullPath = $@"{path}\{name}.zip";
+                fullPath = $@"{path}{name}.zip";
 
-                ZipFile.CreateFromDirectory(path, Path.GetFileName(fullPath));
+                var archive = ZipFile.Open(fullPath, ZipArchiveMode.Create);
+
+                archive.Dispose();
             }
             catch (Exception ex)
             {
                 fullPath = string.Empty;
                 s_logger.Error(ex, "Unable to create zip file.");
             }
-            return path;
+            return fullPath;
         }
 
         /// <summary>
@@ -47,49 +49,54 @@ namespace Helpdesk.Common.Utilities
         /// <param name="data">The data to put saved in the CSV</param>
         public void SaveToZIPAsCSV(string zipPath, string filename, DataTable data)
         {
-            using (FileStream zipToOpen = new FileStream(zipPath, FileMode.Create))
+            using (FileStream zipToOpen = new FileStream(zipPath, FileMode.Open))
             {
                 using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
                 {
                     ZipArchiveEntry readmeEntry = archive.CreateEntry($"{filename}.csv");
                     using (StreamWriter writer = new StreamWriter(readmeEntry.Open()))
                     {
-                        for (int i = 0; i < data.Columns.Count; i++)
-                        {
-                            writer.Write(data.Columns[i]);
-                            if (i < data.Columns.Count - 1)
-                            {
-                                writer.Write(",");
-                            }
-                        }
-
-                        writer.Write(writer.NewLine);
-                        foreach (DataRow dr in data.Rows)
-                        {
-                            for (int i = 0; i < data.Columns.Count; i++)
-                            {
-                                if (!Convert.IsDBNull(dr[i]))
-                                {
-                                    string value = dr[i].ToString();
-                                    if (value.Contains(','))
-                                    {
-                                        value = $"\"{value}\"";
-                                        writer.Write(value);
-                                    }
-                                    else
-                                    {
-                                        writer.Write(dr[i].ToString());
-                                    }
-                                }
-                                if (i < data.Columns.Count - 1)
-                                {
-                                    writer.Write(",");
-                                }
-                            }
-                            writer.Write(writer.NewLine);
-                        }
+                        WriteDateTableToStream(writer, data);
                     }
                 }
+            }
+        }
+
+        public void WriteDateTableToStream(StreamWriter writer, DataTable data)
+        {
+            for (int i = 0; i < data.Columns.Count; i++)
+            {
+                writer.Write(data.Columns[i]);
+                if (i < data.Columns.Count - 1)
+                {
+                    writer.Write(",");
+                }
+            }
+
+            writer.Write(writer.NewLine);
+            foreach (DataRow dr in data.Rows)
+            {
+                for (int i = 0; i < data.Columns.Count; i++)
+                {
+                    if (!Convert.IsDBNull(dr[i]))
+                    {
+                        string value = dr[i].ToString();
+                        if (value.Contains(','))
+                        {
+                            value = $"\"{value}\"";
+                            writer.Write(value);
+                        }
+                        else
+                        {
+                            writer.Write(dr[i].ToString());
+                        }
+                    }
+                    if (i < data.Columns.Count - 1)
+                    {
+                        writer.Write(",");
+                    }
+                }
+                writer.Write(writer.NewLine);
             }
         }
     }
