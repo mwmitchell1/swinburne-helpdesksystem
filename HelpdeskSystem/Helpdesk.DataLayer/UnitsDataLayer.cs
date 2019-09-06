@@ -7,6 +7,8 @@ using System.Linq;
 using Helpdesk.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Helpdesk.Common.Requests.Units;
+using System.Data;
+using System.Data.Common;
 
 namespace Helpdesk.DataLayer
 {
@@ -168,6 +170,48 @@ namespace Helpdesk.DataLayer
             }
 
             return unitDTOs;
+        }
+
+        /// <summary>
+        /// Used to get a datatable with all of the unit records
+        /// </summary>
+        /// <returns>Datatable with the unit records</returns>
+        public DataTable GetUnitsAsDataTable()
+        {
+            DataTable units = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "getallhelpdesks";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            units.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return units;
         }
 
         /// <summary>

@@ -8,6 +8,8 @@ using Helpdesk.Common.Requests.Queue;
 using System.Linq;
 using Helpdesk.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Data.Common;
 
 namespace Helpdesk.DataLayer
 {
@@ -119,6 +121,48 @@ namespace Helpdesk.DataLayer
                 }
             }
             return queueItemDTOs;
+        }
+
+        /// <summary>
+        /// Used to get a datatable with all of the helpdesk records
+        /// </summary>
+        /// <returns>Datatable with the helpdesk records</returns>
+        public DataTable GetQueueItemsAsDataTable()
+        {
+            DataTable queueItems = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "getallqueueitems";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            queueItems.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return queueItems;
         }
 
         /// <summary>

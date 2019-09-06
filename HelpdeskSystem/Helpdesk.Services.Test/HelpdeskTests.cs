@@ -392,5 +392,14 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.NotFound, getTimespanResponse.Status);
         }
+
+        [TestMethod]
+        public void GetDatabaseExport()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            bool result = helpdeskFacade.ExportDatabase();
+
+            Assert.IsTrue(result);
+        }
     }
 }
