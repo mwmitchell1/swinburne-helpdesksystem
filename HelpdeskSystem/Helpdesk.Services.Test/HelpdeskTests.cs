@@ -280,7 +280,7 @@ namespace Helpdesk.Services.Test
             UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(addTimeSpanResponse.SpanId, updateTimespanRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, updateTimespanResponse.Status);
-            Assert.IsTrue(updateTimespanResponse.result);
+            Assert.IsTrue(updateTimespanResponse.Result);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -400,6 +400,48 @@ namespace Helpdesk.Services.Test
             bool result = helpdeskFacade.ExportDatabase();
 
             Assert.IsTrue(result);
+        }
+
+        /// <summary>
+        /// Ensures that the code can delete a timespan
+        /// </summary>
+        [TestMethod]
+        public void DeleteTimespan()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest()
+            {
+                HelpdeskId = 1,
+                Name = AlphaNumericStringGenerator.GetString(10),
+                StartDate = DateTime.Today,
+                EndDate = new DateTime(DateTime.Today.Year + 1, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0)
+            };
+
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+
+            DeleteTimeSpanResponse deleteResponse = helpdeskFacade.DeleteTimeSpan(addTimeSpanResponse.SpanId);
+
+            Assert.AreEqual(HttpStatusCode.OK, deleteResponse.Status);
+
+            GetTimeSpanResponse response = helpdeskFacade.GetTimeSpan(addTimeSpanResponse.SpanId);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
+        }
+
+        /// <summary>
+        /// Ensures that deleting a user that does not exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void DeleteTimespanNotFound()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            DeleteTimeSpanResponse deleteResponse = helpdeskFacade.DeleteTimeSpan(-1);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, deleteResponse.Status);
         }
     }
 }

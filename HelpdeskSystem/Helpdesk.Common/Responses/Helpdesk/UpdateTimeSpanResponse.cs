@@ -10,6 +10,6 @@ namespace Helpdesk.Common.Responses.Helpdesk
     /// </summary>
     public class UpdateTimeSpanResponse : BaseResponse
     {
-        public bool result { get; set; }
+        public bool Result { get; set; }
     }
 }

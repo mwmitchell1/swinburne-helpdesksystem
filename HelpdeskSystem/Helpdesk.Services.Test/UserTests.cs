@@ -271,7 +271,7 @@ namespace Helpdesk.Services.Test
             UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(addUserResponse.UserId, updateUserRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, updateUserResponse.Status);
-            Assert.IsTrue(updateUserResponse.result);
+            Assert.IsTrue(updateUserResponse.Result);
 
             var hashedPassword = HashText(newPassword);
 

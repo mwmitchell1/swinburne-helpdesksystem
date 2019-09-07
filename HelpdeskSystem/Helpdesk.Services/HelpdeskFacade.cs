@@ -352,7 +352,7 @@ namespace Helpdesk.Services
                 if (result == false)
                     throw new NotFoundException("Unable to find timespan!");
 
-                response.result = result;
+                response.Result = result;
                 response.Status = HttpStatusCode.OK;
             }
             catch(NotFoundException ex)
@@ -434,9 +434,38 @@ namespace Helpdesk.Services
             return result;
         }
 
+        /// <summary>
+        /// This method is responsible for handling the deletion of a timespan from the system
+        /// </summary>
+        /// <param name="id">The SpanID of the timespan to be deleted</param>
+        /// <returns>A response indicating success or failure</returns>
         public DeleteTimeSpanResponse DeleteTimeSpan(int id)
         {
-            throw new NotImplementedException();
+            DeleteTimeSpanResponse response = new DeleteTimeSpanResponse();
+
+            try
+            {
+                var dataLayer = new HelpdeskDataLayer();
+
+                bool result = dataLayer.DeleteTimeSpan(id);
+
+                if (result == false)
+                    throw new NotFoundException("Unable to find timespan with id " + id);
+
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Warn($"Unable to find the timespan with id [{id}]");
+                response.Status = HttpStatusCode.NotFound;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete the timespan.");
+                response.Status = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
         }
     }
 }

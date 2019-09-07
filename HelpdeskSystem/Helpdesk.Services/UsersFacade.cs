@@ -200,7 +200,7 @@ namespace Helpdesk.Services
                 if (result == false)
                     throw new NotFoundException("Unable to find user!");
 
-                response.result = result;
+                response.Result = result;
                 response.Status = HttpStatusCode.OK;
 
             }

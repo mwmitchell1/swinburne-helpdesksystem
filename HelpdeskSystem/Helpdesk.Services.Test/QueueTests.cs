@@ -719,7 +719,7 @@ namespace Helpdesk.Services.Test
 
         /// <summary>
         /// Test getting every queue item from a specific helpdesk with no queue items from the database
-        /// is handeled properly
+        /// is handled properly
         /// </summary>
         [TestMethod]
         public void GetQueueItemsByHelpdeskIDNoUnits()
@@ -746,7 +746,7 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// Test getting every queue item from a specific helpdesk that doesn't exist is handeled properly
+        /// Test getting every queue item from a specific helpdesk that doesn't exist is handled properly
         /// </summary>
         [TestMethod]
         public void GetQueueItemsByHelpdeskIDNoHelpdesk()
