@@ -55,10 +55,13 @@ CREATE TABLE QueueItem (
 
 CREATE TABLE CheckInHistory (
     CheckInID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	StudentID INT NOT NULL,
     UnitID INT NOT NULL,
     CheckInTime DATETIME NOT NULL,
     CheckoutTime DATETIME,
     ForcedCheckout BOOL,
+	FOREIGN KEY (StudentID)
+		REFERENCES NickNames (StudentID),
     FOREIGN KEY (UnitID)
         REFERENCES Unit (UnitID)
 );

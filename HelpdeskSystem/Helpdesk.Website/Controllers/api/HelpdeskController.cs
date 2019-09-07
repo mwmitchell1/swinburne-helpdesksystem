@@ -345,6 +345,11 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Deletes a specific timespan from the database
+        /// </summary>
+        /// <param name="id">SpanID of the timespan to be deleted</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpDelete]
         [Route("timespan/{id}")]
         public IActionResult DeleteTimeSpan([FromRoute] int id)
@@ -352,7 +357,29 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.DeleteTimeSpan(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete timespan.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 }
