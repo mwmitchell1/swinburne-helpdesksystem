@@ -309,9 +309,24 @@ namespace Helpdesk.DataLayer
             return true;
         }
 
+        /// <summary>
+        /// Used to delete a specific timespan from the database
+        /// </summary>
+        /// <param name="id">The SpanID of the timespan to be deleted</param>
+        /// <returns>Boolean indicating success or failure</returns>
         public bool DeleteTimeSpan(int id)
         {
-            throw new NotImplementedException();
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Timespans timespan = context.Timespans.FirstOrDefault(ts => ts.SpanId == id);
+
+                if (timespan == null)
+                    return false;
+
+                context.Timespans.Remove(timespan);
+                context.SaveChanges();
+            }
+            return true;
         }
 
         /// <summary>
