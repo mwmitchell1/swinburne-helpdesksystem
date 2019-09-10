@@ -366,7 +366,7 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// Test getting all units from a helpdesk that doesn't exist is handeled properly
+        /// Test getting all units from a helpdesk that doesn't exist is handled properly
         /// </summary>
         [TestMethod]
         public void GetUnitsByHelpdeskIDNotFound()
@@ -422,7 +422,7 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// Test deleting a unit that doesn't exist is handeled properly
+        /// Test deleting a unit that doesn't exist is handled properly
         /// </summary>
         [TestMethod]
         public void DeleteUnitNotFound()
