@@ -78,7 +78,42 @@ namespace Helpdesk.Services
             return response;
         }
 
-        public UpdateQueueItemStatusResponse UpdateQueueItemStatus(UpdateQueueItemStatusRequest request)
+        public UpdateQueueItemResponse UpdateQueueItem(int id, UpdateQueueItemRequest request)
+        {
+            UpdateQueueItemResponse response = new UpdateQueueItemResponse();
+
+            try
+            {
+                response = (UpdateQueueItemResponse)request.CheckValidation(response);
+
+                if (response.Status == HttpStatusCode.BadRequest)
+                    return response;
+
+                QueueDataLayer dataLayer = new QueueDataLayer();
+                response.Result = dataLayer.UpdateQueueItem(id, request);
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Warn(ex, "Unable to update queue item");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to update queue item"));
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to update queue item");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update queue item"));
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// This method updates a queue items status by either entering a helped time or removed time.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public UpdateQueueItemStatusResponse UpdateQueueItemStatus(int id, UpdateQueueItemStatusRequest request)
         {
             UpdateQueueItemStatusResponse response = new UpdateQueueItemStatusResponse();
 
@@ -92,7 +127,7 @@ namespace Helpdesk.Services
                 }
 
                 QueueDataLayer dataLayer = new QueueDataLayer();
-                bool result = dataLayer.UpdateQueueItemStatus(request);
+                bool result = dataLayer.UpdateQueueItemStatus(id, request);
 
                 if (result)
                 {
@@ -104,6 +139,12 @@ namespace Helpdesk.Services
                     response.Status = HttpStatusCode.BadRequest;
                     response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Unable to update queue item status."));
                 }
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Warn(ex, "Unable to update queue item status");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to update queue item status"));
             }
             catch (Exception ex)
             {

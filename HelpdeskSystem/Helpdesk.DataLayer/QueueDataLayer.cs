@@ -60,38 +60,72 @@ namespace Helpdesk.DataLayer
             return id.Value;
         }
 
-        public bool UpdateQueueItemStatus(UpdateQueueItemStatusRequest request)
+        /// <summary>
+        /// Used to update a queue item status in the database.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public bool UpdateQueueItemStatus(int id, UpdateQueueItemStatusRequest request)
         {
-            bool result = false;
-
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                Queueitem item = new Queueitem();
+                Queueitem item = context.Queueitem.FirstOrDefault(p => p.ItemId == id);
 
-                if (request.TimeHelped != null && request.TimeRemoved == null)
+                if (item == null)
+                    throw new NotFoundException($"Unable to find queue item with id [{id}]");
+
+                if (request.TimeHelped != null && request.TimeRemoved == null && item.TimeHelped == null)
                 {
                     // Update TimeHelped
-                    item.ItemId = request.ItemId;
                     item.TimeHelped = request.TimeHelped;
                     context.SaveChanges();
-                    result = true;
+                    return true;
                 }
-                else if (request.TimeRemoved != null && request.TimeHelped == null)
+                if (request.TimeRemoved != null && request.TimeHelped == null && item.TimeRemoved == null)
                 {
+                    if (request.TimeRemoved <= item.TimeHelped)
+                    {
+                        // TimeRemoved date is earlier than TimeHelped date - this can not happen.
+                        return false;
+                    }
                     // Update TimeRemoved
-                    item.ItemId = request.ItemId;
                     item.TimeRemoved = request.TimeRemoved;
                     context.SaveChanges();
-                    result = true;
+                    return true;
                 }
-                else
-                {
-                    // something went wrong. Shouldn't happen if the facade validation did its job.
-                    // Means both Helped and Removed values are assigned or null.
-                    result = false;
-                }
+                // something went wrong. Shouldn't happen if the facade validation did its job.
+                // Means both Helped and Removed values are assigned or null.
+                // Could also mean a TimeHelped or TimeRemoved was provided twice.
+                // E.g. you tried to provide TimeHelped when TimeHelped was alrady set in the table.
+                return false;
             }
-            return result;
+        }
+
+        /// <summary>
+        /// Edits the queue details in the database.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public bool UpdateQueueItem(int id, UpdateQueueItemRequest request)
+        {
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Queueitem item = context.Queueitem.FirstOrDefault(p => p.ItemId == id);
+
+                if (item == null)
+                    throw new NotFoundException($"Unable to find queue item with id [{id}]");
+
+                Topic topic = context.Topic.FirstOrDefault(t => t.TopicId == request.TopicID);
+
+                // Check that the topic the queue item wants to update to actually exists.
+                if (topic == null)
+                    throw new NotFoundException($"Unable to find topic with id [{request.TopicID}]");
+
+                item.TopicId = request.TopicID;
+                context.SaveChanges();
+                return true;
+            }
         }
 
         /// <summary>
