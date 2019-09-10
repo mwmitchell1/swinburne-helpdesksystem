@@ -167,6 +167,47 @@ namespace Helpdesk.DataLayer
             return helpdeskunits;
         }
 
+        /// Used to get a datatable with all of the timespan records
+        /// </summary>
+        /// <returns>Datatable with the timespans records</returns>
+        public DataTable GetTimeSpansAsDataTable()
+        {
+            DataTable timespans = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "getalltimespans";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            timespans.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return timespans;
+        }
+
         /// <summary>
         /// Used to retreive all the active helpdesks
         /// </summary>

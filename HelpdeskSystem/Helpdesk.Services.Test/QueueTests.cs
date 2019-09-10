@@ -99,98 +99,6 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// Used to ensure that joining the queue with a checkin works for a new student
-        /// </summary>
-        [TestMethod]
-        public void JoinQueueCheckInNewStudent()
-        {
-            Helpdesksettings helpdesk = new Helpdesksettings()
-            {
-                HasQueue = true,
-                HasCheckIn = true,
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(10),
-            };
-
-            Unit unit = new Unit()
-            {
-                Code = AlphaNumericStringGenerator.GetString(8),
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(10),
-            };
-
-            Topic topic = new Topic()
-            {
-                IsDeleted = false,
-                Name = AlphaNumericStringGenerator.GetString(10),
-            };
-
-            Checkinhistory checkin = new Checkinhistory()
-            {
-                CheckInTime = DateTime.Now,
-            };
-
-            using (helpdesksystemContext context = new helpdesksystemContext())
-            {
-                context.Helpdesksettings.Add(helpdesk);
-                context.Unit.Add(unit);
-                context.SaveChanges();
-
-
-                Helpdeskunit helpdeskunit = new Helpdeskunit()
-                {
-                    HelpdeskId = helpdesk.HelpdeskId,
-                    UnitId = unit.UnitId
-                };
-
-                context.Helpdeskunit.Add(helpdeskunit);
-
-                checkin.UnitId = unit.UnitId;
-                context.Checkinhistory.Add(checkin);
-
-                context.SaveChanges();
-
-                topic.UnitId = unit.UnitId;
-                context.Topic.Add(topic);
-                context.SaveChanges();
-            }
-
-            AddToQueueRequest request = new AddToQueueRequest()
-            {
-                Nickname = AlphaNumericStringGenerator.GetString(10),
-                SID = AlphaNumericStringGenerator.GetStudentIDString(),
-                TopicID = topic.TopicId,
-                CheckInID = checkin.CheckInId
-            };
-
-            QueueFacade facade = new QueueFacade();
-
-            AddToQueueResponse response = facade.AddToQueue(request);
-
-            Assert.AreEqual(HttpStatusCode.OK, response.Status);
-            Assert.IsTrue(response.ItemId > 0);
-
-            using (helpdesksystemContext context = new helpdesksystemContext())
-            {
-                Queueitem queueitem = context.Queueitem.FirstOrDefault(qi => qi.ItemId == response.ItemId);
-
-                var baseTime = DateTime.Now.AddMinutes(-1);
-                var addTime = queueitem.TimeAdded;
-                Assert.AreEqual(request.TopicID, queueitem.TopicId);
-                var timeDiff = baseTime.CompareTo(addTime);
-                Assert.IsTrue(timeDiff == -1);
-
-                Nicknames nicknames = context.Nicknames.FirstOrDefault(n => n.StudentId == queueitem.StudentId);
-
-                Assert.AreEqual(request.Nickname, nicknames.NickName);
-                Assert.AreEqual(request.SID, nicknames.Sid);
-
-                Checkinqueueitem checkinqueueitem = context.Checkinqueueitem.FirstOrDefault(cqi => cqi.CheckInId == checkin.CheckInId && cqi.QueueItemId == queueitem.ItemId);
-                Assert.IsNotNull(checkinqueueitem);
-            }
-        }
-
-        /// <summary>
         /// Used to ensure that joining the queue works
         /// </summary>
         [TestMethod]
@@ -313,6 +221,7 @@ namespace Helpdesk.Services.Test
                 context.Nicknames.Add(nickname);
                 context.SaveChanges();
 
+                checkin.StudentId = nickname.StudentId;
                 checkin.UnitId = unit.UnitId;
 
                 Helpdeskunit helpdeskunit = new Helpdeskunit()

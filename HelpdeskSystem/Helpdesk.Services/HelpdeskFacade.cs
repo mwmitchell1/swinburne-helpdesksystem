@@ -401,9 +401,13 @@ namespace Helpdesk.Services
                     var topicsDataLayer = new TopicsDataLayer();
                     var studentDataLayer = new StudentDatalayer();
                     var queueDataLayer = new QueueDataLayer();
+                    var checkInDataLayer = new CheckInDataLayer();
 
                     DataTable helpdesks = helpdeskDataLayer.GetHelpdesksAsDataTable();
                     proccessing.SaveToZIPAsCSV(fullZipPath, "helpdesks", helpdesks);
+
+                    DataTable timespans = helpdeskDataLayer.GetTimeSpansAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "timespans", timespans);
 
                     DataTable helpdeskUnits = helpdeskDataLayer.GetHelpdeskUnitsAsDataTable();
                     proccessing.SaveToZIPAsCSV(fullZipPath, "helpdeskunits", helpdeskUnits);
@@ -422,6 +426,12 @@ namespace Helpdesk.Services
 
                     DataTable queuesItems = queueDataLayer.GetQueueItemsAsDataTable();
                     proccessing.SaveToZIPAsCSV(fullZipPath, "queueItems", queuesItems);
+
+                    DataTable checkIns = checkInDataLayer.GetCheckInsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "checkInHistory", checkIns);
+
+                    DataTable checkInQueueItems = checkInDataLayer.GetCheckInQueueItemsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "checkinqueueitem", checkInQueueItems);
 
                     result = true;
                 }
