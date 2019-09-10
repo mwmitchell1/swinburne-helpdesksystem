@@ -55,10 +55,13 @@ CREATE TABLE QueueItem (
 
 CREATE TABLE CheckInHistory (
     CheckInID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	StudentID INT NOT NULL,
     UnitID INT NOT NULL,
     CheckInTime DATETIME NOT NULL,
     CheckoutTime DATETIME,
     ForcedCheckout BOOL,
+	FOREIGN KEY (StudentID)
+		REFERENCES NickNames (StudentID),
     FOREIGN KEY (UnitID)
         REFERENCES Unit (UnitID)
 );
@@ -96,4 +99,60 @@ CREATE TABLE TimeSpans (
 INSERT INTO User (Username, Password, FirstTime) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=', false);
 INSERT INTO  HelpdeskSettings (Name, HasCheckIn, HasQueue) VALUES ('Test Helpdesk', TRUE, TRUE);
 INSERT INTO Unit (Code, Name) VALUES ('COS00000', 'Test Unit');
-INSERT INTO helpdeskunit (HelpdeskID, UnitID) VALUES(1,1)
+INSERT INTO helpdeskunit (HelpdeskID, UnitID) VALUES(1,1);
+
+DELIMITER //
+CREATE PROCEDURE `getallhelpdesks` ()
+BEGIN
+	SELECT *
+    FROM helpdesksettings;
+END //
+
+CREATE PROCEDURE `getallusers`()
+BEGIN
+	SELECT *
+    FROM `user`;
+END //
+
+CREATE PROCEDURE `getalltopics`()
+BEGIN
+	SELECT *
+    FROM topic;
+END //
+
+CREATE PROCEDURE `getallnicknames`()
+BEGIN
+	SELECT *
+    FROM nicknames;
+END //
+
+CREATE PROCEDURE `getallcheckins`()
+BEGIN
+	SELECT *
+    FROM checkinhistory;
+END //
+
+CREATE PROCEDURE `getallqueueitems`()
+BEGIN
+	SELECT *
+    FROM queueitem;
+END //
+
+CREATE PROCEDURE `getalltimespans`()
+BEGIN
+	SELECT *
+    FROM timespans;
+END //
+
+CREATE PROCEDURE `getallhelpdeskunits`()
+BEGIN
+	SELECT *
+    FROM helpdeskunit;
+END //
+
+CREATE PROCEDURE `getallcheckinqueueitems`()
+BEGIN
+	SELECT *
+    FROM checkinqueueitem;
+END //
+DELIMITER ;

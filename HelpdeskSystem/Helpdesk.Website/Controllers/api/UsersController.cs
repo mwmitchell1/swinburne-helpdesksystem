@@ -43,6 +43,8 @@ namespace Helpdesk.Website.Controllers.api
                         return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.Forbidden:
+                        return Forbid();
                     case HttpStatusCode.NotFound:
                         return NotFound();
                     case HttpStatusCode.InternalServerError:
@@ -111,6 +113,8 @@ namespace Helpdesk.Website.Controllers.api
                         return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.Forbidden:
+                        return Forbid();
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:
@@ -136,9 +140,6 @@ namespace Helpdesk.Website.Controllers.api
         [Route("{id}")]
         public IActionResult UpdateUser([FromRoute] int id, [FromBody] UpdateUserRequest request)
         {
-            //if (!IsAuthorized())
-            //    return Unauthorized();
-
             try
             {
                 var facade = new UsersFacade();

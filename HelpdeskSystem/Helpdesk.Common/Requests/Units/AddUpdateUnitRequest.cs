@@ -7,8 +7,6 @@ namespace Helpdesk.Common.Requests.Units
 {
     public class AddUpdateUnitRequest : BaseRequest
     {
-        public int UnitID { get; set; }
-
         [Range(1, int.MaxValue, ErrorMessage = "You must select a helpdesk to add the unit to.")]
         public int HelpdeskID { get; set; }
 

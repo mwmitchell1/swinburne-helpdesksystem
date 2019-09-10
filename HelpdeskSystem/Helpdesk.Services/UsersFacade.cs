@@ -130,14 +130,18 @@ namespace Helpdesk.Services
                 {
                     return response;
                 }
+
+                if (string.IsNullOrEmpty(request.Password))
+                    request.Password = request.Username;
+
                 request.Password = HashText(request.Password);
 
                 var dataLayer = new UsersDataLayer();
 
                 if (dataLayer.GetUserByUsername(request.Username) != null)
                 {
-                    response.Status = HttpStatusCode.BadRequest;
-                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Username already exists"));
+                    response.Status = HttpStatusCode.Forbidden;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.Forbidden, "Username already exists"));
                     return response;
                 }
 
@@ -176,6 +180,7 @@ namespace Helpdesk.Services
             try
             {
                 response = (UpdateUserResponse)request.CheckValidation(response);
+
                 if (response.Status == HttpStatusCode.BadRequest)
                 {
                     return response;
@@ -185,7 +190,7 @@ namespace Helpdesk.Services
 
                 var dataLayer = new UsersDataLayer();
 
-                if (dataLayer.GetUserByUsername(request.Username).UserId != id)
+                if (dataLayer.GetUserByUsername(request.Username)!=null && dataLayer.GetUserByUsername(request.Username).UserId != id)
                 {
                     throw new Exception("Unable to update user! User with username " + request.Username + "already exists!");
                 }
@@ -195,7 +200,7 @@ namespace Helpdesk.Services
                 if (result == false)
                     throw new NotFoundException("Unable to find user!");
 
-                response.result = result;
+                response.Result = result;
                 response.Status = HttpStatusCode.OK;
 
             }

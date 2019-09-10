@@ -47,6 +47,9 @@ namespace Helpdesk.Data.Models
 
                 entity.ToTable("checkinhistory", "helpdesksystem");
 
+                entity.HasIndex(e => e.StudentId)
+                    .HasName("StudentID");
+
                 entity.HasIndex(e => e.UnitId)
                     .HasName("UnitID");
 
@@ -56,15 +59,25 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.ForcedCheckout).HasColumnType("tinyint(1)");
 
+                entity.Property(e => e.StudentId)
+                    .HasColumnName("StudentID")
+                    .HasColumnType("int(11)");
+
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
                     .HasColumnType("int(11)");
+
+                entity.HasOne(d => d.Student)
+                    .WithMany(p => p.Checkinhistory)
+                    .HasForeignKey(d => d.StudentId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("checkinhistory_ibfk_1");
 
                 entity.HasOne(d => d.Unit)
                     .WithMany(p => p.Checkinhistory)
                     .HasForeignKey(d => d.UnitId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("checkinhistory_ibfk_1");
+                    .HasConstraintName("checkinhistory_ibfk_2");
             });
 
             modelBuilder.Entity<Checkinqueueitem>(entity =>

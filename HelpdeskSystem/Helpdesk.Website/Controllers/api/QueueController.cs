@@ -20,13 +20,14 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class QueueController : BaseApiController
     {
-        /// <summary>
-        /// Gets every queue item from the database
-        /// </summary>
-        /// <returns>Response which indicates success or failure</returns>
+       /// <summary>
+       /// Retrieves queue items from the database by helpdesk id
+       /// </summary>
+       /// <param name="id">The id of the helpdesk</param>
+       /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
-        [Route("")]
-        public IActionResult GetQueueItems()
+        [Route("helpdesk/{id}")]
+        public IActionResult GetQueueItemsByHelpdeskID([FromRoute] int id)
         {
             if (!IsAuthorized())
                 return Unauthorized();
@@ -34,12 +35,12 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new QueueFacade();
-                var response = facade.GetQueueItems();
+                var response = facade.GetQueueItemsByHelpdeskID(id);
 
                 switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.NotFound:

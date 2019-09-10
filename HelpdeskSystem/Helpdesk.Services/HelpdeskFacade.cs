@@ -4,11 +4,15 @@ using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests.Helpdesk;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Helpdesk;
+using Helpdesk.Common.Utilities;
 using Helpdesk.DataLayer;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 
@@ -59,6 +63,94 @@ namespace Helpdesk.Services
                 s_logger.Error(ex, "Unable to add helpdesk.");
             }
 
+            return response;
+        }
+
+        /// <summary>
+        /// Used to return all of the active helpdesks
+        /// </summary>
+        /// <returns>A response indicating the success and a list of active helpdesks</returns>
+        public GetHelpdesksResponse GetActiveHelpdesks()
+        {
+            var response = new GetHelpdesksResponse();
+
+            try
+            {
+                var dataLayer = new HelpdeskDataLayer();
+                response.Helpdesks = dataLayer.GetActiveHelpdesks();
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to get helpdesk"));
+                s_logger.Warn(ex, "Unable to find helpdesks.");
+            }
+            catch (Exception ex)
+            {
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get helpdesks"));
+                s_logger.Error(ex, "Unable to get helpdesks.");
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// Used to return all of the helpdesks
+        /// </summary>
+        /// <returns>A response indicating the success and a list of helpdesks</returns>
+        public GetHelpdesksResponse GetHelpdesks()
+        {
+            var response = new GetHelpdesksResponse();
+
+            try
+            {
+                var dataLayer = new HelpdeskDataLayer();
+                response.Helpdesks = dataLayer.GetHelpdesks();
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to get helpdesk"));
+                s_logger.Warn(ex, "Unable to find helpdesks.");
+            }
+            catch (Exception ex)
+            {
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get helpdesks"));
+                s_logger.Error(ex, "Unable to get helpdesks.");
+            }
+            return response;
+        }
+
+        /// <summary>
+        /// Used to get a helpdesk using it's id
+        /// </summary>
+        /// <param name="id">The id of the helpdesk to be retreived</param>
+        /// <returns>A response indicating the success and helpdesk DTO or null</returns>
+        public GetHelpdeskResponse GetHelpdesk(int id)
+        {
+            var response = new GetHelpdeskResponse();
+
+            try
+            {
+                var dataLayer = new HelpdeskDataLayer();
+                response.Helpdesk = dataLayer.GetHelpdesk(id);
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to get helpdesk"));
+                s_logger.Error(ex, $"Unable to find helpdesk with id [{id}].");
+            }
+            catch (Exception ex)
+            {
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get helpdesk"));
+                s_logger.Error(ex, $"Unable to get helpdesk with id [{id}].");
+            }
             return response;
         }
 
@@ -163,11 +255,7 @@ namespace Helpdesk.Services
                 var dataLayer = new HelpdeskDataLayer();
 
                 TimeSpanDTO timespan = dataLayer.GetTimeSpan(id);
-
-                if (timespan == null)
-                    throw new NotFoundException("Unable to find timespan!");
-
-                response.Timespan = timespan;
+                response.Timespan = timespan ?? throw new NotFoundException("Unable to find timespan!");
                 response.Status = HttpStatusCode.OK;
 
             }
@@ -264,7 +352,7 @@ namespace Helpdesk.Services
                 if (result == false)
                     throw new NotFoundException("Unable to find timespan!");
 
-                response.result = result;
+                response.Result = result;
                 response.Status = HttpStatusCode.OK;
             }
             catch(NotFoundException ex)
@@ -282,9 +370,102 @@ namespace Helpdesk.Services
             return response;
         }
 
+
+        /// <summary>
+        /// Used to get a Zip file of all of the database tables as CSVs
+        /// </summary>
+        public bool ExportDatabase()
+        {
+            bool result = false;
+
+            try
+            {
+                FileProccessing proccessing = new FileProccessing();
+
+                DateTime now = DateTime.Now;
+
+                string exportName = $"databaseexport_{now.ToString("yyyyddMM_HHmmss")}";
+
+                string fullZipPath = proccessing.CreateZip(_appSettings.DatabaseBackupDestination, exportName);
+
+                if (string.IsNullOrEmpty(fullZipPath))
+                {
+                    s_logger.Error("Unable to create empty zip");
+                    return result;
+                }
+                else
+                {
+                    var helpdeskDataLayer = new HelpdeskDataLayer();
+                    var unitDataLayer = new UnitsDataLayer();
+                    var usersDataLayer = new UsersDataLayer();
+                    var topicsDataLayer = new TopicsDataLayer();
+                    var studentDataLayer = new StudentDatalayer();
+                    var queueDataLayer = new QueueDataLayer();
+
+                    DataTable helpdesks = helpdeskDataLayer.GetHelpdesksAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "helpdesks", helpdesks);
+
+                    DataTable helpdeskUnits = helpdeskDataLayer.GetHelpdeskUnitsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "helpdeskunits", helpdeskUnits);
+
+                    DataTable users = usersDataLayer.GetUsersAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "users", users);
+
+                    DataTable units = unitDataLayer.GetUnitsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "units", units);
+
+                    DataTable topics = topicsDataLayer.GetTopicsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "topics", topics);
+
+                    DataTable students = studentDataLayer.GetStudentsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "students", students);
+
+                    DataTable queuesItems = queueDataLayer.GetQueueItemsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "queueItems", queuesItems);
+
+                    result = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                s_logger.Error(ex, "Unable to generate database export");
+                result = false;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// This method is responsible for handling the deletion of a timespan from the system
+        /// </summary>
+        /// <param name="id">The SpanID of the timespan to be deleted</param>
+        /// <returns>A response indicating success or failure</returns>
         public DeleteTimeSpanResponse DeleteTimeSpan(int id)
         {
-            throw new NotImplementedException();
+            DeleteTimeSpanResponse response = new DeleteTimeSpanResponse();
+
+            try
+            {
+                var dataLayer = new HelpdeskDataLayer();
+
+                bool result = dataLayer.DeleteTimeSpan(id);
+
+                if (result == false)
+                    throw new NotFoundException("Unable to find timespan with id " + id);
+
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Warn($"Unable to find the timespan with id [{id}]");
+                response.Status = HttpStatusCode.NotFound;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete the timespan.");
+                response.Status = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
         }
     }
 }

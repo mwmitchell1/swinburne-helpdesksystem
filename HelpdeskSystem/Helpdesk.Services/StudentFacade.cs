@@ -1,5 +1,6 @@
 ﻿using Helpdesk.Common;
 using Helpdesk.Common.DTOs;
+using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests.Students;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Students;
@@ -95,6 +96,53 @@ namespace Helpdesk.Services
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to add a nickname"));
             }
 
+            return response;
+        }
+
+        /// <summary>
+        /// This method is responsible for updating a specific students's nickname
+        /// </summary>
+        /// <param name="id">The StudentID of the student to be updated</param>
+        /// <param name="request">The student's new nickname</param>
+        /// <returns>The response that indicates if the update was successfull</returns>
+        public EditStudentNicknameResponse EditStudentNickname(int id, EditStudentNicknameRequest request)
+        {
+            s_logger.Info("Editing student's nickname...");
+
+            EditStudentNicknameResponse response = new EditStudentNicknameResponse();
+
+            try
+            {
+                response = (EditStudentNicknameResponse)request.CheckValidation(response);
+
+                if (response.Status == HttpStatusCode.BadRequest)
+                {
+                    return response;
+                }
+
+                var dataLayer = new StudentDatalayer();
+
+                bool result = dataLayer.EditStudentNickname(id, request);
+
+                if (result == false)
+                    throw new NotFoundException("Unable to find student!");
+
+                response.Result = result;
+                response.Status = HttpStatusCode.OK;
+
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Error(ex, "Unable to find student!");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to find student!"));
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to update student's nickname!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update student's nickname!"));
+            }
             return response;
         }
     }

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using Helpdesk.Common.DTOs;
 using Helpdesk.Common.Requests.Students;
 using Helpdesk.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Helpdesk.DataLayer
 {
@@ -36,6 +39,48 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
+        /// Used to get a datatable with all of the helpdesk records
+        /// </summary>
+        /// <returns>Datatable with the helpdesk records</returns>
+        public DataTable GetStudentsAsDataTable()
+        {
+            DataTable nicknames = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "getallnicknames";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            nicknames.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return nicknames;
+        }
+
+        /// <summary>
         /// Used to add a nickname to the database
         /// </summary>
         /// <param name="request">The nickname information</param>
@@ -57,6 +102,30 @@ namespace Helpdesk.DataLayer
             }
 
             return nickname.StudentId;
+        }
+
+        /// <summary>
+        /// Used to edit the specified student's nickname in the databse with the request's information
+        /// </summary>
+        /// <param name="id">The StudentID of the student to be updated</param>
+        /// <param name="request">The request that contains the student's new nickname</param>
+        /// <returns>A boolean that indicates whether the operation was a success</returns>
+        public bool EditStudentNickname(int id, EditStudentNicknameRequest request)
+        {
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Nicknames nickname = context.Nicknames.FirstOrDefault(n => n.StudentId == id);
+
+                if (nickname == null)
+                {
+                    return false;
+                }
+
+                nickname.NickName = request.Nickname;
+
+                context.SaveChanges();
+            }
+            return true;
         }
 
         /// <summary>
