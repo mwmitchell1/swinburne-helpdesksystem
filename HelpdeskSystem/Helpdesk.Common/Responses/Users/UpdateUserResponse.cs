@@ -10,6 +10,6 @@ namespace Helpdesk.Common.Responses.Users
     /// </summary>
     public class UpdateUserResponse : BaseResponse
     {
-        public bool result { get; set; }
+        public bool Result { get; set; }
     }
 }

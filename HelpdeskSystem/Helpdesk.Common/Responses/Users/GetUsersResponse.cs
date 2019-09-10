@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Helpdesk.Common.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Helpdesk.Common.DTOs;
 
 namespace Helpdesk.Common.Responses.Users
 {

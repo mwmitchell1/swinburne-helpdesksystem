@@ -4,7 +4,7 @@ import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
 import { NotifierService } from 'angular-notifier';
-import { UpateUserRequest } from 'src/app/data/requests/users/update-request';
+import { UpdateUserRequest } from 'src/app/data/requests/users/update-request';
 import { UsersService } from 'src/app/admin/users/users.service';
 
 @Component({
@@ -81,7 +81,7 @@ export class LoginComponent implements OnInit {
       }
       else if (result.status == 202) {
         this.setPasswordForm.patchValue({ modalUsername: loginRequest.Username, modalUserId: result.userId });
-        
+
         document.getElementById("open-set-password").click();
       }
     },
@@ -116,7 +116,7 @@ export class LoginComponent implements OnInit {
     if (!isValid)
       return;
 
-    const updateUserRequest = new UpateUserRequest;
+    const updateUserRequest = new UpdateUserRequest;
     updateUserRequest.Username = data.modalUsername;
     updateUserRequest.Password = data.modalPassword;
 

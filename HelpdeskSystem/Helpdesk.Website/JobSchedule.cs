@@ -2,7 +2,7 @@
 
 namespace Helpdesk.Website
 {
-    internal class JobSchedule
+    public class JobSchedule
     {
         public Type Type { get; }
         public string CronExpression { get; set; }

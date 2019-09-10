@@ -7,6 +7,9 @@ using Helpdesk.Data.Models;
 using Helpdesk.Common.Requests.Queue;
 using System.Linq;
 using Helpdesk.Common.Extensions;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Data.Common;
 
 namespace Helpdesk.DataLayer
 {
@@ -132,24 +135,68 @@ namespace Helpdesk.DataLayer
         /// This method retrieves a list of all the queue items in the database
         /// </summary>
         /// <returns>A list of queue items retrieved from the database</returns>
-        public List<QueueItemDTO> GetQueueItems()
+        public List<QueueItemDTO> GetQueueItemsByHelpdeskID(int id)
         {
-            List<QueueItemDTO> queueItemsList = new List<QueueItemDTO>();
+            List<QueueItemDTO> queueItemDTOs = new List<QueueItemDTO>();
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var queueItems = context.Queueitem.ToList();
+                var unitIDs = context.Helpdeskunit.Include("Helpdeskunit").Where(hu => hu.HelpdeskId == id).Select(u => u.UnitId);
+                var topicIDs = context.Topic.Where(t => unitIDs.Contains(t.UnitId)).Select(ti => ti.TopicId).ToList();
+                var queueItems = context.Queueitem.Where(qi => topicIDs.Contains(qi.TopicId)).ToList();
 
                 foreach (Queueitem queueItem in queueItems)
                 {
                     if (queueItem != null)
                     {
                         QueueItemDTO queueItemDTO = DAO2DTO(queueItem);
-                        queueItemsList.Add(queueItemDTO);
+                        queueItemDTOs.Add(queueItemDTO);
                     }
                 }
             }
-            return queueItemsList;
+            return queueItemDTOs;
+        }
+
+        /// <summary>
+        /// Used to get a datatable with all of the helpdesk records
+        /// </summary>
+        /// <returns>Datatable with the helpdesk records</returns>
+        public DataTable GetQueueItemsAsDataTable()
+        {
+            DataTable queueItems = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "getallqueueitems";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            queueItems.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return queueItems;
         }
 
         /// <summary>
