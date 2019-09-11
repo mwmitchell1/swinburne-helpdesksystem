@@ -43,10 +43,18 @@ export class UsersComponent {
     });
   }
 
+  /**
+   * Prepares hidden delete form
+   * @param id Id of user to delete
+   */
   setupDelete(id: number) {
     this.deleteForm.patchValue({userId: id});
   }
 
+  /**
+   * User service method to delete user
+   * @param data Form data
+   */
   deleteUser(data) {
     this.usersService.deleteUser(data.userId).subscribe(
       result => {
@@ -66,6 +74,10 @@ export class UsersComponent {
       });
   }
 
+  /**
+   * User service method to add new user
+   * @param form Add user form
+   */
   addUser(form) {
 
     console.log('adding user', this.userToAdd);
