@@ -9,7 +9,6 @@ namespace Helpdesk.Common.Requests.Queue
     /// </summary>
     public class UpdateQueueItemStatusRequest : BaseRequest
     {
-        public int ItemId { get; set; }
         public DateTime? TimeHelped { get; set; }
         public DateTime? TimeRemoved { get; set; }
 

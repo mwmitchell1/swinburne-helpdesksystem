@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using Helpdesk.Common.Requests;
 using Helpdesk.Common.Requests.Helpdesk;
+using Helpdesk.Common.Requests.Queue;
 using Helpdesk.Common.Requests.Units;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Helpdesk;
+using Helpdesk.Common.Responses.Queue;
 using Helpdesk.Common.Responses.Units;
 using Helpdesk.Common.Utilities;
 
@@ -38,6 +40,17 @@ namespace Helpdesk.Services.Test
         public AddUpdateUnitResponse Response { get; }
     }
 
+    public class TestDataQueue
+    {
+        public TestDataQueue(AddToQueueRequest request, AddToQueueResponse response)
+        {
+            Request = request;
+            Response = response;
+        }
+        public AddToQueueRequest Request { get; }
+        public AddToQueueResponse Response { get; }
+    }
+
     /// <summary>
     /// Class with methods for generating test entities on the database.
     /// </summary>
@@ -46,6 +59,13 @@ namespace Helpdesk.Services.Test
         public TestEntityFactory(bool populateEmptyStrings = true)
         {
             PopulateEmptyStrings = populateEmptyStrings;
+        }
+
+        public TestEntityFactory()
+        {
+            HelpdeskFacade = new HelpdeskFacade();
+            UnitsFacade = new UnitsFacade();
+            QueueFacade = new QueueFacade();
         }
 
         /// <summary>
@@ -65,8 +85,7 @@ namespace Helpdesk.Services.Test
             request.HasCheckIn = (bool)hasCheckin;
             request.HasQueue = (bool)hasQueue;
 
-            var facade = new HelpdeskFacade();
-            var response = facade.AddHelpdesk(request);
+            var response = HelpdeskFacade.AddHelpdesk(request);
 
             TestDataHelpdesk data = new TestDataHelpdesk(request, response);
             return data;
@@ -104,9 +123,35 @@ namespace Helpdesk.Services.Test
             return data;
         }
 
+        public TestDataQueue AddQueueItem(int? studentID = null, int? topicID = null, int? checkInID = null, string nickname = "", string sID = "")
+        {
+            var request = new AddToQueueRequest();
+
+            if (studentID != null) request.StudentID = studentID;
+            if (topicID != null) request.TopicID = (int)topicID;
+            if (checkInID != null) request.CheckInID = (int)checkInID;
+            if (nickname != null)
+            {
+                if (nickname == "" && PopulateEmptyStrings) request.Nickname = AlphaNumericStringGenerator.GetString(20); else request.Nickname = nickname;
+            }
+            if (sID != null)
+            {
+                if (sID == "" && PopulateEmptyStrings) request.SID = AlphaNumericStringGenerator.GetStudentIDString(); else request.SID = sID;
+            }
+
+            var response = QueueFacade.AddToQueue(request);
+
+            TestDataQueue data = new TestDataQueue(request, response);
+            return data;
+        }
+
 
         // GETTERS & SETTERS
 
         public bool PopulateEmptyStrings { get; set; }
+
+        public HelpdeskFacade HelpdeskFacade { get; }
+        public UnitsFacade UnitsFacade { get; }
+        public QueueFacade QueueFacade { get; }
     }
 }
