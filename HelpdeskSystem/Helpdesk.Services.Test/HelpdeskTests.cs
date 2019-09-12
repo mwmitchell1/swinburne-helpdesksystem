@@ -195,11 +195,12 @@ namespace Helpdesk.Services.Test
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
+            DateTime startDate = DateTime.Today;
+            DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
+
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
             addTimeSpanRequest.HelpdeskId = 1;
             addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
-            DateTime startDate = DateTime.Today;
-            DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
             addTimeSpanRequest.StartDate = startDate;
             addTimeSpanRequest.EndDate = endDate;
 
@@ -216,13 +217,16 @@ namespace Helpdesk.Services.Test
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
-            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
-            addTimeSpanRequest.HelpdeskId = 1;
-            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
             DateTime startDate = DateTime.Today;
-            DateTime endDate = new DateTime(startDate.Year - 1, startDate.Month, startDate.Day, 0, 0, 0);
-            addTimeSpanRequest.StartDate = startDate;
-            addTimeSpanRequest.EndDate = endDate;
+            DateTime endDate = startDate.AddYears(-1);
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest
+            {
+                HelpdeskId = 1,
+                Name = AlphaNumericStringGenerator.GetString(10),
+                StartDate = startDate,
+                EndDate = endDate
+            };
 
             AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
 
@@ -368,7 +372,7 @@ namespace Helpdesk.Services.Test
             GetTimeSpanResponse getTimespanResponse = helpdeskFacade.GetTimeSpan(addTimeSpanResponse.SpanId);
 
             Assert.AreEqual(HttpStatusCode.OK, getTimespanResponse.Status);
-            Assert.AreEqual("TestName", getTimespanResponse.Timespan.Name);
+            Assert.AreEqual(addTimeSpanRequest.Name, getTimespanResponse.Timespan.Name);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -393,6 +397,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.NotFound, getTimespanResponse.Status);
         }
 
+        /// <summary>
+        /// Used to test the full database export code works as expected
+        /// </summary>
         [TestMethod]
         public void GetDatabaseExport()
         {
