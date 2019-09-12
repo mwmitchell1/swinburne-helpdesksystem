@@ -151,6 +151,8 @@ namespace Helpdesk.Website.Controllers.api
                         return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.Forbidden:
+                        return Forbid();
                     case HttpStatusCode.InternalServerError:
                         return StatusCode(StatusCodes.Status500InternalServerError);
                     case HttpStatusCode.NotFound:

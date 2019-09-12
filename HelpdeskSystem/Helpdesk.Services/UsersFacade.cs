@@ -213,8 +213,8 @@ namespace Helpdesk.Services
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to update user!");
-                response.Status = HttpStatusCode.InternalServerError;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update user!"));
+                response.Status = HttpStatusCode.Forbidden;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.Forbidden, "Unable to update user!"));
             }
             return response;
         }
