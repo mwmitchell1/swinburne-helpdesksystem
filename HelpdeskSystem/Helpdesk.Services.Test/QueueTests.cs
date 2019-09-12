@@ -9,6 +9,8 @@ using Helpdesk.Data.Models;
 using System.Net;
 using System.Linq;
 using NLog;
+using Helpdesk.Common.DTOs;
+using Helpdesk.Common.Responses.Topics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Helpdesk.Services.Test
@@ -19,6 +21,8 @@ namespace Helpdesk.Services.Test
     [TestClass]
     public class QueueTests
     {
+        private readonly TestEntityFactory testEntityFactory = new TestEntityFactory();
+
         private static Logger s_logger = LogManager.GetCurrentClassLogger(); 
 
         /// <summary>
@@ -561,6 +565,318 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
+        /// Test updating a queue item (topic).
+        /// </summary>
+        [TestMethod]
+        public void UpdateQueueItem()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
+
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Get topics for the unit that was just created.
+            TopicsFacade topicsFacade = new TopicsFacade();
+            GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
+
+            // Check that there are two units in the response (Layouts, Lifecycle).
+            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+
+            // Add test queue item, pass in topic [0].
+            TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
+
+            // Check that queue item was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, queueData.Response.Status);
+
+            // Create request to alter queue item.
+            var queueUpdateRequest = new UpdateQueueItemRequest
+            {
+                TopicID = topicResponse.Topics[0].TopicId
+            };
+
+            // Update the queue item
+            UpdateQueueItemResponse updateQueueResponse = testEntityFactory.QueueFacade.UpdateQueueItem(queueData.Response.ItemId, queueUpdateRequest);
+
+            // Check that queue item was updated successfully.
+            Assert.AreEqual(HttpStatusCode.OK, updateQueueResponse.Status);
+
+            // Do another request to change to another topic
+            queueUpdateRequest = new UpdateQueueItemRequest
+            {
+                TopicID = topicResponse.Topics[1].TopicId
+            };
+
+            // Update the queue item again
+            updateQueueResponse = testEntityFactory.QueueFacade.UpdateQueueItem(queueData.Response.ItemId, queueUpdateRequest);
+
+            // Check that queue item was updated successfully.
+            Assert.AreEqual(HttpStatusCode.OK, updateQueueResponse.Status);
+        }
+
+        [TestMethod]
+        public void UpdateQueueItemDoesNotExist()
+        {
+            // Invalid topic id shouldn't matter, as QueueID will be assessed first in the data layer.
+            var request = new UpdateQueueItemRequest
+            {
+                TopicID = -1
+            };
+            var queueFacade = new QueueFacade();
+            var response = queueFacade.UpdateQueueItem(-1, request);
+
+            // Check that a request containing both TimeHelped and TimeRemoved is rejected.
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
+        }
+
+        [TestMethod]
+        public void UpdateQueueItemTopicDoesNotExist()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
+
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Get topics for the unit that was just created.
+            TopicsFacade topicsFacade = new TopicsFacade();
+            GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
+
+            // Check that there are two units in the response (Layouts, Lifecycle).
+            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+
+            // Add test queue item, pass in topic [0].
+            TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
+
+            // Check that queue item was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, queueData.Response.Status);
+
+            // Create request to alter queue item.
+            // NOTICE This should fail, as there's no TopicID -1
+            var queueUpdateRequest = new UpdateQueueItemRequest
+            {
+                TopicID = -1
+            };
+
+            // Update the queue item
+            UpdateQueueItemResponse updateQueueResponse = testEntityFactory.QueueFacade.UpdateQueueItem(queueData.Response.ItemId, queueUpdateRequest);
+
+            // Check that queue item update failed due to non-existent TopicID.
+            Assert.AreEqual(HttpStatusCode.NotFound, updateQueueResponse.Status);
+        }
+
+        /// <summary>
+        /// Tests successfully updating a queue item status.
+        /// </summary>
+        [TestMethod]
+        public void UpdateQueueItemStatus()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
+
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Get topics for the unit that was just created.
+            TopicsFacade topicsFacade = new TopicsFacade();
+            GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
+
+            // Check that there are two units in the response (Layouts, Lifecycle).
+            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+
+            // Add test queue item, pass in topic [0].
+            TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
+
+            // Check that queue item was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, queueData.Response.Status);
+
+            // Create update request for TimeHelped.
+            var queueUpdateRequest = new UpdateQueueItemStatusRequest
+            {
+                TimeHelped = DateTime.Now,
+                TimeRemoved = null
+            };
+
+            // Update queue item TimeHelped.
+            var queueUpdateResponse = testEntityFactory.QueueFacade.UpdateQueueItemStatus(queueData.Response.ItemId, queueUpdateRequest);
+
+            // Check that queue item was updated successfully.
+            Assert.AreEqual(HttpStatusCode.OK, queueUpdateResponse.Status);
+            Assert.IsTrue(queueUpdateResponse.Result == true);
+
+            // Create update request for TimeRemoved.
+            DateTime timeRemoved = queueUpdateRequest.TimeHelped.Value.AddMinutes(1);
+            queueUpdateRequest = new UpdateQueueItemStatusRequest
+            {
+                TimeHelped = null,
+                TimeRemoved = timeRemoved
+            };
+
+            // Update queue item TimeRemoved.
+            queueUpdateResponse = testEntityFactory.QueueFacade.UpdateQueueItemStatus(queueData.Response.ItemId, queueUpdateRequest);
+
+            // Check that queue item was updated successfully.
+            Assert.AreEqual(HttpStatusCode.OK, queueUpdateResponse.Status);
+            Assert.IsTrue(queueUpdateResponse.Result == true);
+        }
+
+        [TestMethod]
+        public void UpdateQueueItemStatusDoesNotExist()
+        {
+            DateTime timeHelped = DateTime.Now;
+            var request = new UpdateQueueItemStatusRequest
+            {
+                TimeHelped = timeHelped,
+                TimeRemoved = null
+            };
+            var queueFacade = new QueueFacade();
+            var response = queueFacade.UpdateQueueItemStatus(-1, request);
+
+            // Check that a request containing both TimeHelped and TimeRemoved is rejected.
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
+        }
+
+        /// <summary>
+        /// Tests that a request containing neither TimeHelped or TimeRemoved is rejected.
+        /// At least one property must be set.
+        /// </summary>
+        [TestMethod]
+        public void UpdateQueueItemStatusBothTimesNull()
+        {
+            var request = new UpdateQueueItemStatusRequest
+            {
+                TimeHelped = null,
+                TimeRemoved = null
+            };
+            var queueFacade = new QueueFacade();
+            var response = queueFacade.UpdateQueueItemStatus(-1, request);
+
+            // Check that a request containing both TimeHelped and TimeRemoved is rejected.
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
+        }
+
+        /// <summary>
+        /// Tests that a request containing both TimeHelped and TimeRemoved is rejected.
+        /// Only one property can be set per request.
+        /// </summary>
+        [TestMethod]
+        public void UpdateQueueItemStatusBothTimesNotNull()
+        {
+            DateTime timeHelped = DateTime.Now;
+            DateTime timeRemoved = timeHelped.AddMinutes(1);
+            var request = new UpdateQueueItemStatusRequest{
+                TimeHelped = timeHelped,
+                TimeRemoved = timeRemoved
+            };
+            var queueFacade = new QueueFacade();
+            var response = queueFacade.UpdateQueueItemStatus(-1, request);
+
+            // Check that a request containing both TimeHelped and TimeRemoved is rejected.
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
+        }
+
+        [TestMethod]
+        public void UpdateQueueItemStatusInvalidTimeRemoved()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
+
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Get topics for the unit that was just created.
+            TopicsFacade topicsFacade = new TopicsFacade();
+            GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
+
+            // Check that there are two units in the response (Layouts, Lifecycle).
+            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+
+            // Add test queue item, pass in topic [0].
+            TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
+
+            // Check that queue item was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, queueData.Response.Status);
+
+            // Create update request for TimeHelped.
+            var queueUpdateRequest = new UpdateQueueItemStatusRequest
+            {
+                TimeHelped = DateTime.Now,
+                TimeRemoved = null
+            };
+
+            // Update queue item TimeHelped.
+            var queueUpdateResponse = testEntityFactory.QueueFacade.UpdateQueueItemStatus(queueData.Response.ItemId, queueUpdateRequest);
+
+            // Check that queue item was updated successfully.
+            Assert.AreEqual(HttpStatusCode.OK, queueData.Response.Status);
+            Assert.IsTrue(queueUpdateResponse.Result == true);
+
+            // Create update request for TimeRemoved.
+            // NOTICE we're providing a TimedRemoved time that precedes TimeHelped. This should fail.
+            DateTime timeRemoved = queueUpdateRequest.TimeHelped.Value.AddMinutes(-1);
+            queueUpdateRequest = new UpdateQueueItemStatusRequest
+            {
+                TimeHelped = null,
+                TimeRemoved = timeRemoved
+            };
+
+            // Update queue item TimeRemoved.
+            queueUpdateResponse = testEntityFactory.QueueFacade.UpdateQueueItemStatus(queueData.Response.ItemId, queueUpdateRequest);
+
+            // Check that queue item was updated successfully.
+            Assert.AreEqual(HttpStatusCode.BadRequest, queueUpdateResponse.Status);
+            Assert.IsTrue(queueUpdateResponse.Result == false);
+        }
+
+        /// <summary>
         /// Test getting every queue item from a specific helpdesk from the database
         /// </summary>
         [TestMethod]
@@ -622,8 +938,10 @@ namespace Helpdesk.Services.Test
 
             GetQueueItemsByHelpdeskIDResponse testResponse = facade.GetQueueItemsByHelpdeskID(helpdesk.HelpdeskId);
 
+            var itemIds = testResponse.QueueItems.Select(i => i.ItemId).ToList();
+
             Assert.AreEqual(HttpStatusCode.OK, testResponse.Status);
-            Assert.AreEqual(request.StudentID, testResponse.QueueItems[0].StudentId);
+            Assert.IsTrue(itemIds.Contains(response.ItemId));
         }
 
         /// <summary>
