@@ -622,8 +622,10 @@ namespace Helpdesk.Services.Test
 
             GetQueueItemsByHelpdeskIDResponse testResponse = facade.GetQueueItemsByHelpdeskID(helpdesk.HelpdeskId);
 
+            var itemIds = testResponse.QueueItems.Select(i => i.ItemId).ToList();
+
             Assert.AreEqual(HttpStatusCode.OK, testResponse.Status);
-            Assert.AreEqual(request.StudentID, testResponse.QueueItems[0].StudentId);
+            Assert.IsTrue(itemIds.Contains(response.ItemId));
         }
 
         /// <summary>
