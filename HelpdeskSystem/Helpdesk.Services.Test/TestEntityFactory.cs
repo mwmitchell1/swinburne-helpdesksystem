@@ -60,6 +60,8 @@ namespace Helpdesk.Services.Test
             var request = new AddHelpdeskRequest();
             if (name == "" && PopulateEmptyStrings) request.Name = AlphaNumericStringGenerator.GetString(10); else request.Name = name;
 
+            request.Name = string.IsNullOrEmpty(name) && PopulateEmptyStrings ? AlphaNumericStringGenerator.GetString(10) : name;
+
             request.HasCheckIn = (bool)hasCheckin;
             request.HasQueue = (bool)hasQueue;
 
