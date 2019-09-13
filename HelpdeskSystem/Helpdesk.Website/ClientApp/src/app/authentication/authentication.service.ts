@@ -40,4 +40,8 @@ export class AuthenticationService {
     isLoggedIn() {
         return this.cookieService.get('AuthToken') !== '';
     }
+
+    verifyUser() {
+        return this.client.get(this.baseUrl + 'api/users/verifyuser')
+    }
 }
