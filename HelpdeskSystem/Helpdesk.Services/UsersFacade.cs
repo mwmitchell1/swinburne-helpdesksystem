@@ -303,13 +303,6 @@ namespace Helpdesk.Services
                     return response;
                 }
 
-                if (user.FirstTime)
-                {
-                    response.Status = HttpStatusCode.Accepted;
-                    response.UserId = user.UserId;
-                    return response;
-                }
-
                 // Generate users bearer token
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.AppSecret);
@@ -328,6 +321,14 @@ namespace Helpdesk.Services
                 var token = tokenHandler.WriteToken(rawToken);
 
                 response.Token = token;
+
+                if (user.FirstTime)
+                {
+                    response.Status = HttpStatusCode.Accepted;
+                    response.UserId = user.UserId;
+                    return response;
+                }
+
                 response.Status = HttpStatusCode.OK;
             }
             catch (Exception ex)
@@ -365,7 +366,7 @@ namespace Helpdesk.Services
 
                 UserDTO userFromUsername = dataLayer.GetUserByUsername(username);
 
-                if (!(userFromID.UserId == userFromUsername.UserId && userFromID.Username == userFromUsername.Username))
+                if (!(userFromID.UserId == userFromUsername.UserId && userFromID.Username == userFromUsername.Username && (!userFromID.FirstTime)))
                 {
                     s_logger.Warn("Unable to verify user.");
                     result = false;

@@ -135,11 +135,13 @@ namespace Helpdesk.Website.Controllers.api
         /// <param name="id">ID of the user to be updated</param>
         /// <param name="request">Request that contains the new user information</param>
         /// <returns>A response which indicates success or failure</returns>
-        [AllowAnonymous]
         [HttpPatch]
         [Route("{id}")]
         public IActionResult UpdateUser([FromRoute] int id, [FromBody] UpdateUserRequest request)
         {
+            if (!IsAuthorized())
+                return Unauthorized();
+
             try
             {
                 var facade = new UsersFacade();
@@ -237,7 +239,21 @@ namespace Helpdesk.Website.Controllers.api
                             return Ok(response);
                         }
                     case HttpStatusCode.Accepted:
-                        return Accepted(response);
+                        {
+                            CookieOptions cookie = new CookieOptions()
+                            {
+                                Expires = DateTime.Now.AddHours(4),
+                                HttpOnly = false,
+                                Domain = ".swin.helpdesk.edu.au",
+                                IsEssential = true,
+                                Path = "/",
+                                Secure = false,
+                                SameSite = SameSiteMode.Strict,
+                            };
+
+                            Response.Cookies.Append("AuthToken", response.Token, cookie);
+                            return Accepted(response);
+                        }
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:

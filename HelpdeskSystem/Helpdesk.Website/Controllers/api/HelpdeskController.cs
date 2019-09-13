@@ -92,6 +92,7 @@ namespace Helpdesk.Website.Controllers.api
         /// </summary>
         /// <param name="id">The id of the helpdesk to be retreived</param>
         /// <returns>A response indicating the success and helpdesk DTO or null</returns>
+        [AllowAnonymous]
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetHelpdesk([FromRoute] int id)
