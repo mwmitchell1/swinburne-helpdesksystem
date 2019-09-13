@@ -5,6 +5,7 @@ import { User } from './user.model';
 import { NotifierService } from 'angular-notifier';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { AddUserRequest } from '../../data/requests/users/add-request';
+import { UpdateUserRequest } from '../../data/requests/users/update-request';
 
 @Component({
   selector: 'app-admin-users',
@@ -14,12 +15,15 @@ export class UsersComponent {
   private users: User[];
   deleteForm;
   private readonly userToAdd: AddUserRequest;
+  private userToEdit: UpdateUserRequest;
+  private userToEditId: number;
 
   constructor(private usersService: UsersService
     , private notifierService: NotifierService
     , private builder: FormBuilder) {
 
     this.userToAdd = new AddUserRequest();
+    this.userToEdit = new UpdateUserRequest();
 
     this.updateUserList();
 
@@ -43,10 +47,35 @@ export class UsersComponent {
     });
   }
 
+
+  getUserById(id: number) {
+    this.users.forEach(user => {
+      if (user.id === id) { return user; } else { return null; }
+    });
+  }
+
+  /**
+   * Prepares hidden delete form
+   * @param id Id of user to delete
+   */
   setupDelete(id: number) {
     this.deleteForm.patchValue({userId: id});
   }
 
+  /**
+   * Prepare edit request object
+   * @param user User object from form
+   */
+  setupEdit(user: User) {
+    // let editingUser = this.getUserById(id);
+    this.userToEdit.Username = user.username;
+    this.userToEditId = user.id;
+  }
+
+  /**
+   * User service method to delete user
+   * @param data Form data
+   */
   deleteUser(data) {
     this.usersService.deleteUser(data.userId).subscribe(
       result => {
@@ -66,6 +95,10 @@ export class UsersComponent {
       });
   }
 
+  /**
+   * User service method to add new user
+   * @param form Add user form
+   */
   addUser(form) {
 
     console.log('adding user', this.userToAdd);
@@ -94,4 +127,30 @@ export class UsersComponent {
       }
     );
   }
+
+  /**
+   * User service method to update a user
+   * @param form User edit form
+   */
+  updateUser(form) {
+    this.usersService.updateUser(this.userToEdit, this.userToEditId).subscribe(
+      result => {
+        this.notifierService.notify('success', 'User edited successfully!');
+        this.updateUserList();
+
+        $('#modal-user-edit').modal('hide');
+        form.reset();
+      },
+      error => {
+        console.log(error);
+        if (error.status === 403) {
+          this.notifierService.notify('warning', 'Another user already exists with this username');
+        } else {
+          this.notifierService.notify('error', 'Unable to edit user, please contact helpdesk admin');
+        }
+      }
+    );
+  }
+
+
 }
