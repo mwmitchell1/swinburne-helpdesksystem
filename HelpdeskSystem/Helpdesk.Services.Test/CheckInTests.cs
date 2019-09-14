@@ -63,6 +63,7 @@ namespace Helpdesk.Services.Test
                 Assert.AreEqual(request.UnitID, checkInHistory.UnitId);
                 var timeDiff = baseTime.CompareTo(addTime);
                 Assert.IsTrue(timeDiff == -1);
+                Assert.AreEqual(request.StudentID, checkInHistory.StudentId);
 
                 Nicknames nicknames = context.Nicknames.FirstOrDefault(n => n.StudentId == checkInHistory.StudentId);
 
@@ -119,6 +120,7 @@ namespace Helpdesk.Services.Test
                 Assert.AreEqual(request.UnitID, checkInHistory.UnitId);
                 var timeDiff = baseTime.CompareTo(addTime);
                 Assert.IsTrue(timeDiff == -1);
+                Assert.AreEqual(request.StudentID, checkInHistory.StudentId);
             }
         }
 
@@ -192,7 +194,22 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void CheckInNoUnit()
         {
-            CheckInRequest request = new CheckInRequest();
+            Nicknames nickname = new Nicknames()
+            {
+                NickName = AlphaNumericStringGenerator.GetString(10),
+                Sid = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Nicknames.Add(nickname);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                StudentID = nickname.StudentId
+            };
 
             CheckInFacade facade = new CheckInFacade();
 
@@ -202,10 +219,10 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// Test checking out works 
+        /// Test checking out works with no forced checkout
         /// </summary>
         [TestMethod]
-        public void CheckOut()
+        public void CheckOutNotForced()
         {
             Unit unit = new Unit()
             {
@@ -234,7 +251,12 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, response.Status);
             Assert.IsTrue(response.CheckInID > 0);
 
-            CheckOutResponse coResponse = facade.CheckOut(response.CheckInID);
+            CheckOutRequest coRequest = new CheckOutRequest()
+            {
+                ForcedCheckout = 0
+            };
+
+            CheckOutResponse coResponse = facade.CheckOut(coRequest, response.CheckInID);
 
             Assert.AreEqual(HttpStatusCode.OK, coResponse.Status);
             Assert.IsTrue(coResponse.Result);
@@ -250,9 +272,65 @@ namespace Helpdesk.Services.Test
                 var timeDiff = baseTime.CompareTo(addTime);
                 Assert.IsTrue(timeDiff == -1);
 
-                byte testValue = 0;
+                Assert.AreEqual(coRequest.ForcedCheckout, checkOut.ForcedCheckout);
+            }
+        }
 
-                Assert.AreEqual(testValue, checkOut.ForcedCheckout);
+        /// <summary>
+        /// Test checking out works with forced checkout
+        /// </summary>
+        [TestMethod]
+        public void CheckOutForced()
+        {
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Unit.Add(unit);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                UnitID = unit.UnitId,
+                Nickname = AlphaNumericStringGenerator.GetString(10),
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            CheckInFacade facade = new CheckInFacade();
+
+            CheckInResponse response = facade.CheckIn(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.CheckInID > 0);
+
+            CheckOutRequest coRequest = new CheckOutRequest()
+            {
+                ForcedCheckout = 1
+            };
+
+            CheckOutResponse coResponse = facade.CheckOut(coRequest, response.CheckInID);
+
+            Assert.AreEqual(HttpStatusCode.OK, coResponse.Status);
+            Assert.IsTrue(coResponse.Result);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Checkinhistory checkOut = context.Checkinhistory.FirstOrDefault(co => co.CheckInId == response.CheckInID);
+
+                Assert.IsNotNull(checkOut);
+
+                var baseTime = DateTime.Now.AddMinutes(-1);
+                var addTime = checkOut.CheckoutTime;
+                var timeDiff = baseTime.CompareTo(addTime);
+                Assert.IsTrue(timeDiff == -1);
+
+                Assert.AreEqual(coRequest.ForcedCheckout, checkOut.ForcedCheckout);
             }
         }
 
@@ -264,7 +342,12 @@ namespace Helpdesk.Services.Test
         {
             CheckInFacade facade = new CheckInFacade();
 
-            CheckOutResponse coResponse = facade.CheckOut(-1);
+            CheckOutRequest request = new CheckOutRequest()
+            {
+                ForcedCheckout = 0
+            };
+
+            CheckOutResponse coResponse = facade.CheckOut(request, -1);
 
             Assert.AreEqual(HttpStatusCode.NotFound, coResponse.Status);
         }

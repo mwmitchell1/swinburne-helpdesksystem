@@ -147,7 +147,7 @@ namespace Helpdesk.DataLayer
 
                 foreach (Queueitem queueItem in queueItems)
                 {
-                    if (queueItem != null)
+                    if (queueItem != null && !queueItem.TimeRemoved.HasValue)
                     {
                         QueueItemDTO queueItemDTO = DAO2DTO(queueItem);
                         queueItemDTOs.Add(queueItemDTO);

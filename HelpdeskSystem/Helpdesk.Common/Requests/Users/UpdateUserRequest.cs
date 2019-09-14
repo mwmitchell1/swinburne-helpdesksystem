@@ -14,6 +14,7 @@ namespace Helpdesk.Common.Requests.Users
         [StringLength(20, ErrorMessage = "Username cannot excede 20 characters")]
         public string Username { get; set; }
 
+        [MinLength(6)]
         public string Password { get; set; }
     }
 }
