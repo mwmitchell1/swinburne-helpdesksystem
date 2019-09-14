@@ -188,6 +188,99 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
+        /// Tests checking out and removing all queue items.
+        /// </summary>
+        [TestMethod]
+        public void ForceCheckoutQueueRemove()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { "Layouts", "Lifecycle" });
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
+
+            // Get topics that were created and check that there are 2 (Layouts and Lifecycle).
+            List<TopicDTO> unitTopics = testEntityFactory.TopicsFacade.GetTopicsByUnitID(unitData.Response.UnitID).Topics;
+            Assert.IsTrue(unitTopics.Count == 2);
+
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
+            Assert.IsTrue(unitData.Response.UnitID > 0);
+
+            // Create students and check that they were created successfully.
+            TestDataNickname nicknameDataA = testEntityFactory.AddNickname();
+            Assert.AreEqual(HttpStatusCode.OK, nicknameDataA.Response.Status);
+            Assert.IsTrue(nicknameDataA.Response.StudentID > 0);
+            TestDataNickname nicknameDataB = testEntityFactory.AddNickname();
+            Assert.AreEqual(HttpStatusCode.OK, nicknameDataB.Response.Status);
+            Assert.IsTrue(nicknameDataB.Response.StudentID > 0);
+
+            // Create two checkins and check that they're created successfully.
+            TestDataCheckIn checkinDataA = testEntityFactory.AddCheckIn(nicknameDataA.Response.StudentID, null, null, unitData.Response.UnitID);
+            Assert.AreEqual(HttpStatusCode.OK, checkinDataA.Response.Status);
+            Assert.IsTrue(checkinDataA.Response.CheckInID > 0);
+            TestDataCheckIn checkinDataB = testEntityFactory.AddCheckIn(nicknameDataB.Response.StudentID, null, null, unitData.Response.UnitID);
+            Assert.AreEqual(HttpStatusCode.OK, checkinDataB.Response.Status);
+            Assert.IsTrue(checkinDataB.Response.CheckInID > 0);
+
+            // Create three queue items, 2 which are associated with checkinDataA and 1 with checkinDataB.
+            TestDataQueue queueDataA = testEntityFactory.AddQueueItem(nicknameDataA.Response.StudentID,
+                unitTopics[0].TopicId, checkinDataA.Response.CheckInID);
+            Assert.AreEqual(HttpStatusCode.OK, queueDataA.Response.Status);
+            Assert.IsTrue(queueDataA.Response.ItemId > 0);
+            TestDataQueue queueDataB = testEntityFactory.AddQueueItem(nicknameDataA.Response.StudentID,
+                unitTopics[0].TopicId, checkinDataA.Response.CheckInID);
+            Assert.AreEqual(HttpStatusCode.OK, queueDataB.Response.Status);
+            Assert.IsTrue(queueDataB.Response.ItemId > 0);
+            TestDataQueue queueDataC = testEntityFactory.AddQueueItem(nicknameDataB.Response.StudentID,
+                unitTopics[0].TopicId, checkinDataB.Response.CheckInID);
+            Assert.AreEqual(HttpStatusCode.OK, queueDataC.Response.Status);
+            Assert.IsTrue(queueDataC.Response.ItemId > 0);
+
+            // Manuall checkout checkinDataB and check that it succeeded.
+            var checkoutBResponse = testEntityFactory.CheckInFacade.CheckOut(checkinDataB.Response.CheckInID);
+            Assert.AreEqual(HttpStatusCode.OK, checkoutBResponse.Status);
+            Assert.IsTrue(checkoutBResponse.Result == true);
+
+            // Do the force checkout and queue remove.
+            var forceCheckoutQueueRemoveResponse = testEntityFactory.HelpdeskFacade.ForceCheckoutQueueRemove();
+            Assert.AreEqual(HttpStatusCode.OK, forceCheckoutQueueRemoveResponse.Status);
+            Assert.IsTrue(forceCheckoutQueueRemoveResponse.Result == true);
+
+            // Check all checkouts and and queue removals occured as expected.
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                // CheckinA was was not manually checked out, so ForcedCheckout should be true.
+                var checkinA = context.Checkinhistory.FirstOrDefault(c => c.CheckInId == checkinDataA.Response.CheckInID);
+                Assert.IsTrue(checkinA.ForcedCheckout == 1);
+                Assert.IsTrue(checkinA.CheckoutTime != null);
+
+                // CheckinB was manually checked out, so ForcedCheckout should be false.
+                var checkinB = context.Checkinhistory.FirstOrDefault(c => c.CheckInId == checkinDataB.Response.CheckInID);
+                Assert.IsTrue(checkinB.ForcedCheckout == 0);
+                Assert.IsTrue(checkinB.CheckoutTime != null);
+
+                // Check that all queue items were removed.
+                var queueItemA = context.Queueitem.FirstOrDefault(q => q.ItemId == queueDataA.Response.ItemId);
+                Assert.IsTrue(queueItemA.TimeRemoved != null);
+
+                var queueItemB = context.Queueitem.FirstOrDefault(q => q.ItemId == queueDataB.Response.ItemId);
+                Assert.IsTrue(queueItemB.TimeRemoved != null);
+
+                var queueItemC = context.Queueitem.FirstOrDefault(q => q.ItemId == queueDataC.Response.ItemId);
+                Assert.IsTrue(queueItemC.TimeRemoved != null);
+            }
+        }
+
+        /// <summary>
         /// Tests adding a timespan to the database with a valid request.
         /// </summary>
         [TestMethod]
