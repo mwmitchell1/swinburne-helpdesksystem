@@ -3,13 +3,17 @@ using Helpdesk.Common.DTOs;
 using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests;
 using Helpdesk.Common.Requests.CheckIn;
+using Helpdesk.Common.Requests.Students;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.CheckIn;
+using Helpdesk.Common.Responses.Students;
+using Helpdesk.Data.Models;
 using Helpdesk.DataLayer;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Linq;
 using System.Text;
 
 namespace Helpdesk.Services
@@ -37,19 +41,47 @@ namespace Helpdesk.Services
                 if (response.Status == HttpStatusCode.BadRequest)
                     return response;
 
+                StudentFacade studentFacade = new StudentFacade();
+
+                if (!request.StudentID.HasValue)
+                {
+                    if (studentFacade.GetStudentByNickname(request.Nickname).Status!=HttpStatusCode.NotFound)
+                    {
+                        response.Status = HttpStatusCode.BadRequest;
+                        return response;
+                    }
+
+                    AddStudentRequest addStudentRequest = new AddStudentRequest()
+                    {
+                        SID = request.SID,
+                        Nickname = request.Nickname
+                    };
+
+                    AddStudentResponse addStudentResponse = studentFacade.AddStudentNickname(addStudentRequest);
+
+                    request.StudentID = addStudentResponse.StudentID;
+                }
+
+                //Will change to facade method when get student by id method is implemented
+                using (helpdesksystemContext context = new helpdesksystemContext())
+                {
+                    if (context.Nicknames.FirstOrDefault(n => n.StudentId == request.StudentID) == null)
+                        throw new NotFoundException("No student found for id " + request.StudentID);
+                }
+
                 CheckInDataLayer dataLayer = new CheckInDataLayer();
                 int checkInID = dataLayer.CheckIn(request);
 
                 response.CheckInID = checkInID;
                 response.Status = HttpStatusCode.OK;
             }
-            catch(NotFoundException ex)
+            catch (NotFoundException ex)
             {
-                s_logger.Warn(ex, "Unable to check in");
+                s_logger.Warn(ex, "No student found for id "+request.StudentID);
                 response.Status = HttpStatusCode.NotFound;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to check in"));
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No student found for id " + request.StudentID));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to check in");
                 response.Status = HttpStatusCode.InternalServerError;
@@ -63,15 +95,15 @@ namespace Helpdesk.Services
         /// </summary>
         /// <param name="id">Specified CheckInID</param>
         /// <returns>A response indicating success or failure</returns>
-        public CheckOutResponse CheckOut(int id)
+        public CheckOutResponse CheckOut(CheckOutRequest request, int id)
         {
             CheckOutResponse response = new CheckOutResponse();
 
             try
             {
-               CheckInDataLayer dataLayer = new CheckInDataLayer();
+                CheckInDataLayer dataLayer = new CheckInDataLayer();
 
-                bool result = dataLayer.CheckOut(id);
+                bool result = dataLayer.CheckOut(request, id);
 
                 if (result == false)
                     throw new NotFoundException("Unable to find check in item!");

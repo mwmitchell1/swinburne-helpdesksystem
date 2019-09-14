@@ -325,6 +325,25 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
+        /// Test trying to update a user with a password that is too short is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateUserPasswordTooShort()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            UpdateUserRequest updateUserRequest = new UpdateUserRequest()
+            {
+                Username = AlphaNumericStringGenerator.GetString(10),
+                Password = AlphaNumericStringGenerator.GetString(5),
+            };
+
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(8, updateUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, updateUserResponse.Status);
+        }
+
+        /// <summary>
         /// Used to hash passwords when a user logs in, is added to the system or has their password changed
         /// </summary>
         /// <param name="text">The password in plain text</param>

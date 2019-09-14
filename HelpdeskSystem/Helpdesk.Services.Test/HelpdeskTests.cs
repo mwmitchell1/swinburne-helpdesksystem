@@ -245,10 +245,11 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, queueDataC.Response.Status);
             Assert.IsTrue(queueDataC.Response.ItemId > 0);
 
+            /*TODO -- Update with new checkout method
             // Manuall checkout checkinDataB and check that it succeeded.
             var checkoutBResponse = testEntityFactory.CheckInFacade.CheckOut(checkinDataB.Response.CheckInID);
             Assert.AreEqual(HttpStatusCode.OK, checkoutBResponse.Status);
-            Assert.IsTrue(checkoutBResponse.Result == true);
+            Assert.IsTrue(checkoutBResponse.Result == true);*/
 
             // Do the force checkout and queue remove.
             var forceCheckoutQueueRemoveResponse = testEntityFactory.HelpdeskFacade.ForceCheckoutQueueRemove();
@@ -407,6 +408,64 @@ namespace Helpdesk.Services.Test
             UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(0, updateTimespanRequest);
 
             Assert.AreEqual(HttpStatusCode.NotFound, updateTimespanResponse.Status);
+        }
+
+        /// <summary>
+        /// Test updating a specific timespan without any information is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateTimespanNoInformation()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest()
+            {
+                HelpdeskId = 1,
+                StartDate = DateTime.Today,
+                EndDate = new DateTime(DateTime.Today.Year + 1, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0),
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+
+            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest();
+
+            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(addTimeSpanResponse.SpanId, updateTimespanRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, updateTimespanResponse.Status);
+        }
+
+        /// <summary>
+        /// Test updating a specific timespan without a name is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateTimespanNoName()
+        {
+            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest()
+            {
+                HelpdeskId = 1,
+                StartDate = DateTime.Today,
+                EndDate = new DateTime(DateTime.Today.Year + 1, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0),
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+            
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+
+            UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
+            {
+                StartDate = new DateTime(2019, 01, 01),
+                EndDate = new DateTime(2019, 06, 01),
+            };
+
+            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(addTimeSpanResponse.SpanId, updateTimespanRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, updateTimespanResponse.Status);
         }
 
         /// <summary>
