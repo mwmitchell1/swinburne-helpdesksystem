@@ -125,6 +125,38 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
+        /// Tests checking in with a student id that doesn't exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void CheckInExistingStudentNotFound()
+        {
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Unit.Add(unit);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                UnitID = unit.UnitId,
+                StudentID = -1
+            };
+
+            CheckInFacade facade = new CheckInFacade();
+
+            CheckInResponse response = facade.CheckIn(request);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
+        }
+
+        /// <summary>
         /// Tests checking in a with a new student with no nickname is handled properly
         /// </summary>
         [TestMethod]
@@ -147,6 +179,46 @@ namespace Helpdesk.Services.Test
             {
                 UnitID = unit.UnitId,
                 SID = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            CheckInFacade facade = new CheckInFacade();
+
+            CheckInResponse response = facade.CheckIn(request);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
+        }
+
+        /// <summary>
+        /// Tests checking in a with a new student with an existing nickname is handled properly
+        /// </summary>
+        [TestMethod]
+        public void CheckInNewStudentExistingNickname()
+        {
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            Nicknames nickname = new Nicknames()
+            {
+                NickName = AlphaNumericStringGenerator.GetString(10),
+                Sid = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Unit.Add(unit);
+                context.Nicknames.Add(nickname);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                UnitID = unit.UnitId,
+                SID = AlphaNumericStringGenerator.GetStudentIDString(),
+                Nickname = nickname.NickName
             };
 
             CheckInFacade facade = new CheckInFacade();
