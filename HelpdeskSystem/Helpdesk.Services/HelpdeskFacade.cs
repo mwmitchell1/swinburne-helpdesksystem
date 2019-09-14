@@ -445,6 +445,36 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
+        /// Used to force-checkout users and remove queue items.
+        /// Takes optional DateTime parameter. If not provided, data layer will use DateTime.Now.
+        /// Used by DailyCleanupJob.
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public ForceCheckoutQueueRemoveResponse ForceCheckoutQueueRemove(DateTime? dateTime = null)
+        {
+            ForceCheckoutQueueRemoveResponse response = new ForceCheckoutQueueRemoveResponse();
+
+            try
+            {
+                HelpdeskDataLayer dataLayer = new HelpdeskDataLayer();
+
+                response.Result = dataLayer.ForceCheckoutQueueRemove(dateTime);
+
+                if (response.Result == true)
+                    response.Status = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to force checkout and remove queue items!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to force checkout and remove queue items!"));
+            }
+
+            return response;
+        }
+
+        /// <summary>
         /// This method is responsible for handling the deletion of a timespan from the system
         /// </summary>
         /// <param name="id">The SpanID of the timespan to be deleted</param>

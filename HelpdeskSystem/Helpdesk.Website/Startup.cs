@@ -12,7 +12,9 @@ using Microsoft.IdentityModel.Tokens;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
+using System.Collections.Specialized;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Helpdesk.Website
 {
@@ -72,6 +74,13 @@ namespace Helpdesk.Website
                     )
             );
 
+            services.AddSingleton<DailyCleanupJob>();
+            services.AddSingleton(
+                new JobSchedule(
+                    typeof(DailyCleanupJob)
+                    , appSettings.Jobs["DailyCleanupJob"]
+                    )
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

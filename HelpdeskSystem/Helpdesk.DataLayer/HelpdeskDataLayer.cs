@@ -258,6 +258,52 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
+        /// Used to force-checkout users and remove queue items.
+        /// Takes optional DateTime parameter. Will use DateTime.Now if not provided.
+        /// Used by DailyCleanupJob.
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public bool ForceCheckoutQueueRemove(DateTime? dateTime = null)
+        {
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DateTime time;
+
+                if (dateTime == null)
+                {
+                    time = DateTime.Now;
+                }
+                else
+                {
+                    time = (DateTime)dateTime;
+                }
+
+                var queueItems = context.Queueitem.Where(q => q.TimeRemoved == null).ToList();
+                var checkins = context.Checkinhistory.Where(c => c.CheckoutTime == null).ToList();
+
+                foreach (Queueitem queueItem in queueItems)
+                {
+                    if (queueItem.TimeRemoved == null)
+                    {
+                        queueItem.TimeRemoved = time;
+                    }
+                }
+
+                foreach (Checkinhistory checkin in checkins)
+                {
+                    if (checkin.CheckoutTime == null)
+                    {
+                        checkin.CheckoutTime = time;
+                        checkin.ForcedCheckout = 1;
+                    }
+                }
+                context.SaveChanges();
+            }
+            return true;
+        }
+
+        /// <summary>
         /// This method adds a timespan to the database.
         /// </summary>
         /// <param name="request"></param>
