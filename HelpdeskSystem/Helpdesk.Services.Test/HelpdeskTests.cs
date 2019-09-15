@@ -67,6 +67,9 @@ namespace Helpdesk.Services.Test
             Assert.IsTrue(response.Helpdesks.Count > 0);
         }
 
+        /// <summary>
+        /// Tests getting all active helpdesks works
+        /// </summary>
         [TestMethod]
         public void GetActiveHelpdesks()
         {
