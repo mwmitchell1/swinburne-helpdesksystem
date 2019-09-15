@@ -26,7 +26,7 @@ namespace Helpdesk.Services
         private static Logger s_logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// This method is used to check into the database
+        /// This method is used to check in into the helpdesk system
         /// </summary>
         /// <param name="request">The request containing the specified UnitID</param>
         /// <returns>A response indicating success or failure</returns>
@@ -91,7 +91,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is used to check a check in item out of the database
+        /// This method is used to check a check in item out of the helpdesk system
         /// </summary>
         /// <param name="id">Specified CheckInID</param>
         /// <returns>A response indicating success or failure</returns>

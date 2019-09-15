@@ -167,5 +167,32 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.BadRequest, editStudentNicknameResponse.Status);
         }
+
+        /// <summary>
+        /// Test trying to edit a student's nickname with a nickname that already exists is handled properly
+        /// </summary>
+        [TestMethod]
+        public void EditStudentNicknameExists()
+        {
+            AddStudentRequest request = new AddStudentRequest()
+            {
+                Nickname = AlphaNumericStringGenerator.GetString(10),
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            StudentFacade studentFacade = new StudentFacade();
+            AddStudentResponse response = studentFacade.AddStudentNickname(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+
+            EditStudentNicknameRequest editStudentNicknameRequest = new EditStudentNicknameRequest()
+            {
+                Nickname = request.Nickname
+            };
+
+            EditStudentNicknameResponse editStudentNicknameResponse = studentFacade.EditStudentNickname(response.StudentID, editStudentNicknameRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, editStudentNicknameResponse.Status);
+        }
     }
 }

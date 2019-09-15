@@ -357,6 +357,9 @@ namespace Helpdesk.DataLayer
             {
                 var timespans = context.Timespans.ToList();
 
+                if (timespans.Count == 0)
+                    throw new NotFoundException("No timespans found!");
+
                 foreach (Timespans timespan in timespans)
                 {
                     if (timespan != null)
@@ -383,10 +386,8 @@ namespace Helpdesk.DataLayer
                 Timespans timespan = context.Timespans.FirstOrDefault(t => t.SpanId == id);
 
                 if (timespan == null)
-                {
                     return false;
-                }
-
+    
                 timespan.Name = request.Name;
                 timespan.StartDate = request.StartDate;
                 timespan.EndDate = request.EndDate;
@@ -408,7 +409,7 @@ namespace Helpdesk.DataLayer
                 Timespans timespan = context.Timespans.FirstOrDefault(ts => ts.SpanId == id);
 
                 if (timespan == null)
-                    return false;
+                    return true;
 
                 context.Timespans.Remove(timespan);
                 context.SaveChanges();

@@ -356,13 +356,14 @@ namespace Helpdesk.Services.Test
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
 
-            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
-            addTimeSpanRequest.HelpdeskId = 1;
-            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
-            DateTime startDate = DateTime.Today;
-            DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
-            addTimeSpanRequest.StartDate = startDate;
-            addTimeSpanRequest.EndDate = endDate;
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest()
+            {
+                HelpdeskId = 1,
+                Name = AlphaNumericStringGenerator.GetString(10),
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddYears(1),
+
+            };
 
             AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
 
@@ -370,7 +371,7 @@ namespace Helpdesk.Services.Test
 
             UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
             {
-                Name = "Semester 1",
+                Name = AlphaNumericStringGenerator.GetString(10),
                 StartDate = new DateTime(2019, 01, 01),
                 EndDate = new DateTime(2019, 06, 01),
             };
@@ -400,12 +401,12 @@ namespace Helpdesk.Services.Test
 
             UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
             {
-                Name = "Semester 1",
+                Name = AlphaNumericStringGenerator.GetString(10),
                 StartDate = new DateTime(2019, 08, 01),
                 EndDate = new DateTime(2019, 11, 01)
             };
 
-            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(0, updateTimespanRequest);
+            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(-1, updateTimespanRequest);
 
             Assert.AreEqual(HttpStatusCode.NotFound, updateTimespanResponse.Status);
         }
@@ -422,7 +423,7 @@ namespace Helpdesk.Services.Test
             {
                 HelpdeskId = 1,
                 StartDate = DateTime.Today,
-                EndDate = new DateTime(DateTime.Today.Year + 1, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0),
+                EndDate = DateTime.Today.AddYears(1),
                 Name = AlphaNumericStringGenerator.GetString(10)
             };
 
@@ -449,7 +450,7 @@ namespace Helpdesk.Services.Test
             {
                 HelpdeskId = 1,
                 StartDate = DateTime.Today,
-                EndDate = new DateTime(DateTime.Today.Year + 1, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0),
+                EndDate = DateTime.Today.AddYears(1),
                 Name = AlphaNumericStringGenerator.GetString(10)
             };
             
@@ -474,12 +475,34 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void GetTimespans()
         {
+            AddHelpdeskRequest addHelpdeskRequest = new AddHelpdeskRequest
+            {
+                HasCheckIn = false,
+                HasQueue = true,
+                Name = AlphaNumericStringGenerator.GetString(10)
+            };
+
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            AddHelpdeskResponse addHelpdeskResponse = helpdeskFacade.AddHelpdesk(addHelpdeskRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addHelpdeskResponse.Status);
+
+            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest
+            {
+                HelpdeskId = addHelpdeskResponse.HelpdeskID,
+                Name = AlphaNumericStringGenerator.GetString(10),
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddYears(1)
+            };
+
+            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
 
             GetTimeSpansResponse getTimespansResponse = helpdeskFacade.GetTimeSpans();
 
             Assert.AreEqual(HttpStatusCode.OK, getTimespansResponse.Status);
-            Assert.AreEqual(1, getTimespansResponse.Timespans[0].SpanId);
+            Assert.IsNotNull(getTimespansResponse.Timespans.Find(t => t.SpanId == addTimeSpanResponse.SpanId));
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -510,12 +533,10 @@ namespace Helpdesk.Services.Test
             AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest
             {
                 HelpdeskId = addHelpdeskResponse.HelpdeskID,
-                Name = "TestName"
+                Name = AlphaNumericStringGenerator.GetString(10),
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddYears(1)
             };
-            DateTime startDate = DateTime.Today;
-            DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
-            addTimeSpanRequest.StartDate = startDate;
-            addTimeSpanRequest.EndDate = endDate;
 
             AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
 
@@ -532,7 +553,7 @@ namespace Helpdesk.Services.Test
 
                 Assert.IsNotNull(timespan);
                 Assert.AreEqual(addHelpdeskResponse.HelpdeskID, timespan.HelpdeskId);
-                Assert.AreEqual("TestName", timespan.Name);
+                Assert.AreEqual(addTimeSpanRequest.Name, timespan.Name);
             }
         }
 
@@ -574,7 +595,7 @@ namespace Helpdesk.Services.Test
                 HelpdeskId = 1,
                 Name = AlphaNumericStringGenerator.GetString(10),
                 StartDate = DateTime.Today,
-                EndDate = new DateTime(DateTime.Today.Year + 1, DateTime.Today.Month, DateTime.Today.Day, 0, 0, 0)
+                EndDate = DateTime.Today.AddYears(1)
             };
 
             AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
@@ -588,10 +609,17 @@ namespace Helpdesk.Services.Test
             GetTimeSpanResponse response = helpdeskFacade.GetTimeSpan(addTimeSpanResponse.SpanId);
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespan = context.Timespans.FirstOrDefault(ts => ts.SpanId == addTimeSpanResponse.SpanId);
+
+                Assert.IsNull(timespan);
+            }
         }
 
         /// <summary>
-        /// Ensures that deleting a user that does not exist is handled properly
+        /// Ensures that deleting a timespan that does not exist is handled properly
         /// </summary>
         [TestMethod]
         public void DeleteTimespanNotFound()
@@ -600,7 +628,7 @@ namespace Helpdesk.Services.Test
 
             DeleteTimeSpanResponse deleteResponse = helpdeskFacade.DeleteTimeSpan(-1);
 
-            Assert.AreEqual(HttpStatusCode.NotFound, deleteResponse.Status);
+            Assert.AreEqual(HttpStatusCode.OK, deleteResponse.Status);
         }
     }
 }

@@ -117,10 +117,8 @@ namespace Helpdesk.DataLayer
                 Nicknames nickname = context.Nicknames.FirstOrDefault(n => n.StudentId == id);
 
                 if (nickname == null)
-                {
                     return false;
-                }
-
+    
                 nickname.NickName = request.Nickname;
 
                 context.SaveChanges();

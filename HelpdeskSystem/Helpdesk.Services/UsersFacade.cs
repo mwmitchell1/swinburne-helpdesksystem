@@ -33,7 +33,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for retrieving all users from the database
+        /// This method is responsible for retrieving all users from the helpdesk system
         /// </summary>
         /// <returns>The response that indicates if the operation was a success,
         /// and the list of users</returns>
@@ -48,11 +48,6 @@ namespace Helpdesk.Services
                 var dataLayer = new UsersDataLayer();
 
                 List<UserDTO> users = dataLayer.GetUsers();
-
-                if (users.Count == 0)
-                {
-                    throw new NotFoundException("No users found!");
-                }
 
                 response.Users = users;
                 response.Status = HttpStatusCode.OK;
@@ -73,7 +68,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for getting a specific user from the database
+        /// This method is responsible for getting a specific user from the helpdesk system
         /// </summary>
         /// <param name="id">The UserId of the specific user to be retrieved</param>
         /// <returns>The response that indicates if the operation was a success,
@@ -182,9 +177,7 @@ namespace Helpdesk.Services
                 response = (UpdateUserResponse)request.CheckValidation(response);
 
                 if (response.Status == HttpStatusCode.BadRequest)
-                {
                     return response;
-                }
 
                 request.Password = HashText(request.Password);
 
