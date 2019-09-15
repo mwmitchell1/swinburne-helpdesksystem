@@ -11,6 +11,7 @@ namespace Helpdesk.Common.Requests.Users
     /// </summary>
     public class UpdateUserRequest : BaseRequest
     {
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Username cannot be empty!")]
         [StringLength(20, ErrorMessage = "Username cannot excede 20 characters")]
         public string Username { get; set; }
 

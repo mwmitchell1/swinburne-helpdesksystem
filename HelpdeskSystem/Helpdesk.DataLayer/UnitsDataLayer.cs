@@ -163,9 +163,7 @@ namespace Helpdesk.DataLayer
                     Unit unit = context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId);
 
                     if(!unit.IsDeleted)
-                    {
                         unitDTOs.Add(DAO2DTO(unit));
-                    }
                 }
             }
 
