@@ -22,6 +22,8 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddHelpdesk()
         {
+            testEntityFactory.PopulateEmptyStrings = true;
+
             TestDataHelpdesk testEntityData = testEntityFactory.AddHelpdesk();
 
             Assert.AreEqual(HttpStatusCode.OK, testEntityData.Response.Status);
@@ -264,12 +266,12 @@ namespace Helpdesk.Services.Test
             {
                 // CheckinA was was not manually checked out, so ForcedCheckout should be true.
                 var checkinA = context.Checkinhistory.FirstOrDefault(c => c.CheckInId == checkinDataA.Response.CheckInID);
-                Assert.IsTrue(checkinA.ForcedCheckout == 1);
+                Assert.IsTrue(checkinA.ForcedCheckout == true);
                 Assert.IsTrue(checkinA.CheckoutTime != null);
 
                 // CheckinB was manually checked out, so ForcedCheckout should be false.
                 var checkinB = context.Checkinhistory.FirstOrDefault(c => c.CheckInId == checkinDataB.Response.CheckInID);
-                Assert.IsTrue(checkinB.ForcedCheckout == 0);
+                Assert.IsTrue(checkinB.ForcedCheckout == false);
                 Assert.IsTrue(checkinB.CheckoutTime != null);
 
                 // Check that all queue items were removed.

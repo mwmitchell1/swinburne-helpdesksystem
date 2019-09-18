@@ -9,6 +9,6 @@ namespace Helpdesk.Common.Requests.CheckIn
     /// </summary>
     public class CheckOutRequest
     {
-        public byte? ForcedCheckout { get; set; }
+        public bool? ForcedCheckout { get; set; }
     }
 }

@@ -325,7 +325,7 @@ namespace Helpdesk.Services.Test
 
             CheckOutRequest coRequest = new CheckOutRequest()
             {
-                ForcedCheckout = 0
+                ForcedCheckout = false
             };
 
             CheckOutResponse coResponse = facade.CheckOut(coRequest, response.CheckInID);
@@ -383,7 +383,7 @@ namespace Helpdesk.Services.Test
 
             CheckOutRequest coRequest = new CheckOutRequest()
             {
-                ForcedCheckout = 1
+                ForcedCheckout = true
             };
 
             CheckOutResponse coResponse = facade.CheckOut(coRequest, response.CheckInID);
@@ -416,7 +416,7 @@ namespace Helpdesk.Services.Test
 
             CheckOutRequest request = new CheckOutRequest()
             {
-                ForcedCheckout = 0
+                ForcedCheckout = false
             };
 
             CheckOutResponse coResponse = facade.CheckOut(request, -1);

@@ -190,7 +190,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getallhelpdesks";
+                        cmd.CommandText = "GetAllHelpdesks";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {

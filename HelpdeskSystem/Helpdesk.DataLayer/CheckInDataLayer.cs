@@ -83,7 +83,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getallcheckins";
+                        cmd.CommandText = "GetAllCheckins";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -124,7 +124,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getallcheckinqueueitems";
+                        cmd.CommandText = "GetAllCheckInQueueItems";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {
