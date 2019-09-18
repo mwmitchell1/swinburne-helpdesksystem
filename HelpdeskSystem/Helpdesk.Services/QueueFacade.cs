@@ -156,7 +156,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for retrieving all queue items from the database
+        /// This method is responsible for retrieving all queue items from the helpdesk system
         /// </summary>
         /// <returns>The response that indicates if the operation was a success,
         /// and the list of queue items</returns>
@@ -173,9 +173,7 @@ namespace Helpdesk.Services
                 List<QueueItemDTO> queueItems = dataLayer.GetQueueItemsByHelpdeskID(id);
 
                 if (queueItems.Count == 0)
-                {
                     throw new NotFoundException("No queue items found under helpdesk "+id);
-                }
 
                 response.QueueItems = queueItems;
                 response.Status = HttpStatusCode.OK;

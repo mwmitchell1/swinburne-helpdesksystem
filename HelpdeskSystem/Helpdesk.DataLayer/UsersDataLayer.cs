@@ -75,6 +75,9 @@ namespace Helpdesk.DataLayer
             {
                 var users = context.User.ToList();
 
+                if (users.Count == 0)
+                    throw new NotFoundException("Unable to find users!");
+
                 foreach (User user in users)
                 {
                     if (user != null)
@@ -142,16 +145,13 @@ namespace Helpdesk.DataLayer
                 User user = context.User.FirstOrDefault(u => u.UserId == id);
 
                 if (user == null)
-                {
-                    return false;
-                }
+                   return false;
 
                 user.Username = request.Username;
 
                 if (!string.IsNullOrEmpty(request.Password))
-                {
                     user.Password = request.Password;
-                }
+
                 user.FirstTime = false;
 
                 context.SaveChanges();

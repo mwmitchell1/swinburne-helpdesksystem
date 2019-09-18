@@ -135,7 +135,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// Attempts to retrieve all units under a specific helpdesk id from the database
+        /// Attempts to retrieve all units under a specific helpdesk id from the helpdesk system
         /// </summary>
         /// <param name="id">ID of the helpdesk to be retrieved from</param>
         /// <returns>A response containing the list of units and status code representing the result</returns>
@@ -152,9 +152,7 @@ namespace Helpdesk.Services
                 List<UnitDTO> units = dataLayer.GetUnitsByHelpdeskID(id);
 
                 if(units.Count==0)
-                {
                     throw new NotFoundException("No units found under helpdesk "+id);
-                }
 
                 response.Units = units;
                 response.Status = HttpStatusCode.OK;
@@ -176,7 +174,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// Attempts to delete a specific unit from the database
+        /// Attempts to delete a specific unit from the helpdesk system
         /// </summary>
         /// <param name="id">ID of the unit to be deleted</param>
         /// <returns>A response indicating the result of the operation</returns>

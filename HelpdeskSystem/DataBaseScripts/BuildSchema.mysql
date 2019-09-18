@@ -144,12 +144,6 @@ BEGIN
     FROM queueitem;
 END //
 
-CREATE PROCEDURE `getalltimespans`()
-BEGIN
-	SELECT *
-    FROM timespans;
-END //
-
 CREATE PROCEDURE `getallhelpdeskunits`()
 BEGIN
 	SELECT *

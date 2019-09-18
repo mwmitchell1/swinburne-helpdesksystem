@@ -29,9 +29,6 @@ namespace Helpdesk.Website.Controllers.api
         [Route("")]
         public IActionResult CheckIn([FromBody] CheckInRequest request)
         {
-            if (!IsAuthorized())
-                return Unauthorized();
-
             try
             {
                 var facade = new CheckInFacade();
@@ -64,15 +61,12 @@ namespace Helpdesk.Website.Controllers.api
         /// <returns>A response indicating success or failure</returns>
         [HttpPost]
         [Route("checkout/{id}")]
-        public IActionResult CheckOut([FromRoute] int id)
+        public IActionResult CheckOut([FromBody] CheckOutRequest request, [FromRoute] int id)
         {
-            if (!IsAuthorized())
-                return Unauthorized();
-
             try
             {
                 var facade = new CheckInFacade();
-                var response = facade.CheckOut(id);
+                var response = facade.CheckOut(request, id);
 
                 switch (response.Status)
                 {

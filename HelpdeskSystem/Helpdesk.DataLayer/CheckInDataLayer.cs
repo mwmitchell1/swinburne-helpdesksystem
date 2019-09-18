@@ -30,26 +30,9 @@ namespace Helpdesk.DataLayer
                 Checkinhistory checkIn = new Checkinhistory()
                 {
                     UnitId = request.UnitID,
-                    CheckInTime = DateTime.Now
+                    CheckInTime = DateTime.Now,
+                    StudentId = request.StudentID
                 };
-
-                if (!request.StudentID.HasValue)
-                {
-                    Nicknames student = new Nicknames()
-                    {
-                        Sid = request.SID,
-                        NickName = request.Nickname
-                    };
-
-                    context.Nicknames.Add(student);
-                    context.SaveChanges();
-
-                    checkIn.StudentId = student.StudentId;
-                }
-                else
-                {
-                    checkIn.StudentId = request.StudentID;
-                }
 
                 context.Checkinhistory.Add(checkIn);
                 context.SaveChanges();
@@ -64,7 +47,7 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="id">CheckInID of the check in item to be checked out</param>
         /// <returns>A boolean indicating success or failure</returns>
-        public bool CheckOut(int id)
+        public bool CheckOut(CheckOutRequest request, int id)
         {
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -74,7 +57,7 @@ namespace Helpdesk.DataLayer
                     return false;
 
                 checkOut.CheckoutTime = DateTime.Now;
-                checkOut.ForcedCheckout = 0;
+                checkOut.ForcedCheckout = request.ForcedCheckout;
 
                 context.SaveChanges();
             }
