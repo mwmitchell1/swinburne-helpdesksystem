@@ -199,7 +199,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for retrieving all timespans from the database
+        /// This method is responsible for retrieving all timespans from the helpdesk system
         /// </summary>
         /// <returns>The response that indicates if the operation was a success,
         /// and the list of timespans</returns>
@@ -214,12 +214,7 @@ namespace Helpdesk.Services
                 var dataLayer = new HelpdeskDataLayer();
 
                 List<TimeSpanDTO> timespans = dataLayer.GetTimeSpans();
-
-                if (timespans.Count == 0)
-                {
-                    throw new NotFoundException("No timespans found!");
-                }
-
+ 
                 response.Timespans = timespans;
                 response.Status = HttpStatusCode.OK;
             }
@@ -239,7 +234,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for getting a specific timespan from the database
+        /// This method is responsible for getting a specific timespan from the helpdesk system
         /// </summary>
         /// <param name="id">The SpanId of the specific timespan to be retrieved</param>
         /// <returns>The response that indicates if the operation was a success,
@@ -257,7 +252,6 @@ namespace Helpdesk.Services
                 TimeSpanDTO timespan = dataLayer.GetTimeSpan(id);
                 response.Timespan = timespan ?? throw new NotFoundException("Unable to find timespan!");
                 response.Status = HttpStatusCode.OK;
-
             }
             catch (NotFoundException ex)
             {
@@ -340,12 +334,13 @@ namespace Helpdesk.Services
             try
             {
                 response = (UpdateTimeSpanResponse)request.CheckValidation(response);
-                if (response.Status == HttpStatusCode.BadRequest)
-                {
-                    return response;
-                }
 
+                if (response.Status == HttpStatusCode.BadRequest)
+                    return response;
+                
                 var dataLayer = new HelpdeskDataLayer();
+
+                //will implement unique check when get timespan by name method is implemented
 
                 bool result = dataLayer.UpdateTimeSpan(id, request);
 
@@ -442,6 +437,36 @@ namespace Helpdesk.Services
                 result = false;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Used to force-checkout users and remove queue items.
+        /// Takes optional DateTime parameter. If not provided, data layer will use DateTime.Now.
+        /// Used by DailyCleanupJob.
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public ForceCheckoutQueueRemoveResponse ForceCheckoutQueueRemove(DateTime? dateTime = null)
+        {
+            ForceCheckoutQueueRemoveResponse response = new ForceCheckoutQueueRemoveResponse();
+
+            try
+            {
+                HelpdeskDataLayer dataLayer = new HelpdeskDataLayer();
+
+                response.Result = dataLayer.ForceCheckoutQueueRemove(dateTime);
+
+                if (response.Result == true)
+                    response.Status = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to force checkout and remove queue items!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to force checkout and remove queue items!"));
+            }
+
+            return response;
         }
 
         /// <summary>

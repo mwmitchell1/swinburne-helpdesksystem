@@ -116,11 +116,18 @@ namespace Helpdesk.Services
                 response = (EditStudentNicknameResponse)request.CheckValidation(response);
 
                 if (response.Status == HttpStatusCode.BadRequest)
-                {
                     return response;
-                }
 
                 var dataLayer = new StudentDatalayer();
+
+                var nickname = dataLayer.GetStudentNicknameByNickname(request.Nickname);
+
+                if (nickname != null)
+                {
+                    response.Status = HttpStatusCode.BadRequest;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "This nickname is already being used."));
+                    return response;
+                }
 
                 bool result = dataLayer.EditStudentNickname(id, request);
 

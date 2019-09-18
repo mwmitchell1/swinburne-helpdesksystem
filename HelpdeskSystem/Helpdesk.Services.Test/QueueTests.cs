@@ -949,7 +949,7 @@ namespace Helpdesk.Services.Test
         /// is handled properly
         /// </summary>
         [TestMethod]
-        public void GetQueueItemsByHelpdeskIDNoUnits()
+        public void GetQueueItemsByHelpdeskIDNoItems()
         {
             Helpdesksettings helpdesk = new Helpdesksettings()
             {
