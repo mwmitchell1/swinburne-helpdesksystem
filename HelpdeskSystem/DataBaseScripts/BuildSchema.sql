@@ -120,7 +120,7 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE GetAllTiimespans
+CREATE PROCEDURE GetAllTimespans
 AS
 -- =============================================
 -- Author:		Wade Russell

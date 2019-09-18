@@ -103,7 +103,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getallhelpdesks";
+                        cmd.CommandText = "GetAllHelpdesks";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -145,7 +145,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getallhelpdeskunits";
+                        cmd.CommandText = "GetAllHelpdeskUnits";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -186,7 +186,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getalltimespans";
+                        cmd.CommandText = "GetAllTimespans";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -295,7 +295,7 @@ namespace Helpdesk.DataLayer
                     if (checkin.CheckoutTime == null)
                     {
                         checkin.CheckoutTime = time;
-                        checkin.ForcedCheckout = 1;
+                        checkin.ForcedCheckout = true;
                     }
                 }
                 context.SaveChanges();
