@@ -35,7 +35,7 @@ namespace Helpdesk.Common
 
             var appSetting = root.GetSection("ApplicationSettings");
             Jobs.Add("ExportDatabaseJob", root.GetSection("Jobs").GetSection("ExportDatabaseJob").Value);
-            Jobs.Add("DailyCleanup", root.GetSection("Jobs").GetSection("DailyCleanup").Value);
+            Jobs.Add("DailyCleanupJob", root.GetSection("Jobs").GetSection("DailyCleanupJob").Value);
         }
 
     }
