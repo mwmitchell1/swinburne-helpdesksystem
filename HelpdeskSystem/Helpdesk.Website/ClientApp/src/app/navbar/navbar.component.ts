@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthenticationService } from '../authentication/authentication.service';
 
-import { HelpdeskDataService } from '../helpdesk-data/helpdesk-data.service';
+import { HelpdeskService } from '../helpdesk/helpdesk.service';
 import { RouteStateService } from '../helpers/route-state.service';
 
 @Component({
   selector: 'app-navbar',
-  templateUrl: './navbar.component.html'
-  // styleUrls: ['./navbar.component.css']
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   isExpanded = false;
@@ -25,7 +25,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private adminRouteSub;
 
   constructor(private service: AuthenticationService,
-              private helpdeskData: HelpdeskDataService,
+              private helpdeskData: HelpdeskService,
               private routeState: RouteStateService) {
     this.authenticationService = service;
     this.userIsAuthorized = this.authenticationService.isLoggedIn();

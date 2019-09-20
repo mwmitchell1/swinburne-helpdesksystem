@@ -151,6 +151,4 @@ export class UsersComponent {
       }
     );
   }
-
-
 }

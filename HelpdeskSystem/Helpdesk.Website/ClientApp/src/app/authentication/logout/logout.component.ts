@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterStateSnapshot, Router } from '@angular/router';
 import { AuthenticationService } from '../authentication.service';
-import { HelpdeskDataService } from '../../helpdesk-data/helpdesk-data.service';
+import { HelpdeskService } from '../../helpdesk/helpdesk.service';
 import { NotifierService } from 'angular-notifier';
 
 @Component({
@@ -16,7 +16,7 @@ export class LogoutComponent implements OnInit {
 
   constructor(private authService: AuthenticationService,
     private router: Router,
-    private helpdeskData: HelpdeskDataService,
+    private helpdeskData: HelpdeskService,
     private notifierService: NotifierService) { }
 
   /**
@@ -26,7 +26,7 @@ export class LogoutComponent implements OnInit {
     this.authService.logout().subscribe(
       result => {
         // Navigate to helpdesk view of active helpdesk
-        this.router.navigateByUrl('/helpdesk/' + this.helpdeskData.getActiveHelpdesk().id);
+        this.router.navigateByUrl('');
       },
       error => {
         this.notifierService.notify('error', 'Unable to log out.')

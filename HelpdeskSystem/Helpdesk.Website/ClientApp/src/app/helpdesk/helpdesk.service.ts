@@ -1,22 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { Helpdesk } from './helpdesk-data.model';
+import { Helpdesk } from '../data/DTOs/helpdesk.dto';
+import { HttpClient } from '@angular/common/http';
+import { GetHelpdesksResponse } from '../data/responses/helpdesk/get-all-response';
+import { GetHelpdeskResponse } from '../data/responses/configuration/get-response';
 
 @Injectable()
-export class HelpdeskDataService {
+export class HelpdeskService {
   private helpdesks: Helpdesk[];
   private activeHelpdesk: Helpdesk;
 
   activeHelpdeskChange: Subject<Helpdesk> = new Subject<Helpdesk>();
 
-  constructor() {
+  constructor(private client: HttpClient) {
     // temporary - array will be filled out by API call
-    this.helpdesks = [
-      new Helpdesk({ id: 1, name: 'Helpdesk 1', hasCheckIn: false, hasQueue: true }),
-      new Helpdesk({ id: 2, name: 'Helpdesk 2', hasCheckIn: true, hasQueue: false }),
-      new Helpdesk({ id: 3, name: 'Helpdesk 3', hasCheckIn: true, hasQueue: true }),
-    ];
+    this.helpdesks = [];
 
     this.activeHelpdesk = this.helpdesks[0];
   }
@@ -26,8 +25,16 @@ export class HelpdeskDataService {
    * Returns all helpdesks
    * @return Helpdesk[]
    */
-  getHelpdesks(): Helpdesk[] {
-    return this.helpdesks;
+  getHelpdesks() {
+    return this.client.get<GetHelpdesksResponse>("/api/helpdesk/")
+  }
+
+  /**
+   * Returns all active helpdesks
+   * @return Helpdesk[]
+   */
+  getActiveHelpdesks() {
+    return this.client.get<GetHelpdesksResponse>("/api/helpdesk/active")
   }
 
   /**
@@ -36,16 +43,8 @@ export class HelpdeskDataService {
    * @return Helpdesk Matching helpdesk
    * @return null If no helpdesks match
    */
-  getHelpdeskById(id: number): Helpdesk {
-    let h = null;
-
-    this.helpdesks.forEach((helpdesk) => {
-      if (helpdesk.id === id) {
-        h = helpdesk;
-      }
-    });
-
-    return h;
+  getHelpdeskById(id: number) {
+    return this.client.get<GetHelpdeskResponse>("/api/helpdesk/" + id);
   }
 
   /**
@@ -53,15 +52,19 @@ export class HelpdeskDataService {
    * @param name Normalized name of the active helpdesk
    * @return boolean True if helpdesk exists and can be set as active, otherwise False
    */
-  setActiveHelpdesk(id: number): boolean {
-    const helpdesk = this.getHelpdeskById(id);
+  setActiveHelpdesk(id: number) {
+    const helpdesk = this.getHelpdeskById(id).subscribe(
+      result => {
+        if (helpdesk) {
+          this.activeHelpdesk = result.helpdesk;
+          this.activeHelpdeskChange.next(this.activeHelpdesk);
+          return true;
+        } else { return false; }
+      }
+    );
 
     // if helpdesk was found by name, set active, return bool value of success
-    if (helpdesk) {
-      this.activeHelpdesk = helpdesk;
-      this.activeHelpdeskChange.next(this.activeHelpdesk);
-      return true;
-    } else { return false; }
+    
   }
 
   /**
