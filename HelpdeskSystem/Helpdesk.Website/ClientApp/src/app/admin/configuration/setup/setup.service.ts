@@ -8,7 +8,7 @@ import { UpdateHelpdeskResponse } from "src/app/data/responses/configuration/upd
 @Injectable({
   providedIn: 'root',
 })
-export class ConfigurationService {
+export class SetUpService {
   constructor(private http: HttpClient) { }
     
     GetHelpdesk(id: number): Observable<GetHelpdeskResponse> {
