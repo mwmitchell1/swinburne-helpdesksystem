@@ -17,6 +17,111 @@ namespace Helpdesk.Website.Controllers.api
     [ApiController]
     public class HelpdeskController : BaseApiController
     {
+
+        /// <summary>
+        /// Used to retreive all of the helpdesks
+        /// </summary>
+        /// <returns>A reponse to indictae whether or not it was a success 
+        /// with a list of helpdesks</returns>
+        [HttpGet]
+        [Route("")]
+        public IActionResult GetHelpdesks()
+        {
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetHelpdesks();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get helpdesks.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Used to retreive all of the active helpdesks
+        /// </summary>
+        /// <returns>A reponse to indictae whether or not it was a success 
+        /// with a list of active helpdesks</returns>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("active")]
+        public IActionResult GetActiveHelpdesks()
+        {
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetActiveHelpdesks();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get active helpdesks.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Used to get the information for a specific helpdesk
+        /// </summary>
+        /// <param name="id">The id of the helpdesk to be retreived</param>
+        /// <returns>A response indicating the success and helpdesk DTO or null</returns>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetHelpdesk([FromRoute] int id)
+        {
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetHelpdesk(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get helpdesk.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
         /// <summary>
         /// This method is the end point to be able to add a heldesk
         /// </summary>
@@ -98,6 +203,10 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Gets every timespan from the database
+        /// </summary>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
         [Route("timespan")]
         public IActionResult GetTimeSpans()
@@ -105,9 +214,36 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetTimeSpans();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get timespans.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Gets a specific timespan from the database
+        /// </summary>
+        /// <param name="id">ID of the specific timespan</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpGet]
         [Route("timespan/{id}")]
         public IActionResult GetTimeSpan([FromRoute] int id)
@@ -115,7 +251,29 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.GetTimeSpan(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get timespan.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPost]
@@ -171,7 +329,7 @@ namespace Helpdesk.Website.Controllers.api
                 switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:
@@ -188,6 +346,11 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Deletes a specific timespan from the database
+        /// </summary>
+        /// <param name="id">SpanID of the timespan to be deleted</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpDelete]
         [Route("timespan/{id}")]
         public IActionResult DeleteTimeSpan([FromRoute] int id)
@@ -195,7 +358,29 @@ namespace Helpdesk.Website.Controllers.api
             if (!IsAuthorized())
                 return Unauthorized();
 
-            throw new NotImplementedException();
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.DeleteTimeSpan(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to delete timespan.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 }

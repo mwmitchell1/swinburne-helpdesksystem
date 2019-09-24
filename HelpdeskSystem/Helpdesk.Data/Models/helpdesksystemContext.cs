@@ -1,7 +1,6 @@
 ﻿using System;
 using Helpdesk.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Helpdesk.Data.Models
 {
@@ -33,7 +32,7 @@ namespace Helpdesk.Data.Models
             {
                 AppSettings appSettings = new AppSettings();
 
-                optionsBuilder.UseMySQL(appSettings.DefaultConnection);
+                optionsBuilder.UseSqlServer(appSettings.DefaultConnection);
             }
         }
 
@@ -45,7 +44,8 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.CheckInId);
 
-                entity.ToTable("checkinhistory", "helpdesksystem");
+                entity.HasIndex(e => e.StudentId)
+                    .HasName("StudentID");
 
                 entity.HasIndex(e => e.UnitId)
                     .HasName("UnitID");
@@ -54,22 +54,31 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("CheckInID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.ForcedCheckout).HasColumnType("tinyint(1)");
+                entity.Property(e => e.ForcedCheckout).HasColumnType("bit");
+
+                entity.Property(e => e.StudentId)
+                    .HasColumnName("StudentID")
+                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
                     .HasColumnType("int(11)");
 
+                entity.HasOne(d => d.Student)
+                    .WithMany(p => p.Checkinhistory)
+                    .HasForeignKey(d => d.StudentId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("checkinhistory_ibfk_1");
+
                 entity.HasOne(d => d.Unit)
                     .WithMany(p => p.Checkinhistory)
                     .HasForeignKey(d => d.UnitId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("checkinhistory_ibfk_1");
+                    .HasConstraintName("checkinhistory_ibfk_2");
             });
 
             modelBuilder.Entity<Checkinqueueitem>(entity =>
             {
-                entity.ToTable("checkinqueueitem", "helpdesksystem");
 
                 entity.HasIndex(e => e.CheckInId)
                     .HasName("CheckInID");
@@ -106,17 +115,15 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.HelpdeskId);
 
-                entity.ToTable("helpdesksettings", "helpdesksystem");
-
                 entity.Property(e => e.HelpdeskId)
                     .HasColumnName("HelpdeskID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+                entity.Property(e => e.IsDeleted).HasColumnType("bit");
 
-                entity.Property(e => e.HasCheckIn).HasColumnType("tinyint(1)");
+                entity.Property(e => e.HasCheckIn).HasColumnType("bit");
 
-                entity.Property(e => e.HasQueue).HasColumnType("tinyint(1)");
+                entity.Property(e => e.HasQueue).HasColumnType("bit");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -126,7 +133,6 @@ namespace Helpdesk.Data.Models
 
             modelBuilder.Entity<Helpdeskunit>(entity =>
             {
-                entity.ToTable("helpdeskunit", "helpdesksystem");
 
                 entity.HasIndex(e => e.HelpdeskId)
                     .HasName("HelpdeskID");
@@ -163,16 +169,13 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.StudentId);
 
-                entity.ToTable("nicknames", "helpdesksystem");
-
                 entity.HasIndex(e => e.NickName)
                     .HasName("NickName")
                     .IsUnique();
 
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
-                    .HasColumnType("int(11)")
-                    .ValueGeneratedNever();
+                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.NickName)
                     .IsRequired()
@@ -190,8 +193,6 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.ItemId);
 
-                entity.ToTable("queueitem", "helpdesksystem");
-
                 entity.HasIndex(e => e.StudentId)
                     .HasName("StudentID");
 
@@ -202,18 +203,9 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("ItemID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.NickName)
-                    .IsRequired()
-                    .HasMaxLength(20)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
                     .HasColumnType("int(11)");
-
-                entity.Property(e => e.TimeHelped).HasColumnType("tinyint(1)");
-
-                entity.Property(e => e.TimeRemoved).HasColumnType("tinyint(1)");
 
                 entity.Property(e => e.TopicId)
                     .HasColumnName("TopicID")
@@ -236,8 +228,6 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.SpanId);
 
-                entity.ToTable("timespans", "helpdesksystem");
-
                 entity.Property(e => e.SpanId)
                     .HasColumnName("SpanID")
                     .HasColumnType("int(11)");
@@ -249,11 +239,16 @@ namespace Helpdesk.Data.Models
                 entity.Property(e => e.Name)
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.Helpdesksettings)
+                    .WithMany(p => p.Timespans)
+                    .HasForeignKey(d => d.HelpdeskId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("helpdesksetting_ibfk_1");
             });
 
             modelBuilder.Entity<Topic>(entity =>
             {
-                entity.ToTable("topic", "helpdesksystem");
 
                 entity.HasIndex(e => e.UnitId)
                     .HasName("UnitID");
@@ -262,7 +257,7 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("TopicID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+                entity.Property(e => e.IsDeleted).HasColumnType("bit");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -282,13 +277,11 @@ namespace Helpdesk.Data.Models
 
             modelBuilder.Entity<Unit>(entity =>
             {
-                entity.ToTable("unit", "helpdesksystem");
-
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+                entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 
                 entity.Property(e => e.Code)
                     .IsRequired()
@@ -303,8 +296,6 @@ namespace Helpdesk.Data.Models
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("user", "helpdesksystem");
-
                 entity.HasIndex(e => e.Username)
                     .HasName("Username")
                     .IsUnique();
@@ -312,6 +303,13 @@ namespace Helpdesk.Data.Models
                 entity.Property(e => e.UserId)
                     .HasColumnName("UserID")
                     .HasColumnType("int(11)");
+
+                entity.Property(e => e.FirstTime)
+                .HasColumnName("FirstTime")
+                .HasColumnType("bit");
+
+                entity.Property(e => e.Password)
+                    .IsRequired();
 
                 entity.Property(e => e.Password)
                     .IsRequired()

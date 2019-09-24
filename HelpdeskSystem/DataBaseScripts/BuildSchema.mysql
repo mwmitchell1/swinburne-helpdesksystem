@@ -6,7 +6,8 @@ use HelpdeskSystem;
 CREATE TABLE User (
     UserID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     Username VARCHAR(20) UNIQUE NOT NULL,
-    Password text NOT NULL
+    Password TEXT NOT NULL,
+    FirstTime BOOLEAN NOT NULL
 );
 
 CREATE TABLE HelpdeskSettings (
@@ -25,7 +26,7 @@ CREATE TABLE Unit (
 );
 
 CREATE TABLE NickNames (
-    StudentID INT PRIMARY KEY NOT NULL,
+    StudentID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     SID VARCHAR(20) NOT NULL,
     NickName VARCHAR(20) UNIQUE NOT NULL
 );
@@ -44,8 +45,8 @@ CREATE TABLE QueueItem (
     StudentID INT NOT NULL,
     TopicID INT NOT NULL,
     TimeAdded DATETIME NOT NULL,
-    TimeHelped BOOL,
-    TimeRemoved BOOL,
+    TimeHelped DATETIME,
+    TimeRemoved DATETIME,
     FOREIGN KEY (StudentID)
         REFERENCES NickNames (StudentID),
     FOREIGN KEY (TopicID)
@@ -54,10 +55,13 @@ CREATE TABLE QueueItem (
 
 CREATE TABLE CheckInHistory (
     CheckInID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	StudentID INT NOT NULL,
     UnitID INT NOT NULL,
     CheckInTime DATETIME NOT NULL,
     CheckoutTime DATETIME,
     ForcedCheckout BOOL,
+	FOREIGN KEY (StudentID)
+		REFERENCES NickNames (StudentID),
     FOREIGN KEY (UnitID)
         REFERENCES Unit (UnitID)
 );
@@ -92,7 +96,63 @@ CREATE TABLE TimeSpans (
     references HelpdeskSettings (HelpdeskID)
 );
 
-INSERT INTO User (Username, Password) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=');
+INSERT INTO User (Username, Password, FirstTime) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=', false);
 INSERT INTO  HelpdeskSettings (Name, HasCheckIn, HasQueue) VALUES ('Test Helpdesk', TRUE, TRUE);
 INSERT INTO Unit (Code, Name) VALUES ('COS00000', 'Test Unit');
-INSERT INTO helpdeskunit (HelpdeskID, UnitID) VALUES(1,1)
+INSERT INTO helpdeskunit (HelpdeskID, UnitID) VALUES(1,1);
+
+DELIMITER //
+CREATE PROCEDURE `getallhelpdesks` ()
+BEGIN
+	SELECT *
+    FROM helpdesksettings;
+END //
+
+CREATE PROCEDURE `getalltimespans`()
+BEGIN
+	SELECT *
+    FROM timespans;
+END //
+
+CREATE PROCEDURE `getallusers`()
+BEGIN
+	SELECT *
+    FROM `user`;
+END //
+
+CREATE PROCEDURE `getalltopics`()
+BEGIN
+	SELECT *
+    FROM topic;
+END //
+
+CREATE PROCEDURE `getallnicknames`()
+BEGIN
+	SELECT *
+    FROM nicknames;
+END //
+
+CREATE PROCEDURE `getallcheckins`()
+BEGIN
+	SELECT *
+    FROM checkinhistory;
+END //
+
+CREATE PROCEDURE `getallqueueitems`()
+BEGIN
+	SELECT *
+    FROM queueitem;
+END //
+
+CREATE PROCEDURE `getallhelpdeskunits`()
+BEGIN
+	SELECT *
+    FROM helpdeskunit;
+END //
+
+CREATE PROCEDURE `getallcheckinqueueitems`()
+BEGIN
+	SELECT *
+    FROM checkinqueueitem;
+END //
+DELIMITER ;

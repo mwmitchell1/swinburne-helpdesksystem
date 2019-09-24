@@ -13,10 +13,9 @@ namespace Helpdesk.Data.Models
         public int ItemId { get; set; }
         public int StudentId { get; set; }
         public int TopicId { get; set; }
-        public string NickName { get; set; }
         public DateTime TimeAdded { get; set; }
-        public byte? TimeHelped { get; set; }
-        public byte? TimeRemoved { get; set; }
+        public DateTime? TimeHelped { get; set; }
+        public DateTime? TimeRemoved { get; set; }
 
         public virtual Nicknames Student { get; set; }
         public virtual Topic Topic { get; set; }

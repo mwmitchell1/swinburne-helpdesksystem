@@ -6,6 +6,9 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Helpdesk.Common.Extensions;
+using System.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 namespace Helpdesk.DataLayer
 {
@@ -37,7 +40,195 @@ namespace Helpdesk.DataLayer
 
             return helpdeskId;
         }
-   
+
+        /// <summary>
+        /// Used to get a helpdesk from the database
+        /// </summary>
+        /// <param name="id">The id of the helpdesk requested</param>
+        /// <returns>The resulting DTO of the helpdesk</returns>
+        public HelpdeskDTO GetHelpdesk(int id)
+        {
+            HelpdeskDTO helpdeskDTO = null;
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var helpdesk = context.Helpdesksettings.FirstOrDefault(h => h.HelpdeskId == id);
+
+                if (helpdesk == null)
+                    throw new NotFoundException("Helpdesk does not exist");
+
+                helpdeskDTO = DAO2DTO(helpdesk);
+            }
+                return helpdeskDTO;
+        }
+
+        /// <summary>
+        /// Used to retreive all the helpdesks
+        /// </summary>
+        /// <returns>The list of all the helpdesks as DTOs</returns>
+        public List<HelpdeskDTO> GetHelpdesks()
+        {
+            List<HelpdeskDTO> helpdeskDTOs = new List<HelpdeskDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var helpdesks = context.Helpdesksettings.OrderBy(h => h.IsDeleted).OrderByDescending(h => h.Name).ToList();
+
+                if (helpdesks.Count == 0)
+                    throw new NotFoundException("No helpdesks found");
+
+                foreach (var helpdesk in helpdesks)
+                    helpdeskDTOs.Add(DAO2DTO(helpdesk));
+            }
+            return helpdeskDTOs;
+        }
+
+        /// <summary>
+        /// Used to get a datatable with all of the helpdesk records
+        /// </summary>
+        /// <returns>Datatable with the helpdesk records</returns>
+        public DataTable GetHelpdesksAsDataTable()
+        {
+            DataTable helpdesks = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "GetAllHelpdesks";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            helpdesks.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return helpdesks;
+        }
+
+        /// <summary>
+        /// Used to get a datatable with all of the helpdeskunit records
+        /// </summary>
+        /// <returns>Datatable with the helpdeskunit records</returns>
+        public DataTable GetHelpdeskUnitsAsDataTable()
+        {
+            DataTable helpdeskunits = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "GetAllHelpdeskUnits";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            helpdeskunits.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return helpdeskunits;
+        }
+
+        /// Used to get a datatable with all of the timespan records
+        /// </summary>
+        /// <returns>Datatable with the timespans records</returns>
+        public DataTable GetTimeSpansAsDataTable()
+        {
+            DataTable timespans = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "GetAllTimespans";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            timespans.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return timespans;
+        }
+
+        /// <summary>
+        /// Used to retreive all the active helpdesks
+        /// </summary>
+        /// <returns>The list of all the active helpdesks as DTOs</returns>
+        public List<HelpdeskDTO> GetActiveHelpdesks()
+        {
+            List<HelpdeskDTO> helpdeskDTOs = new List<HelpdeskDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var helpdesks = context.Helpdesksettings.Where(h => !h.IsDeleted).OrderByDescending(h => h.Name).ToList();
+
+                if (helpdesks.Count == 0)
+                    throw new NotFoundException("No helpdesks found");
+
+                foreach (var helpdesk in helpdesks)
+                    helpdeskDTOs.Add(DAO2DTO(helpdesk));
+            }
+            return helpdeskDTOs;
+        }
+
         /// <summary>
         /// This method is used to update the relevent helpdesk
         /// </summary>
@@ -67,6 +258,52 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
+        /// Used to force-checkout users and remove queue items.
+        /// Takes optional DateTime parameter. Will use DateTime.Now if not provided.
+        /// Used by DailyCleanupJob.
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public bool ForceCheckoutQueueRemove(DateTime? dateTime = null)
+        {
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DateTime time;
+
+                if (dateTime == null)
+                {
+                    time = DateTime.Now;
+                }
+                else
+                {
+                    time = (DateTime)dateTime;
+                }
+
+                var queueItems = context.Queueitem.Where(q => q.TimeRemoved == null).ToList();
+                var checkins = context.Checkinhistory.Where(c => c.CheckoutTime == null).ToList();
+
+                foreach (Queueitem queueItem in queueItems)
+                {
+                    if (queueItem.TimeRemoved == null)
+                    {
+                        queueItem.TimeRemoved = time;
+                    }
+                }
+
+                foreach (Checkinhistory checkin in checkins)
+                {
+                    if (checkin.CheckoutTime == null)
+                    {
+                        checkin.CheckoutTime = time;
+                        checkin.ForcedCheckout = true;
+                    }
+                }
+                context.SaveChanges();
+            }
+            return true;
+        }
+
+        /// <summary>
         /// This method adds a timespan to the database.
         /// </summary>
         /// <param name="request"></param>
@@ -89,14 +326,50 @@ namespace Helpdesk.DataLayer
             return spanId;
         }
 
+        /// <summary>
+        /// Used to retreve a timespan by its id
+        /// </summary>
+        /// <param name="id">The id of the timespan</param>
+        /// <returns>The timespan DTO</returns>
         public TimeSpanDTO GetTimeSpan(int id)
         {
-            throw new NotImplementedException();
+            TimeSpanDTO timespanDTO = null;
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespan = context.Timespans.FirstOrDefault(t => t.SpanId == id);
+
+                if (timespan != null)
+                    timespanDTO = timespanDAO2DTO(timespan);
+            }
+            return timespanDTO;
         }
 
+        /// <summary>
+        /// This method retrieves a list of all the timespans in the database
+        /// </summary>
+        /// <returns>A list of timespans retrieved from the database</returns>
         public List<TimeSpanDTO> GetTimeSpans()
         {
-            throw new NotImplementedException();
+            List<TimeSpanDTO> timespanDTOs = new List<TimeSpanDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespans = context.Timespans.ToList();
+
+                if (timespans.Count == 0)
+                    throw new NotFoundException("No timespans found!");
+
+                foreach (Timespans timespan in timespans)
+                {
+                    if (timespan != null)
+                    {
+                        TimeSpanDTO timespanDTO = timespanDAO2DTO(timespan);
+                        timespanDTOs.Add(timespanDTO);
+                    }
+                }
+            }
+            return timespanDTOs;
         }
 
         /// <summary>
@@ -113,10 +386,8 @@ namespace Helpdesk.DataLayer
                 Timespans timespan = context.Timespans.FirstOrDefault(t => t.SpanId == id);
 
                 if (timespan == null)
-                {
                     return false;
-                }
-
+    
                 timespan.Name = request.Name;
                 timespan.StartDate = request.StartDate;
                 timespan.EndDate = request.EndDate;
@@ -126,9 +397,100 @@ namespace Helpdesk.DataLayer
             return true;
         }
 
+        /// <summary>
+        /// Used to delete a specific timespan from the database
+        /// </summary>
+        /// <param name="id">The SpanID of the timespan to be deleted</param>
+        /// <returns>Boolean indicating success or failure</returns>
         public bool DeleteTimeSpan(int id)
         {
-            throw new NotImplementedException();
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Timespans timespan = context.Timespans.FirstOrDefault(ts => ts.SpanId == id);
+
+                if (timespan == null)
+                    return true;
+
+                context.Timespans.Remove(timespan);
+                context.SaveChanges();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Used to convert a helpdesk DAO to DTO
+        /// </summary>
+        /// <param name="helpdesk">The DAO to be converted</param>
+        /// <returns>The resulting DTO</returns>
+        public HelpdeskDTO DAO2DTO(Helpdesksettings helpdesk)
+        {
+            HelpdeskDTO helpdeskDTO = new HelpdeskDTO()
+            {
+                HelpdeskID = helpdesk.HelpdeskId,
+                Name = helpdesk.Name,
+                HasCheckIn = helpdesk.HasCheckIn,
+                HasQueue = helpdesk.HasQueue,
+                IsDisabled = helpdesk.IsDeleted
+            };
+
+            return helpdeskDTO;
+        }
+
+        /// <summary>
+        /// Used to convert a helpdesk DTO to DAO
+        /// </summary>
+        /// <param name="helpdeskDTO">The DTO to be converted</param>
+        /// <returns>The resulting DAO</returns>
+        public Helpdesksettings DTO2DAO(HelpdeskDTO helpdeskDTO)
+        {
+            Helpdesksettings helpdesk = new Helpdesksettings()
+            {
+                HelpdeskId = helpdeskDTO.HelpdeskID,
+                Name = helpdeskDTO.Name,
+                HasCheckIn = helpdeskDTO.HasCheckIn,
+                HasQueue = helpdeskDTO.HasQueue,
+                IsDeleted = helpdeskDTO.IsDisabled
+            };
+
+            return helpdesk;
+        }
+
+        /// <summary>
+        /// Converts the timespan DAO to a DTO to send to the front end
+        /// </summary>
+        /// <param name="timespan">The DAO for the timespan</param>
+        /// <returns>The DTO for the timespan</returns>
+        private TimeSpanDTO timespanDAO2DTO(Timespans timespan)
+        {
+            TimeSpanDTO timespanDTO = new TimeSpanDTO
+            {
+                SpanId = timespan.SpanId,
+                HelpdeskId = timespan.HelpdeskId,
+                Name = timespan.Name,
+                StartDate = timespan.StartDate,
+                EndDate = timespan.EndDate
+            };
+
+            return timespanDTO;
+        }
+
+        /// <summary>
+        /// Converts the timespan DTO to a DAO to interact with the database
+        /// </summary>
+        /// <param name="timespanDTO">The DTO for the timespan</param>
+        /// <returns>The DAO for the timespan</returns>
+        private Timespans timespanDTO2DAO(TimeSpanDTO timespanDTO)
+        {
+            Timespans timespan = new Timespans
+            {
+                SpanId = timespanDTO.SpanId,
+                HelpdeskId = timespanDTO.HelpdeskId,
+                Name = timespanDTO.Name,
+                StartDate = timespanDTO.StartDate,
+                EndDate = timespanDTO.EndDate
+            };
+
+            return timespan;
         }
     }
 }

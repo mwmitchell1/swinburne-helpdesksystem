@@ -3,6 +3,9 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { NotifierModule, NotifierOptions } from 'angular-notifier'
+import * as $ from 'jquery';
+import * as bootstrap from "bootstrap";
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
@@ -15,14 +18,17 @@ import { AuthenticationService } from './authentication/authentication.service';
 import { LogoutComponent } from './authentication/logout/logout.component';
 import { AdminComponent } from './admin/admin.component';
 
-import { HelpdeskDataService } from './helpdesk-data/helpdesk-data.service';
+import { HelpdeskService } from './helpdesk/helpdesk.service';
 import { RouteStateService } from './helpers/route-state.service';
 
-import { ConfigurationComponent } from './admin/configuration/configuration.component';
-import { UnitsComponent } from './admin/units/units.component';
+import { SetUpComponent } from './admin/configuration/setup/setup.component';
+import { UnitsComponent } from './admin/configuration/units/units.component';
 import { UsersComponent } from './admin/users/users.component';
 import { ReportingComponent } from './admin/reporting/reporting.component';
-import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
+import { NicknamesComponent } from './admin/nicknames/nicknames.component';
+
+import { UsersService } from './admin/users/users.service';
+import { ConfigurationComponent } from './admin/configuration/configuration.component';
 
 @NgModule({
   declarations: [
@@ -32,11 +38,12 @@ import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
     LoginComponent,
     LogoutComponent,
     AdminComponent,
-    ConfigurationComponent,
+    SetUpComponent,
     UnitsComponent,
     UsersComponent,
     NicknamesComponent,
-    ReportingComponent
+    ReportingComponent,
+    ConfigurationComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -44,20 +51,28 @@ import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forRoot([
-      { path: '', redirectTo: 'helpdesk', pathMatch: 'full' },
+      { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'login', component: LoginComponent, pathMatch: 'full' },
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
-      { path: 'helpdesk', component: HomeComponent, pathMatch: 'full' }, // change to SelectHelpdeskComponent
       { path: 'helpdesk/:id', component: HomeComponent, pathMatch: 'full' }, // change to HelpdeskComponent
-      { path: 'admin/:id', component: AdminComponent,
+      {
+        path: 'admin', component: AdminComponent, canActivate: [AuthGuardService],
         children: [
-          { path: 'configuration', component: ConfigurationComponent, pathMatch: 'full' },
-          { path: 'units', component: UnitsComponent, pathMatch: 'full' },
           { path: 'users', component: UsersComponent, pathMatch: 'full' },
           { path: 'nicknames', component: NicknamesComponent, pathMatch: 'full' },
-          { path: 'reporting', component: ReportingComponent, pathMatch: 'full' }
-        ]}
-    ])
+          { path: 'reporting', component: ReportingComponent, pathMatch: 'full' },
+          {
+            path: ':id', component: ConfigurationComponent,
+            children: [
+              { path: 'setup', component: SetUpComponent, pathMatch: 'full' },
+              { path: 'units', component: UnitsComponent, pathMatch: 'full' }
+            ]
+          }
+        ]
+      },
+
+    ]),
+    NotifierModule
   ],
   providers: [CookieService,
     {
@@ -67,8 +82,9 @@ import { NicknamesComponent } from "./admin/nicknames/nicknames.component";
     },
     AuthGuardService,
     AuthenticationService,
-    HelpdeskDataService,
-    RouteStateService],
+    HelpdeskService,
+    RouteStateService,
+    UsersService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

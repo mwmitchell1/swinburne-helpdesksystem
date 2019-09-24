@@ -18,7 +18,7 @@ namespace Helpdesk.Website.Controllers.api
 
         [HttpPost]
         [Route("")]
-        public IActionResult AddOrUpdateUnit([FromBody] AddUpdateUnitRequest request)
+        public IActionResult AddOrUpdateUnit([FromRoute] int id, [FromBody] AddUpdateUnitRequest request)
         {
             if (request == null)
                 return BadRequest();
@@ -29,7 +29,7 @@ namespace Helpdesk.Website.Controllers.api
             try
             {
                 var facade = new UnitsFacade();
-                var response = facade.AddOrUpdateUnit(request);
+                var response = facade.AddOrUpdateUnit(id, request);
 
                 switch (response.Status)
                 {
@@ -145,7 +145,7 @@ namespace Helpdesk.Website.Controllers.api
                 switch (response.Status)
                 {
                     case HttpStatusCode.OK:
-                        return Ok();
+                        return Ok(response);
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:

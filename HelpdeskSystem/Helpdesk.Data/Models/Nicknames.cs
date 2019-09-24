@@ -14,6 +14,7 @@ namespace Helpdesk.Data.Models
         public string Sid { get; set; }
         public string NickName { get; set; }
 
+        public virtual ICollection<Checkinhistory> Checkinhistory { get; set; }
         public virtual ICollection<Queueitem> Queueitem { get; set; }
     }
 }

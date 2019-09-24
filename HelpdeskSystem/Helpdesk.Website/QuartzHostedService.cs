@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace Helpdesk.Website
 {
-    internal class QuartzHostedService : IHostedService
+    public class QuartzHostedService : IHostedService
     {
         private readonly ISchedulerFactory _schedulerFactory;
         private readonly IJobFactory _jobFactory;
         private readonly IEnumerable<JobSchedule> _jobSchedules;
-        public IScheduler Scheduler { get; set; }
 
-        public QuartzHostedService(ISchedulerFactory schedulerFactory,
+        public QuartzHostedService(
+            ISchedulerFactory schedulerFactory,
             IJobFactory jobFactory,
             IEnumerable<JobSchedule> jobSchedules)
         {
@@ -24,11 +24,11 @@ namespace Helpdesk.Website
             _jobSchedules = jobSchedules;
             _jobFactory = jobFactory;
         }
+        public IScheduler Scheduler { get; set; }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             Scheduler = await _schedulerFactory.GetScheduler(cancellationToken);
-
             Scheduler.JobFactory = _jobFactory;
 
             foreach (var jobSchedule in _jobSchedules)
@@ -53,6 +53,7 @@ namespace Helpdesk.Website
             return JobBuilder
                 .Create(jobType)
                 .WithIdentity(jobType.FullName)
+                .WithDescription(jobType.Name)
                 .Build();
         }
 
@@ -60,7 +61,7 @@ namespace Helpdesk.Website
         {
             return TriggerBuilder
                 .Create()
-                .WithIdentity($"{schedule.Type.FullName}")
+                .WithIdentity($"{schedule.Type.FullName}.trigger")
                 .WithCronSchedule(schedule.CronExpression)
                 .WithDescription(schedule.CronExpression)
                 .Build();
