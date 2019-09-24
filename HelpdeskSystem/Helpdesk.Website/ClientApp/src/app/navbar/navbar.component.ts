@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthenticationService } from '../authentication/authentication.service';
 
-import { HelpdeskDataService } from '../helpdesk-data/helpdesk-data.service';
+import { HelpdeskService } from '../helpdesk/helpdesk.service';
 import { RouteStateService } from '../helpers/route-state.service';
 
 @Component({
   selector: 'app-navbar',
-  templateUrl: './navbar.component.html'
-  // styleUrls: ['./navbar.component.css']
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   isExpanded = false;
@@ -18,13 +18,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private dropdownPrefix: string;
   private helpdeskLink: string;
   private adminLink: string;
+  private logoutLink: string;
   private isAdminRoute: boolean;
 
   private activeHelpdeskSub;
   private adminRouteSub;
 
   constructor(private service: AuthenticationService,
-              private helpdeskData: HelpdeskDataService,
+              private helpdeskData: HelpdeskService,
               private routeState: RouteStateService) {
     this.authenticationService = service;
     this.userIsAuthorized = this.authenticationService.isLoggedIn();
@@ -32,6 +33,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.dropdownLabel = 'No helpdesk selected';
     this.dropdownPrefix = 'helpdesk';
     this.adminLink = 'admin';
+    this.logoutLink = 'logout'
   }
 
   ngOnInit(): void {
@@ -39,6 +41,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.dropdownLabel = helpdesk.name;
       this.helpdeskLink = 'helpdesk/' + helpdesk.id;
       this.adminLink = 'admin/' + helpdesk.id;
+      this.logoutLink = 'logout/';
     });
 
     this.adminRouteSub = this.routeState.adminRouteChange.subscribe((isAdmin) => {

@@ -24,7 +24,7 @@ namespace Helpdesk.Services
             _appSettings = new AppSettings();
         }
 
-        public AddUpdateUnitResponse AddOrUpdateUnit(AddUpdateUnitRequest request)
+        public AddUpdateUnitResponse AddOrUpdateUnit(int id, AddUpdateUnitRequest request)
         {
             s_logger.Info("Adding unit to helpdesk");
 
@@ -40,7 +40,7 @@ namespace Helpdesk.Services
                 var dataLayer = new UnitsDataLayer();
                 
 
-                if (request.UnitID == 0)
+                if (id == 0)
                 {
                     UnitDTO unit = dataLayer.GetUnitByNameAndHelpdeskId(request.Name, request.HelpdeskID);
 
@@ -72,7 +72,7 @@ namespace Helpdesk.Services
                 }
                 else
                 {
-                    var existingUnit = dataLayer.GetUnit(request.UnitID);
+                    var existingUnit = dataLayer.GetUnit(id);
 
                     if (existingUnit == null)
                     {
@@ -135,7 +135,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// Attempts to retrieve all units under a specific helpdesk id from the database
+        /// Attempts to retrieve all units under a specific helpdesk id from the helpdesk system
         /// </summary>
         /// <param name="id">ID of the helpdesk to be retrieved from</param>
         /// <returns>A response containing the list of units and status code representing the result</returns>
@@ -148,12 +148,11 @@ namespace Helpdesk.Services
             try
             {
                 var dataLayer = new UnitsDataLayer();
+
                 List<UnitDTO> units = dataLayer.GetUnitsByHelpdeskID(id);
 
                 if(units.Count==0)
-                {
                     throw new NotFoundException("No units found under helpdesk "+id);
-                }
 
                 response.Units = units;
                 response.Status = HttpStatusCode.OK;
@@ -175,7 +174,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// Attempts to delete a specific unit from the database
+        /// Attempts to delete a specific unit from the helpdesk system
         /// </summary>
         /// <param name="id">ID of the unit to be deleted</param>
         /// <returns>A response indicating the result of the operation</returns>
@@ -193,7 +192,7 @@ namespace Helpdesk.Services
             }
             catch(NotFoundException ex)
             {
-                s_logger.Warn(ex, $"Unable to find the unit with id [{id}]");
+                s_logger.Warn($"Unable to find the unit with id [{id}]");
                 response.Status = HttpStatusCode.NotFound;
             }
             catch (Exception ex)

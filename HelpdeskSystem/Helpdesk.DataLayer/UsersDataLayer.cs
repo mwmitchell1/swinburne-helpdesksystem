@@ -7,11 +7,14 @@ using NLog;
 using System.Text;
 using System.Linq;
 using Helpdesk.Common.Extensions;
+using System.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Data.Common;
 
 namespace Helpdesk.DataLayer
 {
     /// <summary>
-    /// Used to handle any business logic relatedto users including CRUD, login and logout
+    /// Used to handle any databases interactions for users including CRUD, login and logout
     /// </summary>
     public class UsersDataLayer
     {
@@ -29,6 +32,7 @@ namespace Helpdesk.DataLayer
             User user = new User();
             user.Username = request.Username;
             user.Password = request.Password;
+            user.FirstTime = true;
             using (var context = new helpdesksystemContext())
             {
                 context.User.Add(user);
@@ -45,16 +49,18 @@ namespace Helpdesk.DataLayer
         /// <returns>The user DTO</returns>
         public UserDTO GetUser(int id)
         {
-            UserDTO userDto = null;
+            UserDTO userDTO = null;
 
-            using (var context = new helpdesksystemContext())
+            using (helpdesksystemContext context = new helpdesksystemContext())
             {
                 var user = context.User.FirstOrDefault(u => u.UserId == id);
 
                 if (user != null)
-                    userDto = DAO2DTO(user);
+                    userDTO = DAO2DTO(user);
+                else
+                    throw new NotFoundException("Unable to find user.");
             }
-            return userDto;
+            return userDTO;
         }
 
         /// <summary>
@@ -69,6 +75,9 @@ namespace Helpdesk.DataLayer
             {
                 var users = context.User.ToList();
 
+                if (users.Count == 0)
+                    throw new NotFoundException("Unable to find users!");
+
                 foreach (User user in users)
                 {
                     if (user != null)
@@ -79,6 +88,48 @@ namespace Helpdesk.DataLayer
                 }
             }
             return userDTOs;
+        }
+
+        /// <summary>
+        /// Used to get a datatable with all of the helpdesk records
+        /// </summary>
+        /// <returns>Datatable with the helpdesk records</returns>
+        public DataTable GetUsersAsDataTable()
+        {
+            DataTable users = new DataTable();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                DbConnection conn = context.Database.GetDbConnection();
+                ConnectionState state = conn.State;
+
+                try
+                {
+                    if (state != ConnectionState.Open)
+                        conn.Open();
+
+                    using (var cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = "GetAllUsers";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            users.Load(reader);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    if (state != ConnectionState.Closed)
+                        conn.Close();
+                }
+            }
+
+            return users;
         }
 
         /// <summary>
@@ -94,12 +145,14 @@ namespace Helpdesk.DataLayer
                 User user = context.User.FirstOrDefault(u => u.UserId == id);
 
                 if (user == null)
-                {
-                    return false;
-                }
+                   return false;
 
                 user.Username = request.Username;
-                user.Password = request.Password;
+
+                if (!string.IsNullOrEmpty(request.Password))
+                    user.Password = request.Password;
+
+                user.FirstTime = false;
 
                 context.SaveChanges();
             }
@@ -159,6 +212,7 @@ namespace Helpdesk.DataLayer
             userDTO.UserId = user.UserId;
             userDTO.Username = user.Username;
             userDTO.Password = user.Password;
+            userDTO.FirstTime = user.FirstTime;
 
             return userDTO;
         }
@@ -175,6 +229,7 @@ namespace Helpdesk.DataLayer
             user.UserId = userDTO.UserId;
             user.Username = userDTO.Username;
             user.Password = userDTO.Password;
+            user.FirstTime = userDTO.FirstTime;
 
             return user;
         }
