@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -379,6 +380,39 @@ namespace Helpdesk.Website.Controllers.api
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to delete timespan.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        [HttpGet]
+        [Route("~/api/exportdatabase")]
+        public IActionResult GetFullDatabaseBackup()
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.ExportDatabaseManual();
+                var contentType = "application/zip";
+                Response.ContentType = contentType;
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return new FileContentResult(response.File, contentType)
+                        {
+                            FileDownloadName = Path.GetFileName(response.Path),
+                        };
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to export database timespan.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }

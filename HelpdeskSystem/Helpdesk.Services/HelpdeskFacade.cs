@@ -214,7 +214,7 @@ namespace Helpdesk.Services
                 var dataLayer = new HelpdeskDataLayer();
 
                 List<TimeSpanDTO> timespans = dataLayer.GetTimeSpans();
- 
+
                 response.Timespans = timespans;
                 response.Status = HttpStatusCode.OK;
             }
@@ -337,7 +337,7 @@ namespace Helpdesk.Services
 
                 if (response.Status == HttpStatusCode.BadRequest)
                     return response;
-                
+
                 var dataLayer = new HelpdeskDataLayer();
 
                 //will implement unique check when get timespan by name method is implemented
@@ -350,7 +350,7 @@ namespace Helpdesk.Services
                 response.Result = result;
                 response.Status = HttpStatusCode.OK;
             }
-            catch(NotFoundException ex)
+            catch (NotFoundException ex)
             {
                 s_logger.Error(ex, "Unable to find timespan!");
                 response.Status = HttpStatusCode.NotFound;
@@ -367,11 +367,37 @@ namespace Helpdesk.Services
 
 
         /// <summary>
+        /// Use to generate a database export and return it as a stream
+        /// </summary>
+        /// <returns>Response containing the stream of the file</returns>
+        public DatabaseExportResponse ExportDatabaseManual()
+        {
+            var response = new DatabaseExportResponse();
+
+            try
+            {
+                response = ExportDatabase();
+
+                if (response.Status != HttpStatusCode.OK)
+                    return response;
+
+                response.File = FileToBytes(response.Path);
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to perform database export");
+                response.Status = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
+
+        /// <summary>
         /// Used to get a Zip file of all of the database tables as CSVs
         /// </summary>
-        public bool ExportDatabase()
+        public DatabaseExportResponse ExportDatabase()
         {
-            bool result = false;
+            var response = new DatabaseExportResponse();
 
             try
             {
@@ -386,7 +412,8 @@ namespace Helpdesk.Services
                 if (string.IsNullOrEmpty(fullZipPath))
                 {
                     s_logger.Error("Unable to create empty zip");
-                    return result;
+                    response.Status = HttpStatusCode.InternalServerError;
+                    return response;
                 }
                 else
                 {
@@ -428,15 +455,38 @@ namespace Helpdesk.Services
                     DataTable checkInQueueItems = checkInDataLayer.GetCheckInQueueItemsAsDataTable();
                     proccessing.SaveToZIPAsCSV(fullZipPath, "checkinqueueitem", checkInQueueItems);
 
-                    result = true;
+                    response.Path = fullZipPath;
+                    response.Status = HttpStatusCode.OK;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to generate database export");
-                result = false;
+                response.Status = HttpStatusCode.InternalServerError;
             }
-            return result;
+            return response;
+        }
+
+        /// <summary>
+        /// Used to load the file at the path specified into a stream
+        /// </summary>
+        /// <param name="path">The full location of the file</param>
+        /// <returns>The file as a stream</returns>
+        public byte[] FileToBytes(string path)
+        {
+            byte[] file = null;
+
+            try
+            {
+                file = File.ReadAllBytes(path);
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to load file to stream");
+                file = null;
+            }
+
+            return file;
         }
 
         /// <summary>

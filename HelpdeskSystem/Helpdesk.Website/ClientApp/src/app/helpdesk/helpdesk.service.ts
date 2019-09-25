@@ -20,7 +20,6 @@ export class HelpdeskService {
     this.activeHelpdesk = this.helpdesks[0];
   }
 
-
   /**
    * Returns all helpdesks
    * @return Helpdesk[]
@@ -45,26 +44,6 @@ export class HelpdeskService {
    */
   getHelpdeskById(id: number) {
     return this.client.get<GetHelpdeskResponse>("/api/helpdesk/" + id);
-  }
-
-  /**
-   * Set the active helpdesk
-   * @param name Normalized name of the active helpdesk
-   * @return boolean True if helpdesk exists and can be set as active, otherwise False
-   */
-  setActiveHelpdesk(id: number) {
-    const helpdesk = this.getHelpdeskById(id).subscribe(
-      result => {
-        if (helpdesk) {
-          this.activeHelpdesk = result.helpdesk;
-          this.activeHelpdeskChange.next(this.activeHelpdesk);
-          return true;
-        } else { return false; }
-      }
-    );
-
-    // if helpdesk was found by name, set active, return bool value of success
-    
   }
 
   /**
