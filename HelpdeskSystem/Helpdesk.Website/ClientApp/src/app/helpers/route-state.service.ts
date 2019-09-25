@@ -19,10 +19,6 @@ export class RouteStateService {
         } else if (url[0].toLowerCase() === 'helpdesk' || url[0] === '') {
           this.adminRouteChange.next(false);
         }
-
-        if (url.length > 1) {
-          helpdesks.setActiveHelpdesk(+url[1]);
-        }
       }
     });
   }

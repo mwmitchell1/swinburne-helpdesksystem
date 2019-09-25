@@ -582,9 +582,9 @@ namespace Helpdesk.Services.Test
         public void GetDatabaseExport()
         {
             HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
-            bool result = helpdeskFacade.ExportDatabase();
+            var response = helpdeskFacade.ExportDatabase();
 
-            Assert.IsTrue(result);
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
         }
 
         /// <summary>
