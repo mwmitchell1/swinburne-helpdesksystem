@@ -1,1 +1,26 @@
-<h2>Units</h2>
+
+<div class="row mt-3">
+  <div class="col-6">
+    <table class="table">
+      <thead>
+      <tr>
+        <th scope="col">Unit Code</th>
+        <th scope="col">Unit Name</th>
+        <th scope="col"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let unit of units">
+        <td>{{ unit.code }}</td>
+        <td>{{ unit.name }}</td>
+        <td>
+          <button class="btn btn-danger float-right ml-1" data-toggle="modal"
+                  data-target="#modal-user-delete"> <!--(click)="setupDelete(unit.id)"-->Delete</button>
+          <button class="btn btn-secondary float-right" data-toggle="modal"
+                  data-target="#modal-user-edit"> <!--(click)="setupEdit(unit)">-->Edit</button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
