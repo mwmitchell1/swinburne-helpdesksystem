@@ -5,19 +5,13 @@ import { Helpdesk } from '../data/DTOs/helpdesk.dto';
 import { HttpClient } from '@angular/common/http';
 import { GetHelpdesksResponse } from '../data/responses/helpdesk/get-all-response';
 import { GetHelpdeskResponse } from '../data/responses/configuration/get-response';
+import { GetUnitsByHelpdeskIdResponse } from '../data/responses/units/get-by-help-id.response';
+import { CheckInRequest } from '../data/requests/check-in/chek-in-request';
 
 @Injectable()
 export class HelpdeskService {
-  private helpdesks: Helpdesk[];
-  private activeHelpdesk: Helpdesk;
-
-  activeHelpdeskChange: Subject<Helpdesk> = new Subject<Helpdesk>();
 
   constructor(private client: HttpClient) {
-    // temporary - array will be filled out by API call
-    this.helpdesks = [];
-
-    this.activeHelpdesk = this.helpdesks[0];
   }
 
   /**
@@ -39,35 +33,22 @@ export class HelpdeskService {
   /**
    * Returns a specific helpdesk
    * @param id Unique Id of the helpdesk to return
-   * @return Helpdesk Matching helpdesk
-   * @return null If no helpdesks match
+   * @return GetHelpdeskResponse
    */
   getHelpdeskById(id: number) {
     return this.client.get<GetHelpdeskResponse>("/api/helpdesk/" + id);
   }
 
   /**
-   * Returns the active helpdesk
-   * @return Helpdesk
+   * Used to retreive the list of units for the helpdesk
+   * @param id The id of the helpdesk
+   * @returns GetUnitsByHelpdeskIdResponse
    */
-  getActiveHelpdesk(): Helpdesk {
-    return this.activeHelpdesk;
+  getUnitsByHelpdeskId(id: number) {
+    return this.client.get<GetUnitsByHelpdeskIdResponse>("/api/units/helpdesk/" + id);
   }
 
-  /**
-   * Clears the current active helpdesk
-   */
-  clearActiveHelpdesk(): void {
-    this.activeHelpdesk = null;
-    this.activeHelpdeskChange.next(null);
+  checkIn(request: CheckInRequest) {
+    return this.client.post<CheckInResponse>("/api/checkin", request);
   }
-
-  /**
-   * Check if a helpdesk is active
-   * @return boolean
-   */
-  helpdeskIsActive(): boolean {
-    if (this.activeHelpdesk) { return true; } else { return false; }
-  }
-
 }
