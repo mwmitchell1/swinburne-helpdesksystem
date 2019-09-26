@@ -7,6 +7,7 @@ import { GetHelpdesksResponse } from '../data/responses/helpdesk/get-all-respons
 import { GetHelpdeskResponse } from '../data/responses/configuration/get-response';
 import { GetUnitsByHelpdeskIdResponse } from '../data/responses/units/get-by-help-id.response';
 import { CheckInRequest } from '../data/requests/check-in/chek-in-request';
+import { CheckInResponse } from '../data/responses/helpdesk/check-in.response';
 
 @Injectable()
 export class HelpdeskService {

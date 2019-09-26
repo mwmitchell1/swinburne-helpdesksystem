@@ -37,13 +37,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.activeHelpdeskSub = this.helpdeskData.activeHelpdeskChange.subscribe((helpdesk) => {
-      this.dropdownLabel = helpdesk.name;
-      this.helpdeskLink = 'helpdesk/' + helpdesk.id;
-      this.adminLink = 'admin/' + helpdesk.id;
-      this.logoutLink = 'logout/';
-    });
-
     this.adminRouteSub = this.routeState.adminRouteChange.subscribe((isAdmin) => {
       this.isAdminRoute = isAdmin;
       this.dropdownPrefix = isAdmin ? 'admin' : 'helpdesk';
