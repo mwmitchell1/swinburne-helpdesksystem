@@ -150,7 +150,7 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="id">ID of the helpdesk to retrieve from</param>
         /// <returns>A list of unit DTOs</returns>
-        public List<UnitDTO> GetUnitsByHelpdeskID(int id)
+        public List<UnitDTO> GetUnitsByHelpdeskID(int id, bool getActive)
         {
             List<UnitDTO> unitDTOs = new List<UnitDTO>();
 
@@ -162,7 +162,9 @@ namespace Helpdesk.DataLayer
                 {
                     Unit unit = context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId);
 
-                    if(!unit.IsDeleted)
+                    if (getActive && !unit.IsDeleted)
+                        unitDTOs.Add(DAO2DTO(unit));
+                    else if (!getActive)
                         unitDTOs.Add(DAO2DTO(unit));
                 }
             }

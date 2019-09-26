@@ -47,7 +47,7 @@ export class HelpdeskComponent implements OnInit {
       }
     );
 
-    this.service.getUnitsByHelpdeskId(this.route.snapshot.params.id).subscribe(
+    this.service.getActiveUnitsByHelpdeskId(this.route.snapshot.params.id).subscribe(
       result => {
         this.units = result.units;
       },
