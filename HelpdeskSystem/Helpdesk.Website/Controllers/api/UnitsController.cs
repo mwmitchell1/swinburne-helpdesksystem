@@ -93,12 +93,11 @@ namespace Helpdesk.Website.Controllers.api
         /// </summary>
         /// <param name="id">The ID of the helpdesk</param>
         /// <returns>Response which indicates success or failure</returns>
+        [AllowAnonymous]
         [HttpGet]
         [Route("helpdesk/{id}")]
         public IActionResult GetUnitsByHelpdeskID([FromRoute] int id)
         {
-            if (!IsAuthorized())
-                return Unauthorized();
 
             try
             {
