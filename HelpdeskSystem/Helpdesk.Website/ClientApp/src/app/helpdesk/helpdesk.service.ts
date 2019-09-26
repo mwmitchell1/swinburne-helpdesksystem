@@ -45,8 +45,8 @@ export class HelpdeskService {
    * @param id The id of the helpdesk
    * @returns GetUnitsByHelpdeskIdResponse
    */
-  getUnitsByHelpdeskId(id: number) {
-    return this.client.get<GetUnitsByHelpdeskIdResponse>("/api/units/helpdesk/" + id);
+  getActiveUnitsByHelpdeskId(id: number) {
+    return this.client.get<GetUnitsByHelpdeskIdResponse>("/api/units/helpdesk/" + id + '/active');
   }
 
   checkIn(request: CheckInRequest) {
