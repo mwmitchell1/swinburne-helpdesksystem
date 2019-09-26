@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
-import { Unit } from './unit.model';
+import { Unit } from '../../../data/DTOs/unit.dto';
 import { UnitsService } from './units.service';
+import { HelpdeskService } from '../../../helpdesk/helpdesk.service';
+import { NotifierService } from 'angular-notifier';
 
 @Component({
   selector: 'app-admin-units',
@@ -11,21 +14,27 @@ export class UnitsComponent {
 
   private units: Unit[];
 
-  constructor(private unitsService: UnitsService) {
+  constructor(private unitsService: UnitsService,
+              private helpdeskService: HelpdeskService,
+              private route: ActivatedRoute,
+              private notifier: NotifierService) {
 
+    this.units = [];
     this.updateUnitsList();
 
 
   }
 
 
+  /**
+   * Uses HelpdeskService to get units of selected helpdesk
+   */
   updateUnitsList() {
-    this.unitsService.getUnits().subscribe(
+    this.helpdeskService.getUnitsByHelpdeskId(this.route.parent.snapshot.params.id).subscribe(
       result => {
-        console.log('result', result);
         this.units = result.units;
       }, error => {
-        console.log('error', error);
+        this.notifier.notify('error', 'Unable to get units, please contact helpdesk admin.');
       }
     );
   }
