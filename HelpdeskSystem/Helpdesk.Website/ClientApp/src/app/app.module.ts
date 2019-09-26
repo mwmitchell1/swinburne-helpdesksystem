@@ -5,7 +5,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { NotifierModule, NotifierOptions } from 'angular-notifier'
 import * as $ from 'jquery';
-import * as bootstrap from "bootstrap";
+import * as bootstrap from 'bootstrap';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './navbar/navbar.component';
@@ -26,9 +26,10 @@ import { UnitsComponent } from './admin/configuration/units/units.component';
 import { UsersComponent } from './admin/users/users.component';
 import { ReportingComponent } from './admin/reporting/reporting.component';
 import { NicknamesComponent } from './admin/nicknames/nicknames.component';
+import { ConfigurationComponent } from './admin/configuration/configuration.component';
 
 import { UsersService } from './admin/users/users.service';
-import { ConfigurationComponent } from './admin/configuration/configuration.component';
+import { UnitsService } from './admin/configuration/units/units.service';
 
 @NgModule({
   declarations: [
@@ -84,7 +85,8 @@ import { ConfigurationComponent } from './admin/configuration/configuration.comp
     AuthenticationService,
     HelpdeskService,
     RouteStateService,
-    UsersService],
+    UsersService,
+    UnitsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
