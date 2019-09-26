@@ -3,7 +3,7 @@
     <div class="row helpdesk-button-row" *ngFor="let helpdesk of helpdesks">
         <div class="col-md-12">
             <a class="btn btn-primary helpdesk-button"
-                [routerLink]='["/helpdesk", helpdesk.helpdeskID]'>{{helpdesk.name}}</a>
+                [routerLink]='["helpdesk", helpdesk.helpdeskID]'>{{helpdesk.name}}</a>
         </div>
     </div>
 </div>

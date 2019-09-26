@@ -27,9 +27,11 @@ import { UsersComponent } from './admin/users/users.component';
 import { ReportingComponent } from './admin/reporting/reporting.component';
 import { NicknamesComponent } from './admin/nicknames/nicknames.component';
 import { ConfigurationComponent } from './admin/configuration/configuration.component';
+import { HelpdeskComponent } from './helpdesk/helpdesk.component';
 
 import { UsersService } from './admin/users/users.service';
 import { UnitsService } from './admin/configuration/units/units.service';
+
 
 @NgModule({
   declarations: [
@@ -44,7 +46,8 @@ import { UnitsService } from './admin/configuration/units/units.service';
     UsersComponent,
     NicknamesComponent,
     ReportingComponent,
-    ConfigurationComponent
+    ConfigurationComponent,
+    HelpdeskComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -55,7 +58,7 @@ import { UnitsService } from './admin/configuration/units/units.service';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'login', component: LoginComponent, pathMatch: 'full' },
       { path: 'logout', component: LogoutComponent, pathMatch: 'full' },
-      { path: 'helpdesk/:id', component: HomeComponent, pathMatch: 'full' }, // change to HelpdeskComponent
+      { path: 'helpdesk/:id', component: HelpdeskComponent, pathMatch: 'full' },
       {
         path: 'admin', component: AdminComponent, canActivate: [AuthGuardService],
         children: [
