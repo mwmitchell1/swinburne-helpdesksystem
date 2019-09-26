@@ -384,6 +384,10 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Used to get an export of the helpdesk as a zip of CSVs
+        /// </summary>
+        /// <returns>The zip file</returns>
         [HttpGet]
         [Route("~/api/exportdatabase")]
         public IActionResult GetFullDatabaseBackup()
