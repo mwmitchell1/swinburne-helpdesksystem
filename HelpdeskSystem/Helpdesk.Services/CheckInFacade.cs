@@ -125,5 +125,36 @@ namespace Helpdesk.Services
             }
             return response;
         }
+
+        /// <summary>
+        /// Used to get the check ins for a helpdesk
+        /// </summary>
+        /// <param name="helpdeskId">The id of the helpdesk</param>
+        /// <returns>Response with checkins if found and the success result</returns>
+        public GetCheckInsResponse GetCheckInsByHelpdeskId(int helpdeskId)
+        {
+            var response = new GetCheckInsResponse();
+
+            try
+            {
+                var dataLayer = new CheckInDataLayer();
+                response.CheckIns = dataLayer.GetCheckinsByHelpdeskId(helpdeskId);
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (NotFoundException ex)
+            {
+                s_logger.Trace(ex, "No check ins found");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No check ins found"));
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get check ins");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get check ins"));
+            }
+
+            return response;
+        }
     }
 }

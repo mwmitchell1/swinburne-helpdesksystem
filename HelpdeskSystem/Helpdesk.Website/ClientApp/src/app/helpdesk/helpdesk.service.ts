@@ -41,7 +41,7 @@ export class HelpdeskService {
   }
 
   /**
-   * Used to retreive the list of units for the helpdesk
+   * Used to retreive the list of active units for the helpdesk
    * @param id The id of the helpdesk
    * @returns GetUnitsByHelpdeskIdResponse
    */
@@ -49,6 +49,11 @@ export class HelpdeskService {
     return this.client.get<GetUnitsByHelpdeskIdResponse>("/api/units/helpdesk/" + id + '/active');
   }
 
+  /**
+   * This function is used to check in a student
+   * @param request the check in information
+   * @returns the response that indicates success
+   */
   checkIn(request: CheckInRequest) {
     return this.client.post<CheckInResponse>("/api/checkin", request);
   }
