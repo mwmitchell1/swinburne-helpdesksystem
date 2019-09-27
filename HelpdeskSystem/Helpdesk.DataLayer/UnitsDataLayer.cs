@@ -33,7 +33,7 @@ namespace Helpdesk.DataLayer
                         Unit newUnit = new Unit()
                         {
                             Code = request.Code,
-                            IsDeleted = false,
+                            IsDeleted = request.IsDeleted,
                             Name = request.Name
                         };
 
