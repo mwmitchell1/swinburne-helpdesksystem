@@ -37,9 +37,9 @@
                             </div>
                             <div class="form-group">
                                 <label for="modalUnitId">Unit:</label>
-                                <select class="form-control" id="modalUnitId" name="modalUnitId">
+                                <select class="form-control" id="modalUnitId" name="modalUnitId" formControlName="modalUnitId">
                                     <option value="">Which unit are you studying?</option>
-                                    <option *ngFor="let unit of units" value="unit.unitId">
+                                    <option *ngFor="let unit of units" value="{{unit.unitId}}">
                                         {{unit.name}}
                                     </option>
                                 </select>

@@ -139,7 +139,7 @@ namespace Helpdesk.Services
         /// </summary>
         /// <param name="id">ID of the helpdesk to be retrieved from</param>
         /// <returns>A response containing the list of units and status code representing the result</returns>
-        public GetUnitsByHelpdeskIDResponse GetUnitsByHelpdeskID(int id)
+        public GetUnitsByHelpdeskIDResponse GetUnitsByHelpdeskID(int id, bool getActive)
         {
             s_logger.Info("Getting units by helpdesk id...");
 
@@ -149,7 +149,7 @@ namespace Helpdesk.Services
             {
                 var dataLayer = new UnitsDataLayer();
 
-                List<UnitDTO> units = dataLayer.GetUnitsByHelpdeskID(id);
+                List<UnitDTO> units = dataLayer.GetUnitsByHelpdeskID(id, getActive);
 
                 if(units.Count==0)
                     throw new NotFoundException("No units found under helpdesk "+id);

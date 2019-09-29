@@ -72,7 +72,7 @@ namespace Helpdesk.DataLayer
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var helpdesks = context.Helpdesksettings.OrderBy(h => h.IsDeleted).OrderByDescending(h => h.Name).ToList();
+                var helpdesks = context.Helpdesksettings.OrderBy(h => h.IsDeleted).OrderBy(h => h.Name).ToList();
 
                 if (helpdesks.Count == 0)
                     throw new NotFoundException("No helpdesks found");
@@ -218,7 +218,7 @@ namespace Helpdesk.DataLayer
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var helpdesks = context.Helpdesksettings.Where(h => !h.IsDeleted).OrderByDescending(h => h.Name).ToList();
+                var helpdesks = context.Helpdesksettings.Where(h => !h.IsDeleted).OrderBy(h => h.Name).ToList();
 
                 if (helpdesks.Count == 0)
                     throw new NotFoundException("No helpdesks found");

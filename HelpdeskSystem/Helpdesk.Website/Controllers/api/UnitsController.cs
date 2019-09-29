@@ -93,16 +93,17 @@ namespace Helpdesk.Website.Controllers.api
         /// </summary>
         /// <param name="id">The ID of the helpdesk</param>
         /// <returns>Response which indicates success or failure</returns>
-        [AllowAnonymous]
         [HttpGet]
         [Route("helpdesk/{id}")]
         public IActionResult GetUnitsByHelpdeskID([FromRoute] int id)
         {
+            if (!IsAuthorized())
+                return Unauthorized();
 
             try
             {
                 var facade = new UnitsFacade();
-                var response = facade.GetUnitsByHelpdeskID(id);
+                var response = facade.GetUnitsByHelpdeskID(id, false);
 
                 switch (response.Status)
                 {
@@ -120,6 +121,42 @@ namespace Helpdesk.Website.Controllers.api
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to get units with helpdesk id "+id+".");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+
+        /// <summary>
+        /// Retrieve the active units from the database by helpdesk ID
+        /// </summary>
+        /// <param name="id">The ID of the helpdesk</param>
+        /// <returns>Response which indicates success or failure</returns>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("helpdesk/{id}/active")]
+        public IActionResult GetActiveUnitsByHelpdeskID([FromRoute] int id)
+        {
+            try
+            {
+                var facade = new UnitsFacade();
+                var response = facade.GetUnitsByHelpdeskID(id, true);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get units with helpdesk id " + id + ".");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }

@@ -1,4 +1,5 @@
-﻿using Helpdesk.Common.Extensions;
+﻿using Helpdesk.Common.DTOs;
+using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests.CheckIn;
 using Helpdesk.Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +63,55 @@ namespace Helpdesk.DataLayer
                 context.SaveChanges();
             }
             return true;
+        }
+
+        /// <summary>
+        /// Used to retreive the check ins by the helpdesk id
+        /// </summary>
+        /// <param name="helpdeskId">The id of the helpdesk</param>
+        /// <returns>The list of checkins</returns>
+        public List<CheckInDTO> GetCheckinsByHelpdeskId(int helpdeskId)
+        {
+            List<CheckInDTO> checkInDTOs = new List<CheckInDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var unitIds = context.Helpdeskunit.Where(u => u.HelpdeskId == helpdeskId).Select(u => u.UnitId).ToList();
+
+                var checkIns = context
+                                .Checkinhistory
+                                .Include("Student")
+                                .Where(c =>
+                                    unitIds.Contains(c.UnitId)
+                                    && !c.CheckoutTime.HasValue
+                                    && (!c.ForcedCheckout.HasValue || !c.ForcedCheckout.Value)
+                                    ).ToList();
+
+                if (checkIns.Count == 0)
+                    throw new NotFoundException("Helpdesk has no check ins");
+
+                foreach (var checkIn in checkIns)
+                {
+                    checkInDTOs.Add(DAO2DTO(checkIn));
+                }
+            }
+            return checkInDTOs;
+        }
+
+        /// <summary>
+        /// Used to convert database checkin object to a DTO
+        /// </summary>
+        /// <param name="checkIn">The check in to be converted</param>
+        /// <returns>The dto version of the check in</returns>
+        public CheckInDTO DAO2DTO(Checkinhistory checkIn)
+        {
+            CheckInDTO dto = new CheckInDTO()
+            {
+                CheckInId = checkIn.CheckInId,
+                Nickname = checkIn.Student.NickName
+            };
+
+            return dto;
         }
 
         /// Used to get a datatable with all of the checkin records

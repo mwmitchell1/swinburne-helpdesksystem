@@ -3,8 +3,8 @@ import { HelpdeskService } from "./helpdesk.service";
 import { NotifierService } from "angular-notifier";
 import { Helpdesk } from "../data/DTOs/helpdesk.dto";
 import { ActivatedRoute } from "@angular/router";
-import { CheckIn } from "../data/view-models/check-in";
-import { FormBuilder, FormControl } from "@angular/forms";
+import { CheckIn } from "../data/DTOs/check-in.dto";
+import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import { Unit } from "../data/DTOs/unit.dto";
 import { CheckInRequest } from "../data/requests/check-in/chek-in-request";
 
@@ -14,7 +14,7 @@ import { CheckInRequest } from "../data/requests/check-in/chek-in-request";
   styleUrls: ['./helpdesk.component.css']
 })
 export class HelpdeskComponent implements OnInit {
-  checkInForm;
+  public checkInForm: FormGroup;
   checkOutForm;
   public helpdesk: Helpdesk = new Helpdesk();
   public helpdeskId: Number;
@@ -26,7 +26,7 @@ export class HelpdeskComponent implements OnInit {
     , private route: ActivatedRoute
     , private builder: FormBuilder) {
     this.checkInForm = this.builder.group({
-      modalSID: new FormControl(),
+      modalSID: new FormControl(''),
       modalStudentId: new FormControl(''),
       modalNickname: new FormControl(''),
       modalUnitId: new FormControl(''),
@@ -38,16 +38,31 @@ export class HelpdeskComponent implements OnInit {
 
   ngOnInit() {
 
+    
     this.service.getHelpdeskById(this.route.snapshot.params.id).subscribe(
       result => {
         this.helpdesk = result.helpdesk;
+
+        if (this.helpdesk.hasCheckIn) {
+          this.service.getCheckInsByHelpdesk(this.route.snapshot.params.id).subscribe(
+            result => {
+              this.checkIns = result.CheckIns;
+            },
+            error => {
+              if (error.status != 404)
+              {
+                this.notifier.notify('error', "Unable to retreive check ins, please contact admin");
+              }
+            }
+          )
+        }
       },
       error => {
-        this.notifier.notify('error', "Unable to retreive helpdesk settings, please contact admin");
+        this.notifier.notify('error', "Unable to retreive helpdesk information, please contact admin");
       }
     );
 
-    this.service.getUnitsByHelpdeskId(this.route.snapshot.params.id).subscribe(
+    this.service.getActiveUnitsByHelpdeskId(this.route.snapshot.params.id).subscribe(
       result => {
         this.units = result.units;
       },
@@ -57,12 +72,12 @@ export class HelpdeskComponent implements OnInit {
     )
   }
 
-  checkIn() {
+  checkIn(data) {
     var request = new CheckInRequest();
-    request.Nickname = this.checkInForm.modalNickname;
-    request.SID = this.checkInForm.modalSID;
-    request.StudentID = this.checkInForm.modalStudentId;
-    request.UnitID = this.checkInForm.modalUnitId;
+    request.Nickname = this.checkInForm.controls.modalNickname.value;
+    request.SID = this.checkInForm.controls.modalSID.value;
+    request.StudentID = this.checkInForm.controls.modalStudentId.value;
+    request.UnitID = this.checkInForm.controls.modalUnitId.value;
     this.service.checkIn(request).subscribe(
       result => {
         var checkIn = new CheckIn();
@@ -71,7 +86,7 @@ export class HelpdeskComponent implements OnInit {
         this.checkIns.push(checkIn);
       },
       error => {
-        // if (error.status == )
+        this.notifier.notify('error', "Unable to check in.");
       }
     );
   }
