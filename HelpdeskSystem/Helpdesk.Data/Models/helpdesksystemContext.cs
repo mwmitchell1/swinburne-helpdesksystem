@@ -52,17 +52,17 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.CheckInId)
                     .HasColumnName("CheckInID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.ForcedCheckout).HasColumnType("bit");
 
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.HasOne(d => d.Student)
                     .WithMany(p => p.Checkinhistory)
@@ -88,15 +88,15 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.CheckInId)
                     .HasColumnName("CheckInID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.QueueItemId)
                     .HasColumnName("QueueItemID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.HasOne(d => d.CheckIn)
                     .WithMany(p => p.Checkinqueueitem)
@@ -175,7 +175,7 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.NickName)
                     .IsRequired()

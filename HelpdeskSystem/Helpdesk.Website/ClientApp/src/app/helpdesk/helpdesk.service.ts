@@ -8,6 +8,7 @@ import { GetHelpdeskResponse } from '../data/responses/configuration/get-respons
 import { GetUnitsByHelpdeskIdResponse } from '../data/responses/units/get-by-help-id.response';
 import { CheckInRequest } from '../data/requests/check-in/chek-in-request';
 import { CheckInResponse } from '../data/responses/helpdesk/check-in.response';
+import { GetCheckInsResponse } from '../data/responses/helpdesk/get-check-ins.response';
 
 @Injectable()
 export class HelpdeskService {
@@ -41,15 +42,29 @@ export class HelpdeskService {
   }
 
   /**
-   * Used to retreive the list of units for the helpdesk
+   * Used to retreive the list of active units for the helpdesk
    * @param id The id of the helpdesk
    * @returns GetUnitsByHelpdeskIdResponse
    */
-  getUnitsByHelpdeskId(id: number) {
-    return this.client.get<GetUnitsByHelpdeskIdResponse>("/api/units/helpdesk/" + id);
+  getActiveUnitsByHelpdeskId(id: number) {
+    return this.client.get<GetUnitsByHelpdeskIdResponse>("/api/units/helpdesk/" + id + '/active');
   }
 
+  /**
+   * This function is used to check in a student
+   * @param request the check in information
+   * @returns the response that indicates success
+   */
   checkIn(request: CheckInRequest) {
-    return this.client.post<CheckInResponse>("/api/checkin", request);
+    return this.client.post<CheckInResponse>("/api/checkin/", request);
+  }
+
+  /**
+   * Used to get the check ins for the helpdesk id required
+   * @param id The id of the helpdesk
+   * @returns The response with the check ins if they are any
+   */
+  getCheckInsByHelpdesk(id: number) {
+    return this.client.get<GetCheckInsResponse>("/api/checkin/" + id);
   }
 }
