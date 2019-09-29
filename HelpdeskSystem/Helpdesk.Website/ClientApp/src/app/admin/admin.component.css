@@ -1,3 +1,12 @@
 #admin-sidebar {
     height: 100vh;
 }
+
+.icon-button-add {
+  background: none;
+  border: none;
+}
+
+.icon-button-add:hover {
+  color: #576068 !important;
+}
