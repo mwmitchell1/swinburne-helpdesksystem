@@ -7,7 +7,7 @@ import { SetUpService } from './setup.service';
 import { UpdateHelpdeskRequest } from 'src/app/data/requests/configuration/update-request';
 
 @Component({
-  selector: 'app-admin-configuration',
+  selector: 'app-admin-setup',
   templateUrl: './setup.component.html'
 })
 export class SetUpComponent implements OnInit {
