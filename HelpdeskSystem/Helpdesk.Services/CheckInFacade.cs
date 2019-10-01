@@ -45,28 +45,35 @@ namespace Helpdesk.Services
 
                 if (!request.StudentID.HasValue)
                 {
-                    if (studentFacade.GetStudentByNickname(request.Nickname).Status!=HttpStatusCode.NotFound)
+                    //Will change once get student by id functionality is implemented
+                    using (helpdesksystemContext context = new helpdesksystemContext())
                     {
-                        response.Status = HttpStatusCode.BadRequest;
-                        return response;
+                        Nicknames nickname = context.Nicknames.FirstOrDefault(n => n.NickName == request.Nickname);
+
+                        if (nickname == null)
+                        {
+                            AddStudentRequest addStudentRequest = new AddStudentRequest()
+                            {
+                                SID = request.SID,
+                                Nickname = request.Nickname
+                            };
+
+                            AddStudentResponse addStudentResponse = studentFacade.AddStudentNickname(addStudentRequest);
+
+                            request.StudentID = addStudentResponse.StudentID;
+                        }
+                        else if (nickname.Sid != request.SID)
+                        {
+                            response.Status = HttpStatusCode.BadRequest;
+                            return response;
+                        }
                     }
-
-                    AddStudentRequest addStudentRequest = new AddStudentRequest()
-                    {
-                        SID = request.SID,
-                        Nickname = request.Nickname
-                    };
-
-                    AddStudentResponse addStudentResponse = studentFacade.AddStudentNickname(addStudentRequest);
-
-                    request.StudentID = addStudentResponse.StudentID;
                 }
 
-                //Will change to facade method when get student by id method is implemented
                 using (helpdesksystemContext context = new helpdesksystemContext())
                 {
                     if (context.Nicknames.FirstOrDefault(n => n.StudentId == request.StudentID) == null)
-                        throw new NotFoundException("No student found for id " + request.StudentID);
+                        throw new NotFoundException("Unable to find student with ID " + request.StudentID);
                 }
 
                 CheckInDataLayer dataLayer = new CheckInDataLayer();
@@ -77,7 +84,7 @@ namespace Helpdesk.Services
             }
             catch (NotFoundException ex)
             {
-                s_logger.Warn(ex, "No student found for id "+request.StudentID);
+                s_logger.Warn(ex, "No student found for id " + request.StudentID);
                 response.Status = HttpStatusCode.NotFound;
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No student found for id " + request.StudentID));
             }
