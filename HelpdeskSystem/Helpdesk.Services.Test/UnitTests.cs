@@ -478,8 +478,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, deleteUnitResponse.Status);
 
             // Try getting the unit that was just deleted. Should be NotFound.
+            //Will update unit test when get unit method is implemented that excludes units
+            //with IsDeleted = true
             getUnitResponse = unitsFacade.GetUnit(unitData.Response.UnitID);
-            Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
             Assert.IsTrue(getUnitResponse.Unit.IsDeleted);
         }
 
