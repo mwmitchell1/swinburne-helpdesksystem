@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Helpdesk.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,10 @@ namespace Helpdesk.Data.Models
             {
                 AppSettings appSettings = new AppSettings();
 
-                optionsBuilder.UseSqlServer(appSettings.DefaultConnection);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    optionsBuilder.UseSqlServer(appSettings.WindowsConnectionString);
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    optionsBuilder.UseSqlServer(appSettings.MacConnectionString);
             }
         }
 

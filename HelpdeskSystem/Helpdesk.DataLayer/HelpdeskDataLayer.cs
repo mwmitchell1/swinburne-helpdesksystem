@@ -264,38 +264,38 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="dateTime"></param>
         /// <returns></returns>
-        public bool ForceCheckoutQueueRemove(DateTime? dateTime = null)
+        public bool ForceCheckoutQueueRemove(int id)
         {
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                DateTime time;
+                DateTime time = DateTime.Now;
+                
+                var unitIds = context.Helpdeskunit.Where(hu => hu.HelpdeskId == id).Select(hu => hu.UnitId).ToList();
 
-                if (dateTime == null)
+                foreach(int unitId in unitIds)
                 {
-                    time = DateTime.Now;
-                }
-                else
-                {
-                    time = (DateTime)dateTime;
-                }
-
-                var queueItems = context.Queueitem.Where(q => q.TimeRemoved == null).ToList();
-                var checkins = context.Checkinhistory.Where(c => c.CheckoutTime == null).ToList();
-
-                foreach (Queueitem queueItem in queueItems)
-                {
-                    if (queueItem.TimeRemoved == null)
+                    List<Checkinhistory> checkins = context.Checkinhistory.Where(c => c.CheckoutTime == null && c.UnitId == unitId).ToList();
+                    foreach (Checkinhistory checkin in checkins)
                     {
-                        queueItem.TimeRemoved = time;
+                        if (checkin.CheckoutTime == null)
+                        {
+                            checkin.CheckoutTime = time;
+                            checkin.ForcedCheckout = true;
+                        }
                     }
-                }
 
-                foreach (Checkinhistory checkin in checkins)
-                {
-                    if (checkin.CheckoutTime == null)
+                    var topicIds = context.Topic.Where(t => t.UnitId == unitId).Select(t => t.TopicId).ToList();
+
+                    foreach (int topicId in topicIds)
                     {
-                        checkin.CheckoutTime = time;
-                        checkin.ForcedCheckout = true;
+                        List<Queueitem> queueItems = context.Queueitem.Where(q => q.TimeRemoved == null && q.TopicId == topicId).ToList();
+                        foreach (Queueitem queueItem in queueItems)
+                        {
+                            if (queueItem.TimeRemoved == null)
+                            {
+                                queueItem.TimeRemoved = time;
+                            }
+                        }
                     }
                 }
                 context.SaveChanges();
