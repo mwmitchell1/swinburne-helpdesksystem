@@ -90,7 +90,7 @@ namespace Helpdesk.DataLayer
             UnitDTO dto = null;
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var unit = context.Unit.FirstOrDefault(u => u.UnitId == id);
+                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == id);
                 if (unit != null)
                 {
                     dto = DAO2DTO(unit);
@@ -113,7 +113,7 @@ namespace Helpdesk.DataLayer
             {
                 var unitIds = context.Helpdeskunit.Where(hu => hu.HelpdeskId == helpdeskId).Select(u => u.UnitId).ToList();
 
-                var unit = context.Unit.Include("Helpdeskunit").FirstOrDefault(u => u.Name.Equals(name) && unitIds.Contains(u.UnitId));
+                var unit = context.Unit.Include("Topic").Include("Helpdeskunit").FirstOrDefault(u => u.Name.Equals(name) && unitIds.Contains(u.UnitId));
                 if (unit != null)
                 {
                     dto = DAO2DTO(unit);
@@ -135,7 +135,7 @@ namespace Helpdesk.DataLayer
             {
                 var unitIds = context.Helpdeskunit.Where(hu => hu.HelpdeskId == helpdeskId).Select(u => u.UnitId).ToList();
 
-                var unit = context.Unit.Include("Helpdeskunit").FirstOrDefault(u => u.Code.Equals(code) && unitIds.Contains(u.UnitId));
+                var unit = context.Unit.Include("Helpdeskunit").Include("Topic").FirstOrDefault(u => u.Code.Equals(code) && unitIds.Contains(u.UnitId));
                 if (unit != null)
                 {
                     dto = DAO2DTO(unit);
@@ -160,7 +160,7 @@ namespace Helpdesk.DataLayer
 
                 foreach (Helpdeskunit helpdeskUnit in helpdeskUnits)
                 {
-                    Unit unit = context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId);
+                    Unit unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId);
 
                     if (getActive && !unit.IsDeleted)
                         unitDTOs.Add(DAO2DTO(unit));
@@ -312,6 +312,21 @@ namespace Helpdesk.DataLayer
             unitDTO.Code = unit.Code;
             unitDTO.Name = unit.Name;
             unitDTO.IsDeleted = unit.IsDeleted;
+
+            foreach (Topic topic in unit.Topic)
+            {
+                if (!topic.IsDeleted)
+                {
+                    unitDTO.Topics.Add(
+                        new TopicDTO()
+                        {
+                            Name = topic.Name,
+                            IsDeleted = topic.IsDeleted,
+                            TopicId = topic.TopicId,
+                            UnitId = topic.UnitId
+                        });
+                }
+            }
 
             return unitDTO;
         }
