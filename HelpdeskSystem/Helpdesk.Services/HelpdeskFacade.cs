@@ -496,7 +496,7 @@ namespace Helpdesk.Services
         /// </summary>
         /// <param name="dateTime"></param>
         /// <returns></returns>
-        public ForceCheckoutQueueRemoveResponse ForceCheckoutQueueRemove(DateTime? dateTime = null)
+        public ForceCheckoutQueueRemoveResponse ForceCheckoutQueueRemove(int id)
         {
             ForceCheckoutQueueRemoveResponse response = new ForceCheckoutQueueRemoveResponse();
 
@@ -504,16 +504,16 @@ namespace Helpdesk.Services
             {
                 HelpdeskDataLayer dataLayer = new HelpdeskDataLayer();
 
-                response.Result = dataLayer.ForceCheckoutQueueRemove(dateTime);
+                response.Result = dataLayer.ForceCheckoutQueueRemove(id);
 
                 if (response.Result == true)
                     response.Status = HttpStatusCode.OK;
             }
             catch (Exception ex)
             {
-                s_logger.Error(ex, "Unable to force checkout and remove queue items!");
+                s_logger.Error(ex, "Unable to force checkout and remove queue items for Helpdesk " + id);
                 response.Status = HttpStatusCode.InternalServerError;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to force checkout and remove queue items!"));
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to force checkout and remove queue items for Helpdesk " + id));
             }
 
             return response;
