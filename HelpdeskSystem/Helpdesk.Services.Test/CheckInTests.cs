@@ -44,7 +44,7 @@ namespace Helpdesk.Services.Test
             {
                 UnitID = unit.UnitId,
                 Nickname = AlphaNumericStringGenerator.GetString(10),
-                StudentID = AlphaNumericStringGenerator.GetStudentIDString()
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
             };
 
             CheckInFacade facade = new CheckInFacade();
@@ -63,12 +63,12 @@ namespace Helpdesk.Services.Test
                 Assert.AreEqual(request.UnitID, checkInHistory.UnitId);
                 var timeDiff = baseTime.CompareTo(addTime);
                 Assert.IsTrue(timeDiff == -1);
-                Assert.AreEqual(request.SID, checkInHistory.StudentId);
+                Assert.AreEqual(request.StudentID, checkInHistory.StudentId);
 
                 Nicknames nicknames = context.Nicknames.FirstOrDefault(n => n.StudentId == checkInHistory.StudentId);
 
                 Assert.AreEqual(request.Nickname, nicknames.NickName);
-                Assert.AreEqual(request.StudentID, nicknames.Sid);
+                Assert.AreEqual(request.SID, nicknames.Sid);
             }
         }
 
@@ -101,7 +101,7 @@ namespace Helpdesk.Services.Test
             CheckInRequest request = new CheckInRequest()
             {
                 UnitID = unit.UnitId,
-                SID = nickname.StudentId
+                StudentID = nickname.StudentId
             };
 
             CheckInFacade facade = new CheckInFacade();
@@ -120,7 +120,7 @@ namespace Helpdesk.Services.Test
                 Assert.AreEqual(request.UnitID, checkInHistory.UnitId);
                 var timeDiff = baseTime.CompareTo(addTime);
                 Assert.IsTrue(timeDiff == -1);
-                Assert.AreEqual(request.SID, checkInHistory.StudentId);
+                Assert.AreEqual(request.StudentID, checkInHistory.StudentId);
             }
         }
 
@@ -146,7 +146,7 @@ namespace Helpdesk.Services.Test
             CheckInRequest request = new CheckInRequest()
             {
                 UnitID = unit.UnitId,
-                SID = -1
+                StudentID = -1
             };
 
             CheckInFacade facade = new CheckInFacade();
@@ -178,7 +178,7 @@ namespace Helpdesk.Services.Test
             CheckInRequest request = new CheckInRequest()
             {
                 UnitID = unit.UnitId,
-                StudentID = AlphaNumericStringGenerator.GetStudentIDString()
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
             };
 
             CheckInFacade facade = new CheckInFacade();
@@ -217,7 +217,7 @@ namespace Helpdesk.Services.Test
             CheckInRequest request = new CheckInRequest()
             {
                 UnitID = unit.UnitId,
-                StudentID = AlphaNumericStringGenerator.GetStudentIDString(),
+                SID = AlphaNumericStringGenerator.GetStudentIDString(),
                 Nickname = nickname.NickName
             };
 
@@ -280,7 +280,7 @@ namespace Helpdesk.Services.Test
 
             CheckInRequest request = new CheckInRequest()
             {
-                SID = nickname.StudentId
+                SID = nickname.Sid
             };
 
             CheckInFacade facade = new CheckInFacade();
@@ -313,7 +313,7 @@ namespace Helpdesk.Services.Test
             {
                 UnitID = unit.UnitId,
                 Nickname = AlphaNumericStringGenerator.GetString(10),
-                StudentID = AlphaNumericStringGenerator.GetStudentIDString()
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
             };
 
             CheckInFacade facade = new CheckInFacade();
@@ -371,7 +371,7 @@ namespace Helpdesk.Services.Test
             {
                 UnitID = unit.UnitId,
                 Nickname = AlphaNumericStringGenerator.GetString(10),
-                StudentID = AlphaNumericStringGenerator.GetStudentIDString()
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
             };
 
             CheckInFacade facade = new CheckInFacade();
