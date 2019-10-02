@@ -9,6 +9,7 @@ import { GetUnitsByHelpdeskIdResponse } from '../data/responses/units/get-by-hel
 import { CheckInRequest } from '../data/requests/check-in/chek-in-request';
 import { CheckInResponse } from '../data/responses/helpdesk/check-in.response';
 import { GetCheckInsResponse } from '../data/responses/helpdesk/get-check-ins.response';
+import { CheckOutRequest } from '../data/requests/check-in/check-out-request';
 
 @Injectable()
 export class HelpdeskService {
@@ -57,6 +58,15 @@ export class HelpdeskService {
    */
   checkIn(request: CheckInRequest) {
     return this.client.post<CheckInResponse>("/api/checkin/", request);
+  }
+
+  /**
+   * This function is used to check out a student
+   * @param id the check in id
+   * @param request request indicating the the checkout is not forced
+   */
+  checkOut(id: number, request: CheckOutRequest) {
+    return this.client.post<CheckInResponse>("/api/checkin/" + id , request);
   }
 
   /**

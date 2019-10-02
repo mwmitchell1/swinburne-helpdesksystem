@@ -59,8 +59,8 @@ namespace Helpdesk.Website.Controllers.api
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        [Route("")]
+        [HttpPost]
+        [Route("validate")]
         public IActionResult ValidateNickname([FromBody] ValidateNicknameRequest request)
         {
             try
