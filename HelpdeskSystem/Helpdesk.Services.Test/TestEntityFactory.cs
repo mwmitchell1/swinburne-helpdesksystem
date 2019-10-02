@@ -187,14 +187,14 @@ namespace Helpdesk.Services.Test
         {
             var request = new CheckInRequest();
 
-            if (studentID != null) request.StudentID = studentID;
+            if (studentID != null) request.SID = studentID;
             if (nickname != null)
             {
                 if (nickname == "" && PopulateEmptyStrings) request.Nickname = AlphaNumericStringGenerator.GetString(20); else request.Nickname = nickname;
             }
             if (sID != null)
             {
-                if (sID == "" && PopulateEmptyStrings) request.SID = AlphaNumericStringGenerator.GetStudentIDString(); else request.SID = sID;
+                if (sID == "" && PopulateEmptyStrings) request.StudentID = AlphaNumericStringGenerator.GetStudentIDString(); else request.StudentID = sID;
             }
             if (unitID != null) request.UnitID = (int)unitID;
 

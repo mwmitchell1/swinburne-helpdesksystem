@@ -165,10 +165,28 @@ namespace Helpdesk.Services
 
                 if (existingNickname == null)
                 {
-                    response.Status = HttpStatusCode.OK;
+                    if (!string.IsNullOrEmpty(request.SID))
+                    {
+                        existingNickname = dataLayer.GetStudentNicknameByStudentID(request.SID);
+
+                        if (existingNickname == null)
+                        {
+                            response.Status = HttpStatusCode.OK;
+                        }
+                        else
+                        {
+                            response.SID = existingNickname.ID;
+                            response.StudentId = existingNickname.StudentID;
+                            response.Nickname = existingNickname.Nickname;
+                            response.Status = HttpStatusCode.Accepted;
+                        }
+                    }
                 }
-                else if (existingNickname != null && existingNickname.SID == request.SID)
+                else if (existingNickname.StudentID == request.SID)
                 {
+                    response.Nickname = existingNickname.Nickname;
+                    response.StudentId = existingNickname.StudentID;
+                    response.SID = existingNickname.ID;
                     response.Status = HttpStatusCode.Accepted;
                 }
                 else
