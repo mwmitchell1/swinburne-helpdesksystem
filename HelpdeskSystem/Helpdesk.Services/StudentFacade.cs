@@ -152,5 +152,38 @@ namespace Helpdesk.Services
             }
             return response;
         }
+
+        public ValidateNicknameResponse ValidateNickname(ValidateNicknameRequest request)
+        {
+            var response = new ValidateNicknameResponse();
+
+            try
+            {
+                var dataLayer = new StudentDatalayer();
+
+                var existingNickname = dataLayer.GetStudentNicknameByNickname(request.Name);
+
+                if (existingNickname == null)
+                {
+                    response.Status = HttpStatusCode.OK;
+                }
+                else if (existingNickname != null && existingNickname.SID == request.SID)
+                {
+                    response.Status = HttpStatusCode.Accepted;
+                }
+                else
+                {
+                    response.Status = HttpStatusCode.BadRequest;
+                }
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to validate student's nickname!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to validate student's nickname!"));
+            }
+
+            return response;
+        }
     }
 }
