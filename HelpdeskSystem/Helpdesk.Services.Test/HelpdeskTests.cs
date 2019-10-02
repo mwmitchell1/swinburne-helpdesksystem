@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Helpdesk.Common.DTOs;
+using Helpdesk.Common.Requests.CheckIn;
 using Helpdesk.Common.Requests.Helpdesk;
 using Helpdesk.Common.Responses.Helpdesk;
 using Helpdesk.Common.Utilities;
@@ -250,14 +251,17 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, queueDataC.Response.Status);
             Assert.IsTrue(queueDataC.Response.ItemId > 0);
 
-            /*TODO -- Update with new checkout method
             // Manuall checkout checkinDataB and check that it succeeded.
-            var checkoutBResponse = testEntityFactory.CheckInFacade.CheckOut(checkinDataB.Response.CheckInID);
+            CheckOutRequest checkoutRequestB = new CheckOutRequest
+            {
+                ForcedCheckout = false
+            };
+            var checkoutBResponse = testEntityFactory.CheckInFacade.CheckOut(checkoutRequestB, checkinDataB.Response.CheckInID);
             Assert.AreEqual(HttpStatusCode.OK, checkoutBResponse.Status);
-            Assert.IsTrue(checkoutBResponse.Result == true);*/
+            Assert.IsTrue(checkoutBResponse.Result == true);
 
             // Do the force checkout and queue remove.
-            var forceCheckoutQueueRemoveResponse = testEntityFactory.HelpdeskFacade.ForceCheckoutQueueRemove();
+            var forceCheckoutQueueRemoveResponse = testEntityFactory.HelpdeskFacade.ForceCheckoutQueueRemove(helpdeskData.Response.HelpdeskID);
             Assert.AreEqual(HttpStatusCode.OK, forceCheckoutQueueRemoveResponse.Status);
             Assert.IsTrue(forceCheckoutQueueRemoveResponse.Result == true);
 
