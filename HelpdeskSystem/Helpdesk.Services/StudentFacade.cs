@@ -116,11 +116,18 @@ namespace Helpdesk.Services
                 response = (EditStudentNicknameResponse)request.CheckValidation(response);
 
                 if (response.Status == HttpStatusCode.BadRequest)
-                {
                     return response;
-                }
 
                 var dataLayer = new StudentDatalayer();
+
+                var nickname = dataLayer.GetStudentNicknameByNickname(request.Nickname);
+
+                if (nickname != null)
+                {
+                    response.Status = HttpStatusCode.BadRequest;
+                    response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "This nickname is already being used."));
+                    return response;
+                }
 
                 bool result = dataLayer.EditStudentNickname(id, request);
 
@@ -143,6 +150,57 @@ namespace Helpdesk.Services
                 response.Status = HttpStatusCode.InternalServerError;
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update student's nickname!"));
             }
+            return response;
+        }
+
+        public ValidateNicknameResponse ValidateNickname(ValidateNicknameRequest request)
+        {
+            var response = new ValidateNicknameResponse();
+
+            try
+            {
+                var dataLayer = new StudentDatalayer();
+
+                var existingNickname = dataLayer.GetStudentNicknameByNickname(request.Name);
+
+                if (existingNickname == null)
+                {
+                    if (!string.IsNullOrEmpty(request.SID))
+                    {
+                        existingNickname = dataLayer.GetStudentNicknameByStudentID(request.SID);
+
+                        if (existingNickname == null)
+                        {
+                            response.Status = HttpStatusCode.OK;
+                        }
+                        else
+                        {
+                            response.SID = existingNickname.ID;
+                            response.StudentId = existingNickname.StudentID;
+                            response.Nickname = existingNickname.Nickname;
+                            response.Status = HttpStatusCode.Accepted;
+                        }
+                    }
+                }
+                else if (existingNickname.StudentID == request.SID)
+                {
+                    response.Nickname = existingNickname.Nickname;
+                    response.StudentId = existingNickname.StudentID;
+                    response.SID = existingNickname.ID;
+                    response.Status = HttpStatusCode.Accepted;
+                }
+                else
+                {
+                    response.Status = HttpStatusCode.BadRequest;
+                }
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to validate student's nickname!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to validate student's nickname!"));
+            }
+
             return response;
         }
     }

@@ -199,7 +199,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for retrieving all timespans from the database
+        /// This method is responsible for retrieving all timespans from the helpdesk system
         /// </summary>
         /// <returns>The response that indicates if the operation was a success,
         /// and the list of timespans</returns>
@@ -214,11 +214,6 @@ namespace Helpdesk.Services
                 var dataLayer = new HelpdeskDataLayer();
 
                 List<TimeSpanDTO> timespans = dataLayer.GetTimeSpans();
-
-                if (timespans.Count == 0)
-                {
-                    throw new NotFoundException("No timespans found!");
-                }
 
                 response.Timespans = timespans;
                 response.Status = HttpStatusCode.OK;
@@ -239,7 +234,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for getting a specific timespan from the database
+        /// This method is responsible for getting a specific timespan from the helpdesk system
         /// </summary>
         /// <param name="id">The SpanId of the specific timespan to be retrieved</param>
         /// <returns>The response that indicates if the operation was a success,
@@ -257,7 +252,6 @@ namespace Helpdesk.Services
                 TimeSpanDTO timespan = dataLayer.GetTimeSpan(id);
                 response.Timespan = timespan ?? throw new NotFoundException("Unable to find timespan!");
                 response.Status = HttpStatusCode.OK;
-
             }
             catch (NotFoundException ex)
             {
@@ -340,12 +334,13 @@ namespace Helpdesk.Services
             try
             {
                 response = (UpdateTimeSpanResponse)request.CheckValidation(response);
+
                 if (response.Status == HttpStatusCode.BadRequest)
-                {
                     return response;
-                }
 
                 var dataLayer = new HelpdeskDataLayer();
+
+                //will implement unique check when get timespan by name method is implemented
 
                 bool result = dataLayer.UpdateTimeSpan(id, request);
 
@@ -355,7 +350,7 @@ namespace Helpdesk.Services
                 response.Result = result;
                 response.Status = HttpStatusCode.OK;
             }
-            catch(NotFoundException ex)
+            catch (NotFoundException ex)
             {
                 s_logger.Error(ex, "Unable to find timespan!");
                 response.Status = HttpStatusCode.NotFound;
@@ -372,11 +367,37 @@ namespace Helpdesk.Services
 
 
         /// <summary>
+        /// Use to generate a database export and return it as a stream
+        /// </summary>
+        /// <returns>Response containing the stream of the file</returns>
+        public DatabaseExportResponse ExportDatabaseManual()
+        {
+            var response = new DatabaseExportResponse();
+
+            try
+            {
+                response = ExportDatabase();
+
+                if (response.Status != HttpStatusCode.OK)
+                    return response;
+
+                response.File = FileToBytes(response.Path);
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to perform database export");
+                response.Status = HttpStatusCode.InternalServerError;
+            }
+
+            return response;
+        }
+
+        /// <summary>
         /// Used to get a Zip file of all of the database tables as CSVs
         /// </summary>
-        public bool ExportDatabase()
+        public DatabaseExportResponse ExportDatabase()
         {
-            bool result = false;
+            var response = new DatabaseExportResponse();
 
             try
             {
@@ -391,7 +412,8 @@ namespace Helpdesk.Services
                 if (string.IsNullOrEmpty(fullZipPath))
                 {
                     s_logger.Error("Unable to create empty zip");
-                    return result;
+                    response.Status = HttpStatusCode.InternalServerError;
+                    return response;
                 }
                 else
                 {
@@ -401,9 +423,13 @@ namespace Helpdesk.Services
                     var topicsDataLayer = new TopicsDataLayer();
                     var studentDataLayer = new StudentDatalayer();
                     var queueDataLayer = new QueueDataLayer();
+                    var checkInDataLayer = new CheckInDataLayer();
 
                     DataTable helpdesks = helpdeskDataLayer.GetHelpdesksAsDataTable();
                     proccessing.SaveToZIPAsCSV(fullZipPath, "helpdesks", helpdesks);
+
+                    DataTable timespans = helpdeskDataLayer.GetTimeSpansAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "timespans", timespans);
 
                     DataTable helpdeskUnits = helpdeskDataLayer.GetHelpdeskUnitsAsDataTable();
                     proccessing.SaveToZIPAsCSV(fullZipPath, "helpdeskunits", helpdeskUnits);
@@ -423,15 +449,74 @@ namespace Helpdesk.Services
                     DataTable queuesItems = queueDataLayer.GetQueueItemsAsDataTable();
                     proccessing.SaveToZIPAsCSV(fullZipPath, "queueItems", queuesItems);
 
-                    result = true;
+                    DataTable checkIns = checkInDataLayer.GetCheckInsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "checkInHistory", checkIns);
+
+                    DataTable checkInQueueItems = checkInDataLayer.GetCheckInQueueItemsAsDataTable();
+                    proccessing.SaveToZIPAsCSV(fullZipPath, "checkinqueueitem", checkInQueueItems);
+
+                    response.Path = fullZipPath;
+                    response.Status = HttpStatusCode.OK;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to generate database export");
-                result = false;
+                response.Status = HttpStatusCode.InternalServerError;
             }
-            return result;
+            return response;
+        }
+
+        /// <summary>
+        /// Used to load the file at the path specified into a stream
+        /// </summary>
+        /// <param name="path">The full location of the file</param>
+        /// <returns>The file as a stream</returns>
+        public byte[] FileToBytes(string path)
+        {
+            byte[] file = null;
+
+            try
+            {
+                file = File.ReadAllBytes(path);
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to load file to stream");
+                file = null;
+            }
+
+            return file;
+        }
+
+        /// <summary>
+        /// Used to force-checkout users and remove queue items.
+        /// Takes optional DateTime parameter. If not provided, data layer will use DateTime.Now.
+        /// Used by DailyCleanupJob.
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public ForceCheckoutQueueRemoveResponse ForceCheckoutQueueRemove(int id)
+        {
+            ForceCheckoutQueueRemoveResponse response = new ForceCheckoutQueueRemoveResponse();
+
+            try
+            {
+                HelpdeskDataLayer dataLayer = new HelpdeskDataLayer();
+
+                response.Result = dataLayer.ForceCheckoutQueueRemove(id);
+
+                if (response.Result == true)
+                    response.Status = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to force checkout and remove queue items for Helpdesk " + id);
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to force checkout and remove queue items for Helpdesk " + id));
+            }
+
+            return response;
         }
 
         /// <summary>

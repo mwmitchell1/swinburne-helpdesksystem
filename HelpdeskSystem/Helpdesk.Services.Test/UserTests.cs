@@ -195,10 +195,21 @@ namespace Helpdesk.Services.Test
         {
             UsersFacade usersFacade = new UsersFacade();
 
+            AddUserRequest addUserRequest = new AddUserRequest()
+            {
+                Username = AlphaNumericStringGenerator.GetString(10),
+                Password = AlphaNumericStringGenerator.GetString(10),
+                PasswordConfirm = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
+
             GetUsersResponse getUsersResponse = usersFacade.GetUsers();
 
             Assert.AreEqual(HttpStatusCode.OK, getUsersResponse.Status);
-            Assert.AreEqual("Admin", getUsersResponse.Users[0].Username);
+            Assert.IsNotNull(getUsersResponse.Users.Find(u => u.UserId == addUserResponse.UserId));
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -251,29 +262,27 @@ namespace Helpdesk.Services.Test
 
             UsersFacade usersFacade = new UsersFacade();
 
-            AddUserRequest addUserRequest = new AddUserRequest();
-            addUserRequest.Username = AlphaNumericStringGenerator.GetString(10);
-            addUserRequest.Password = "Password1";
-            addUserRequest.PasswordConfirm = "Password1";
+            AddUserRequest addUserRequest = new AddUserRequest()
+            {
+                Username = AlphaNumericStringGenerator.GetString(10),
+                Password = AlphaNumericStringGenerator.GetString(10),
+                PasswordConfirm = AlphaNumericStringGenerator.GetString(10)
+            };
 
             AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
 
-            string newPassword = AlphaNumericStringGenerator.GetString(10);
-
             UpdateUserRequest updateUserRequest = new UpdateUserRequest()
             {
                 Username = AlphaNumericStringGenerator.GetString(10),
-                Password = newPassword
+                Password = AlphaNumericStringGenerator.GetString(10)
             };
 
             UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(addUserResponse.UserId, updateUserRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, updateUserResponse.Status);
             Assert.IsTrue(updateUserResponse.Result);
-
-            var hashedPassword = HashText(newPassword);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
@@ -282,7 +291,7 @@ namespace Helpdesk.Services.Test
                 user = context.User.FirstOrDefault(u => u.UserId == addUserResponse.UserId);
 
                 Assert.AreEqual(updateUserRequest.Username, user.Username);
-                Assert.AreEqual(hashedPassword, user.Password);
+                Assert.AreEqual(updateUserRequest.Password, user.Password);
             }
         }
 
@@ -297,7 +306,7 @@ namespace Helpdesk.Services.Test
             UpdateUserRequest updateUserRequest = new UpdateUserRequest()
             {
                 Username = AlphaNumericStringGenerator.GetString(9),
-                Password = "UpdatedPassword"
+                Password = AlphaNumericStringGenerator.GetString(9)
             };
 
             UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(-1, updateUserRequest);
@@ -316,10 +325,98 @@ namespace Helpdesk.Services.Test
             UpdateUserRequest updateUserRequest = new UpdateUserRequest()
             {
                 Username = AlphaNumericStringGenerator.GetString(21),
-                Password = "Password1"
+                Password = AlphaNumericStringGenerator.GetString(9)
             };
 
             UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(8, updateUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, updateUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test trying to update a user with a password that is too short is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateUserPasswordTooShort()
+        {
+            UsersFacade usersFacade = new UsersFacade();
+
+            UpdateUserRequest updateUserRequest = new UpdateUserRequest()
+            {
+                Username = AlphaNumericStringGenerator.GetString(10),
+                Password = AlphaNumericStringGenerator.GetString(5),
+            };
+
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(8, updateUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, updateUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test updating a specific user's username with a username that already exists is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateUserUsernameExists()
+        {
+
+            UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest()
+            {
+                Username = AlphaNumericStringGenerator.GetString(10),
+                Password = AlphaNumericStringGenerator.GetString(10),
+                PasswordConfirm = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            AddUserRequest addUserRequest2 = new AddUserRequest()
+            {
+                Username = AlphaNumericStringGenerator.GetString(10),
+                Password = AlphaNumericStringGenerator.GetString(10),
+                PasswordConfirm = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+            AddUserResponse addUserResponse2 = usersFacade.AddUser(addUserRequest2);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
+
+            UpdateUserRequest updateUserRequest = new UpdateUserRequest()
+            {
+                Username = addUserResponse.Username,
+                Password = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(addUserResponse2.UserId, updateUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, updateUserResponse.Status);
+        }
+
+        /// <summary>
+        /// Test updating a specific user's username with no username is handled properly
+        /// </summary>
+        [TestMethod]
+        public void UpdateUserNoUsername()
+        {
+
+            UsersFacade usersFacade = new UsersFacade();
+
+            AddUserRequest addUserRequest = new AddUserRequest()
+            {
+                Username = AlphaNumericStringGenerator.GetString(10),
+                Password = AlphaNumericStringGenerator.GetString(10),
+                PasswordConfirm = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            AddUserResponse addUserResponse = usersFacade.AddUser(addUserRequest);
+
+            Assert.AreEqual(HttpStatusCode.OK, addUserResponse.Status);
+
+            UpdateUserRequest updateUserRequest = new UpdateUserRequest()
+            {
+                Password = AlphaNumericStringGenerator.GetString(10)
+            };
+
+            UpdateUserResponse updateUserResponse = usersFacade.UpdateUser(addUserResponse.UserId, updateUserRequest);
 
             Assert.AreEqual(HttpStatusCode.BadRequest, updateUserResponse.Status);
         }

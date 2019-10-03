@@ -51,7 +51,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getalltopics";
+                        cmd.CommandText = "GetAllTopics";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {

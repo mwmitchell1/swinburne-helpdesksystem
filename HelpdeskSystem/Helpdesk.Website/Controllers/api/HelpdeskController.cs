@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -92,6 +93,7 @@ namespace Helpdesk.Website.Controllers.api
         /// </summary>
         /// <param name="id">The id of the helpdesk to be retreived</param>
         /// <returns>A response indicating the success and helpdesk DTO or null</returns>
+        [AllowAnonymous]
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetHelpdesk([FromRoute] int id)
@@ -378,6 +380,76 @@ namespace Helpdesk.Website.Controllers.api
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to delete timespan.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Used to get an export of the helpdesk as a zip of CSVs
+        /// </summary>
+        /// <returns>The zip file</returns>
+        [HttpGet]
+        [Route("~/api/exportdatabase")]
+        public IActionResult GetFullDatabaseBackup()
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.ExportDatabaseManual();
+                var contentType = "application/zip";
+                Response.ContentType = contentType;
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return new FileContentResult(response.File, contentType)
+                        {
+                            FileDownloadName = Path.GetFileName(response.Path),
+                        };
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to export database timespan.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+        
+        /// <summary>
+        /// Used to force checkout students and clear queue
+        /// </summary>
+        /// <param name="id">The hepdesk of the ID</param>
+        /// <returns>A response that indicates the result</returns>
+        [HttpDelete]
+        [Route("{id}/clear")]
+        public IActionResult ClearHelpdesk([FromRoute]int id)
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.ForceCheckoutQueueRemove(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to clear helpdesk queue and/or check ins.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }

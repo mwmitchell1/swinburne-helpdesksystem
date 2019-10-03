@@ -108,6 +108,12 @@ BEGIN
     FROM helpdesksettings;
 END //
 
+CREATE PROCEDURE `getalltimespans`()
+BEGIN
+	SELECT *
+    FROM timespans;
+END //
+
 CREATE PROCEDURE `getallusers`()
 BEGIN
 	SELECT *
@@ -136,12 +142,6 @@ CREATE PROCEDURE `getallqueueitems`()
 BEGIN
 	SELECT *
     FROM queueitem;
-END //
-
-CREATE PROCEDURE `getalltimespans`()
-BEGIN
-	SELECT *
-    FROM timespans;
 END //
 
 CREATE PROCEDURE `getallhelpdeskunits`()
