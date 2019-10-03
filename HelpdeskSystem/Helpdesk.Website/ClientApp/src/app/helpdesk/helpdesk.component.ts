@@ -69,7 +69,12 @@ export class HelpdeskComponent implements OnInit {
         this.units = result.units;
       },
       error => {
-        this.notifier.notify('error', 'Unable to retreive the units for the helpdesk.');
+        if (error.status == 404) {
+          this.notifier.notify('warning', 'There are no units for this helpdesk, please talk to admin');
+        }
+        else {
+          this.notifier.notify('error', 'Unable to retreive the units for the helpdesk.');
+        }
       }
     )
   }
@@ -164,7 +169,7 @@ export class HelpdeskComponent implements OnInit {
 
           if (result.nickname)
             this.checkInForm.controls.modalNickname.setValue(result.nickname);
-          
+
           if (result.studentId)
             this.checkInForm.controls.modalStudentId.setValue(result.studentId);
 
