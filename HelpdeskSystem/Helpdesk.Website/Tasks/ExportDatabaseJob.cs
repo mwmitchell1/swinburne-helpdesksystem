@@ -4,6 +4,7 @@ using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Helpdesk.Website
@@ -20,7 +21,7 @@ namespace Helpdesk.Website
             try
             {
                 var facade = new HelpdeskFacade();
-                if(!facade.ExportDatabase())
+                if(facade.ExportDatabase().Status != HttpStatusCode.OK)
                 {
                     s_logger.Error("Unable to export database.");
                 }

@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { HelpdeskDataService } from '../helpdesk-data/helpdesk-data.service';
+import { HelpdeskService } from '../helpdesk/helpdesk.service';
 
 @Injectable()
 export class RouteStateService {
   adminRouteChange: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private router: Router, helpdesks: HelpdeskDataService) {
+  constructor(private router: Router, helpdesks: HelpdeskService) {
     router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         const url = event.url.split('/').splice(1);
@@ -18,10 +18,6 @@ export class RouteStateService {
           this.adminRouteChange.next(true);
         } else if (url[0].toLowerCase() === 'helpdesk' || url[0] === '') {
           this.adminRouteChange.next(false);
-        }
-
-        if (url.length > 1) {
-          helpdesks.setActiveHelpdesk(+url[1]);
         }
       }
     });

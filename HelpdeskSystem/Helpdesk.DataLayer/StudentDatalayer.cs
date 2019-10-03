@@ -39,6 +39,28 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
+        /// Used to get a student nickname by their studentId
+        /// </summary>
+        /// <param name="studentId">The studentId to look up</param>
+        /// <returns>The nickname</returns>
+        public NicknameDTO GetStudentNicknameByStudentID(string studentId)
+        {
+            NicknameDTO nicknameDTO = null;
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var nicknameDAO = context.Nicknames.FirstOrDefault(p => p.Sid == studentId);
+
+                if (nicknameDAO == null)
+                    return null;
+
+                nicknameDTO = DAO2DTO(nicknameDAO);
+            }
+
+            return nicknameDTO;
+        }
+
+        /// <summary>
         /// Used to get a datatable with all of the helpdesk records
         /// </summary>
         /// <returns>Datatable with the helpdesk records</returns>
@@ -58,7 +80,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getallnicknames";
+                        cmd.CommandText = "GetAllNicknames";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -117,10 +139,8 @@ namespace Helpdesk.DataLayer
                 Nicknames nickname = context.Nicknames.FirstOrDefault(n => n.StudentId == id);
 
                 if (nickname == null)
-                {
                     return false;
-                }
-
+    
                 nickname.NickName = request.Nickname;
 
                 context.SaveChanges();
@@ -140,7 +160,7 @@ namespace Helpdesk.DataLayer
             nicknameDTO = new NicknameDTO();
             nicknameDTO.ID = nickname.StudentId;
             nicknameDTO.Nickname = nickname.NickName;
-            nicknameDTO.SID = nickname.Sid;
+            nicknameDTO.StudentID = nickname.Sid;
 
             return nicknameDTO;
         }

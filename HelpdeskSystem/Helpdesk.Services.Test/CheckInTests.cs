@@ -63,6 +63,7 @@ namespace Helpdesk.Services.Test
                 Assert.AreEqual(request.UnitID, checkInHistory.UnitId);
                 var timeDiff = baseTime.CompareTo(addTime);
                 Assert.IsTrue(timeDiff == -1);
+                Assert.AreEqual(request.StudentID, checkInHistory.StudentId);
 
                 Nicknames nicknames = context.Nicknames.FirstOrDefault(n => n.StudentId == checkInHistory.StudentId);
 
@@ -119,7 +120,40 @@ namespace Helpdesk.Services.Test
                 Assert.AreEqual(request.UnitID, checkInHistory.UnitId);
                 var timeDiff = baseTime.CompareTo(addTime);
                 Assert.IsTrue(timeDiff == -1);
+                Assert.AreEqual(request.StudentID, checkInHistory.StudentId);
             }
+        }
+
+        /// <summary>
+        /// Tests checking in with a student id that doesn't exist is handled properly
+        /// </summary>
+        [TestMethod]
+        public void CheckInExistingStudentNotFound()
+        {
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Unit.Add(unit);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                UnitID = unit.UnitId,
+                StudentID = -1
+            };
+
+            CheckInFacade facade = new CheckInFacade();
+
+            CheckInResponse response = facade.CheckIn(request);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
         }
 
         /// <summary>
@@ -145,6 +179,46 @@ namespace Helpdesk.Services.Test
             {
                 UnitID = unit.UnitId,
                 SID = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            CheckInFacade facade = new CheckInFacade();
+
+            CheckInResponse response = facade.CheckIn(request);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
+        }
+
+        /// <summary>
+        /// Tests checking in a with a new student with an existing nickname is handled properly
+        /// </summary>
+        [TestMethod]
+        public void CheckInNewStudentExistingNickname()
+        {
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            Nicknames nickname = new Nicknames()
+            {
+                NickName = AlphaNumericStringGenerator.GetString(10),
+                Sid = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Unit.Add(unit);
+                context.Nicknames.Add(nickname);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                UnitID = unit.UnitId,
+                SID = AlphaNumericStringGenerator.GetStudentIDString(),
+                Nickname = nickname.NickName
             };
 
             CheckInFacade facade = new CheckInFacade();
@@ -192,7 +266,22 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void CheckInNoUnit()
         {
-            CheckInRequest request = new CheckInRequest();
+            Nicknames nickname = new Nicknames()
+            {
+                NickName = AlphaNumericStringGenerator.GetString(10),
+                Sid = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Nicknames.Add(nickname);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                SID = nickname.Sid
+            };
 
             CheckInFacade facade = new CheckInFacade();
 
@@ -202,10 +291,10 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// Test checking out works 
+        /// Test checking out works with no forced checkout
         /// </summary>
         [TestMethod]
-        public void CheckOut()
+        public void CheckOutNotForced()
         {
             Unit unit = new Unit()
             {
@@ -234,7 +323,12 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, response.Status);
             Assert.IsTrue(response.CheckInID > 0);
 
-            CheckOutResponse coResponse = facade.CheckOut(response.CheckInID);
+            CheckOutRequest coRequest = new CheckOutRequest()
+            {
+                ForcedCheckout = false
+            };
+
+            CheckOutResponse coResponse = facade.CheckOut(coRequest, response.CheckInID);
 
             Assert.AreEqual(HttpStatusCode.OK, coResponse.Status);
             Assert.IsTrue(coResponse.Result);
@@ -250,9 +344,65 @@ namespace Helpdesk.Services.Test
                 var timeDiff = baseTime.CompareTo(addTime);
                 Assert.IsTrue(timeDiff == -1);
 
-                byte testValue = 0;
+                Assert.AreEqual(coRequest.ForcedCheckout, checkOut.ForcedCheckout);
+            }
+        }
 
-                Assert.AreEqual(testValue, checkOut.ForcedCheckout);
+        /// <summary>
+        /// Test checking out works with forced checkout
+        /// </summary>
+        [TestMethod]
+        public void CheckOutForced()
+        {
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Unit.Add(unit);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                UnitID = unit.UnitId,
+                Nickname = AlphaNumericStringGenerator.GetString(10),
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            CheckInFacade facade = new CheckInFacade();
+
+            CheckInResponse response = facade.CheckIn(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.CheckInID > 0);
+
+            CheckOutRequest coRequest = new CheckOutRequest()
+            {
+                ForcedCheckout = true
+            };
+
+            CheckOutResponse coResponse = facade.CheckOut(coRequest, response.CheckInID);
+
+            Assert.AreEqual(HttpStatusCode.OK, coResponse.Status);
+            Assert.IsTrue(coResponse.Result);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Checkinhistory checkOut = context.Checkinhistory.FirstOrDefault(co => co.CheckInId == response.CheckInID);
+
+                Assert.IsNotNull(checkOut);
+
+                var baseTime = DateTime.Now.AddMinutes(-1);
+                var addTime = checkOut.CheckoutTime;
+                var timeDiff = baseTime.CompareTo(addTime);
+                Assert.IsTrue(timeDiff == -1);
+
+                Assert.AreEqual(coRequest.ForcedCheckout, checkOut.ForcedCheckout);
             }
         }
 
@@ -264,9 +414,202 @@ namespace Helpdesk.Services.Test
         {
             CheckInFacade facade = new CheckInFacade();
 
-            CheckOutResponse coResponse = facade.CheckOut(-1);
+            CheckOutRequest request = new CheckOutRequest()
+            {
+                ForcedCheckout = false
+            };
+
+            CheckOutResponse coResponse = facade.CheckOut(request, -1);
 
             Assert.AreEqual(HttpStatusCode.NotFound, coResponse.Status);
+        }
+
+        /// <summary>
+        /// This tests that the get checkins by helpdesk id workds
+        /// </summary>
+        [TestMethod]
+        public void GetCheckinsNoCheckedOut()
+        {
+            var helpdesk = new Helpdesksettings()
+            {
+                Name = AlphaNumericStringGenerator.GetString(8),
+                HasCheckIn = true,
+                IsDeleted = false
+            };
+
+            var unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(6),
+                Name = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Helpdesksettings.Add(helpdesk);
+                context.Unit.Add(unit);
+
+                context.SaveChanges();
+
+                context.Helpdeskunit.Add(new Helpdeskunit()
+                {
+                    HelpdeskId = helpdesk.HelpdeskId,
+                    UnitId = unit.UnitId
+                });
+
+                var student = new Nicknames()
+                {
+                    NickName = AlphaNumericStringGenerator.GetString(8),
+                    Sid = AlphaNumericStringGenerator.GetStudentIDString()
+                };
+
+                var student2 = new Nicknames()
+                {
+                    NickName = AlphaNumericStringGenerator.GetString(8),
+                    Sid = AlphaNumericStringGenerator.GetStudentIDString()
+                };
+
+                context.Nicknames.Add(student);
+                context.Nicknames.Add(student2);
+
+                context.SaveChanges();
+
+                var checkIn = new Checkinhistory()
+                {
+                    UnitId = unit.UnitId,
+                    StudentId = student.StudentId,
+                    CheckInTime = DateTime.Now,
+                };
+
+                var checkIn2 = new Checkinhistory()
+                {
+                    UnitId = unit.UnitId,
+                    StudentId = student2.StudentId,
+                    CheckInTime = DateTime.Now,
+                };
+
+                context.Checkinhistory.Add(checkIn);
+                context.Checkinhistory.Add(checkIn2);
+
+                context.SaveChanges();
+            }
+
+            var facade = new CheckInFacade();
+            var response = facade.GetCheckInsByHelpdeskId(helpdesk.HelpdeskId);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.CheckIns.Count == 2);
+        }
+
+        /// <summary>
+        /// Makes sure that get checkins by helpdesk id only gets still checked in items
+        /// </summary>
+        [TestMethod]
+        public void GetCheckinsTwoCheckedOut()
+        {
+            var checkIn = new Checkinhistory();
+            var checkIn2 = new Checkinhistory();
+            var checkIn3 = new Checkinhistory();
+
+            var helpdesk = new Helpdesksettings()
+            {
+                Name = AlphaNumericStringGenerator.GetString(8),
+                HasCheckIn = true,
+                IsDeleted = false
+            };
+
+            var unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(6),
+                Name = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Helpdesksettings.Add(helpdesk);
+                context.Unit.Add(unit);
+
+                context.SaveChanges();
+
+                context.Helpdeskunit.Add(new Helpdeskunit()
+                {
+                    HelpdeskId = helpdesk.HelpdeskId,
+                    UnitId = unit.UnitId
+                });
+
+                var student = new Nicknames()
+                {
+                    NickName = AlphaNumericStringGenerator.GetString(8),
+                    Sid = AlphaNumericStringGenerator.GetStudentIDString()
+                };
+
+                var student2 = new Nicknames()
+                {
+                    NickName = AlphaNumericStringGenerator.GetString(8),
+                    Sid = AlphaNumericStringGenerator.GetStudentIDString()
+                };
+
+                var student3 = new Nicknames()
+                {
+                    NickName = AlphaNumericStringGenerator.GetString(8),
+                    Sid = AlphaNumericStringGenerator.GetStudentIDString()
+                };
+
+                context.Nicknames.Add(student);
+                context.Nicknames.Add(student2);
+                context.Nicknames.Add(student3);
+
+                context.SaveChanges();
+
+                checkIn = new Checkinhistory()
+                {
+                    UnitId = unit.UnitId,
+                    StudentId = student.StudentId,
+                    CheckInTime = DateTime.Now,
+                };
+
+                context.Checkinhistory.Add(checkIn);
+
+                checkIn2 = new Checkinhistory()
+                {
+                    UnitId = unit.UnitId,
+                    StudentId = student2.StudentId,
+                    CheckInTime = DateTime.Now,
+                };
+
+                checkIn3 = new Checkinhistory()
+                {
+                    UnitId = unit.UnitId,
+                    StudentId = student3.StudentId,
+                    CheckInTime = DateTime.Now,
+                };
+                context.Checkinhistory.Add(checkIn);
+                context.Checkinhistory.Add(checkIn2);
+                context.Checkinhistory.Add(checkIn3);
+
+                context.SaveChanges();
+            }
+
+            var facade = new CheckInFacade();
+            var response = facade.GetCheckInsByHelpdeskId(helpdesk.HelpdeskId);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.CheckIns.Count == 3);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                checkIn.CheckoutTime = DateTime.Now;
+                checkIn3.ForcedCheckout = true;
+                context.Update(checkIn);
+                context.Update(checkIn3);
+                context.SaveChanges();
+            }
+
+            response = facade.GetCheckInsByHelpdeskId(helpdesk.HelpdeskId);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.CheckIns.Count == 1);
         }
     }
 }

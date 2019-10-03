@@ -1,0 +1,94 @@
+<div class="container">
+    <h1>{{helpdesk.name}}</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <button *ngIf="helpdesk.hasCheckIn" class="btn btn-primary checkin-button" data-toggle="modal" data-target="#modal-check-in"
+            [ngClass]="{'check-in-button-large': !helpdesk.hasQueue}">
+                Check In<br />
+                <span [ngClass]="{'check-in-count-small': helpdesk.hasQueue, 'check-in-count-large': !helpdesk.hasQueue}">Checked In: {{checkIns.length}}</span>
+            </button>
+            <button *ngIf="helpdesk.hasCheckIn" class="btn btn-secondary checkout-button" data-toggle="modal" data-target="#modal-check-out"
+            [ngClass]="{'check-in-button-large': !helpdesk.hasQueue}">
+                Checkout
+            </button>
+        </div>
+    </div>
+    <div *ngIf="helpdesk.hasCheckIn" class="row">
+        <!-- Check in Modal -->
+        <div class="modal fade" id="modal-check-in" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form [formGroup]="checkInForm" (ngSubmit)="checkIn(checkInForm.value)">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="checkInModalLabel">Check In</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" class="form-control" formControlName="modalStudentId" id="modalStudentId"
+                                name="modalStudentId">
+                            <div class="form-group">
+                                <label for="modalSID">Student ID</label>
+                                <input type="text" class="form-control" formControlName="modalSID"
+                                    id="modalSID" name="modalSID" placeholder="What is your student id?"
+                                    (blur)="validateNickname()"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalNickname">Nickname</label>
+                                <input type="text" class="form-control" id="modalNickname"
+                                    formControlName="modalNickname" name="modalNickname" placeholder="What is your nickname?"
+                                    (blur)="validateNickname()"
+                                    required>
+                            </div>
+                            <div class="form-group" *ngIf="!helpdesk.hasQueue">
+                                <label for="modalUnitId">Unit:</label>
+                                <select class="form-control" id="modalUnitId" name="modalUnitId" formControlName="modalUnitId">
+                                    <option value="">Which unit are you studying?</option>
+                                    <option *ngFor="let unit of units" value="{{unit.unitId}}">
+                                        {{unit.name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="reset" class="btn btn-secondary" (click)="closeCheckIn()" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Check In</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Check out Modal -->
+        <div class="modal fade" id="modal-check-out" tabindex="-1" role="dialog" data-backdrop="static">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form [formGroup]="checkOutForm" (ngSubmit)="checkOut()">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="checkOutModalLabel">Check Out</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="checkOutStudentId">Checked In:</label>
+                                <select class="form-control" id="checkOutStudentId" name="checkOutStudentId" formControlName="checkOutStudentId">
+                                    <option value="">What is your nickname?</option>
+                                    <option *ngFor="let checkIn of checkIns" value="{{checkIn.checkInId}}">
+                                        {{checkIn.nickname}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="reset" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Check Out</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

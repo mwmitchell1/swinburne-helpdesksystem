@@ -1,0 +1,86 @@
+<h2>Settings</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <form [formGroup]="configForm" (ngSubmit)="UpdateHelpdesk()">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="name">Helpdesk Name</label>
+                        <input name="name" type="name" class="form-control" formControlName="name"
+                            id="name" required>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            Uses Queue
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 radio">
+                            <div class="radio">
+                                <label><input type="radio" name="hasQueue" value="true" formControlName="hasQueue"> Yes</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 radio">
+                            <div class="radio">
+                                <label><input type="radio" name="hasQueue" value="false" formControlName="hasQueue"> No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            Uses Check In
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 radio">
+                            <div class="radio">
+                                <label><input type="radio" name="hasCheck" value="true" formControlName="hasCheck"> Yes</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 radio">
+                            <div class="radio">
+                                <label><input type="radio" name="hasCheck" value="false" formControlName="hasCheck"> No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            Is Disabled
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 radio">
+                            <div class="radio">
+                                <label><input type="radio" ng-value="" name="isDisabled" value="true" formControlName="isDisabled"> Yes</label>
+                            </div>
+                        </div>
+                        <div class="col-md-3 radio">
+                            <div class="radio">
+                                <label><input type="radio" name="isDisabled" value="false" formControlName="isDisabled"> No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary float-right">Save</button>
+                    <button type="button" class="btn btn-secondary float-left" (click)="ClearHelpdesk()">Clear Helpdesk Items</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

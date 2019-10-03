@@ -15,7 +15,6 @@ namespace Helpdesk.Website.Controllers.api
     /// <summary>
     /// Used as the access point for any features relating to checking in
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/checkin")]
     [ApiController]
     public class CheckInController : BaseApiController
@@ -29,9 +28,6 @@ namespace Helpdesk.Website.Controllers.api
         [Route("")]
         public IActionResult CheckIn([FromBody] CheckInRequest request)
         {
-            if (!IsAuthorized())
-                return Unauthorized();
-
             try
             {
                 var facade = new CheckInFacade();
@@ -63,16 +59,13 @@ namespace Helpdesk.Website.Controllers.api
         /// <param name="request">Request containing the specific CheckInID to be associated with checking out</param>
         /// <returns>A response indicating success or failure</returns>
         [HttpPost]
-        [Route("checkout/{id}")]
-        public IActionResult CheckOut([FromRoute] int id)
+        [Route("{id}")]
+        public IActionResult CheckOut([FromBody] CheckOutRequest request, [FromRoute] int id)
         {
-            if (!IsAuthorized())
-                return Unauthorized();
-
             try
             {
                 var facade = new CheckInFacade();
-                var response = facade.CheckOut(id);
+                var response = facade.CheckOut(request, id);
 
                 switch (response.Status)
                 {
@@ -90,6 +83,40 @@ namespace Helpdesk.Website.Controllers.api
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to check out.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Used to get the check ins for a helpdesk
+        /// </summary>
+        /// <param name="id">The id of the helpdesk</param>
+        /// <returns>A response with the list of check ins and success indications</returns>
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetCheckInsByHelpdeskID([FromRoute] int id)
+        {
+            try
+            {
+                var facade = new CheckInFacade();
+                var response = facade.GetCheckInsByHelpdeskId(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get check ins.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }

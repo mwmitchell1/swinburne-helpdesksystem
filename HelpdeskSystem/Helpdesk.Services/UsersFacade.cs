@@ -33,7 +33,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for retrieving all users from the database
+        /// This method is responsible for retrieving all users from the helpdesk system
         /// </summary>
         /// <returns>The response that indicates if the operation was a success,
         /// and the list of users</returns>
@@ -48,11 +48,6 @@ namespace Helpdesk.Services
                 var dataLayer = new UsersDataLayer();
 
                 List<UserDTO> users = dataLayer.GetUsers();
-
-                if (users.Count == 0)
-                {
-                    throw new NotFoundException("No users found!");
-                }
 
                 response.Users = users;
                 response.Status = HttpStatusCode.OK;
@@ -73,7 +68,7 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for getting a specific user from the database
+        /// This method is responsible for getting a specific user from the helpdesk system
         /// </summary>
         /// <param name="id">The UserId of the specific user to be retrieved</param>
         /// <returns>The response that indicates if the operation was a success,
@@ -182,9 +177,7 @@ namespace Helpdesk.Services
                 response = (UpdateUserResponse)request.CheckValidation(response);
 
                 if (response.Status == HttpStatusCode.BadRequest)
-                {
                     return response;
-                }
 
                 request.Password = HashText(request.Password);
 
@@ -213,8 +206,8 @@ namespace Helpdesk.Services
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to update user!");
-                response.Status = HttpStatusCode.InternalServerError;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to update user!"));
+                response.Status = HttpStatusCode.Forbidden;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.Forbidden, "Unable to update user!"));
             }
             return response;
         }
@@ -303,13 +296,6 @@ namespace Helpdesk.Services
                     return response;
                 }
 
-                if (user.FirstTime)
-                {
-                    response.Status = HttpStatusCode.Accepted;
-                    response.UserId = user.UserId;
-                    return response;
-                }
-
                 // Generate users bearer token
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(_appSettings.AppSecret);
@@ -328,6 +314,14 @@ namespace Helpdesk.Services
                 var token = tokenHandler.WriteToken(rawToken);
 
                 response.Token = token;
+
+                if (user.FirstTime)
+                {
+                    response.Status = HttpStatusCode.Accepted;
+                    response.UserId = user.UserId;
+                    return response;
+                }
+
                 response.Status = HttpStatusCode.OK;
             }
             catch (Exception ex)
@@ -365,7 +359,7 @@ namespace Helpdesk.Services
 
                 UserDTO userFromUsername = dataLayer.GetUserByUsername(username);
 
-                if (!(userFromID.UserId == userFromUsername.UserId && userFromID.Username == userFromUsername.Username))
+                if (!(userFromID.UserId == userFromUsername.UserId && userFromID.Username == userFromUsername.Username && (!userFromID.FirstTime)))
                 {
                     s_logger.Warn("Unable to verify user.");
                     result = false;

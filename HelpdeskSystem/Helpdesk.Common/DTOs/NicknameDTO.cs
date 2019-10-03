@@ -10,6 +10,6 @@ namespace Helpdesk.Common.DTOs
 
         public string Nickname { get; set; }
 
-        public string SID { get; set; }
+        public string StudentID { get; set; }
     }
 }

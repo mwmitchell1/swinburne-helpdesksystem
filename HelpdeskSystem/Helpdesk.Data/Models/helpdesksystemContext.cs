@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Helpdesk.Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Helpdesk.Data.Models
 {
@@ -33,7 +33,10 @@ namespace Helpdesk.Data.Models
             {
                 AppSettings appSettings = new AppSettings();
 
-                optionsBuilder.UseMySQL(appSettings.DefaultConnection);
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    optionsBuilder.UseSqlServer(appSettings.WindowsConnectionString);
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                    optionsBuilder.UseSqlServer(appSettings.MacConnectionString);
             }
         }
 
@@ -45,8 +48,6 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.CheckInId);
 
-                entity.ToTable("checkinhistory", "helpdesksystem");
-
                 entity.HasIndex(e => e.StudentId)
                     .HasName("StudentID");
 
@@ -55,17 +56,17 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.CheckInId)
                     .HasColumnName("CheckInID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
-                entity.Property(e => e.ForcedCheckout).HasColumnType("tinyint(1)");
+                entity.Property(e => e.ForcedCheckout).HasColumnType("bit");
 
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.HasOne(d => d.Student)
                     .WithMany(p => p.Checkinhistory)
@@ -82,7 +83,6 @@ namespace Helpdesk.Data.Models
 
             modelBuilder.Entity<Checkinqueueitem>(entity =>
             {
-                entity.ToTable("checkinqueueitem", "helpdesksystem");
 
                 entity.HasIndex(e => e.CheckInId)
                     .HasName("CheckInID");
@@ -92,15 +92,15 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.CheckInId)
                     .HasColumnName("CheckInID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.QueueItemId)
                     .HasColumnName("QueueItemID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.HasOne(d => d.CheckIn)
                     .WithMany(p => p.Checkinqueueitem)
@@ -119,17 +119,15 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.HelpdeskId);
 
-                entity.ToTable("helpdesksettings", "helpdesksystem");
-
                 entity.Property(e => e.HelpdeskId)
                     .HasColumnName("HelpdeskID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+                entity.Property(e => e.IsDeleted).HasColumnType("bit");
 
-                entity.Property(e => e.HasCheckIn).HasColumnType("tinyint(1)");
+                entity.Property(e => e.HasCheckIn).HasColumnType("bit");
 
-                entity.Property(e => e.HasQueue).HasColumnType("tinyint(1)");
+                entity.Property(e => e.HasQueue).HasColumnType("bit");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -139,7 +137,6 @@ namespace Helpdesk.Data.Models
 
             modelBuilder.Entity<Helpdeskunit>(entity =>
             {
-                entity.ToTable("helpdeskunit", "helpdesksystem");
 
                 entity.HasIndex(e => e.HelpdeskId)
                     .HasName("HelpdeskID");
@@ -176,15 +173,13 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.StudentId);
 
-                entity.ToTable("nicknames", "helpdesksystem");
-
                 entity.HasIndex(e => e.NickName)
                     .HasName("NickName")
                     .IsUnique();
 
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.NickName)
                     .IsRequired()
@@ -201,8 +196,6 @@ namespace Helpdesk.Data.Models
             modelBuilder.Entity<Queueitem>(entity =>
             {
                 entity.HasKey(e => e.ItemId);
-
-                entity.ToTable("queueitem", "helpdesksystem");
 
                 entity.HasIndex(e => e.StudentId)
                     .HasName("StudentID");
@@ -239,8 +232,6 @@ namespace Helpdesk.Data.Models
             {
                 entity.HasKey(e => e.SpanId);
 
-                entity.ToTable("timespans", "helpdesksystem");
-
                 entity.Property(e => e.SpanId)
                     .HasColumnName("SpanID")
                     .HasColumnType("int(11)");
@@ -262,7 +253,6 @@ namespace Helpdesk.Data.Models
 
             modelBuilder.Entity<Topic>(entity =>
             {
-                entity.ToTable("topic", "helpdesksystem");
 
                 entity.HasIndex(e => e.UnitId)
                     .HasName("UnitID");
@@ -271,7 +261,7 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("TopicID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+                entity.Property(e => e.IsDeleted).HasColumnType("bit");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -291,13 +281,11 @@ namespace Helpdesk.Data.Models
 
             modelBuilder.Entity<Unit>(entity =>
             {
-                entity.ToTable("unit", "helpdesksystem");
-
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.IsDeleted).HasColumnType("tinyint(1)");
+                entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 
                 entity.Property(e => e.Code)
                     .IsRequired()
@@ -312,8 +300,6 @@ namespace Helpdesk.Data.Models
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("user", "helpdesksystem");
-
                 entity.HasIndex(e => e.Username)
                     .HasName("Username")
                     .IsUnique();
@@ -324,7 +310,7 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.FirstTime)
                 .HasColumnName("FirstTime")
-                .HasColumnType("tinyint(1)");
+                .HasColumnType("bit");
 
                 entity.Property(e => e.Password)
                     .IsRequired();

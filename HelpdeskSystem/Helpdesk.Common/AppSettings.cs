@@ -13,7 +13,9 @@ namespace Helpdesk.Common
     /// </summary>
     public class AppSettings
     {
-        public string DefaultConnection { get; } = string.Empty;
+        public string WindowsConnectionString { get; } = string.Empty;
+
+        public string MacConnectionString { get; set; }
 
         public string AppSecret { get; set; }
 
@@ -29,12 +31,15 @@ namespace Helpdesk.Common
 
             var root = configurationBuilder.Build();
 
-            DefaultConnection = root.GetConnectionString("DefaultConnection");
+            WindowsConnectionString = root.GetConnectionString("Windows");
+            MacConnectionString = root.GetConnectionString("Mac");
+
             AppSecret = root.GetSection("AppSettings").GetSection("Secret").Value;
             DatabaseBackupDestination = root.GetSection("AppSettings").GetSection("DatabaseBackupDestination").Value;
 
             var appSetting = root.GetSection("ApplicationSettings");
             Jobs.Add("ExportDatabaseJob", root.GetSection("Jobs").GetSection("ExportDatabaseJob").Value);
+            Jobs.Add("DailyCleanupJob", root.GetSection("Jobs").GetSection("DailyCleanupJob").Value);
         }
 
     }

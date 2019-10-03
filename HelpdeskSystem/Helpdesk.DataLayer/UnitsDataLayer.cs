@@ -33,7 +33,7 @@ namespace Helpdesk.DataLayer
                         Unit newUnit = new Unit()
                         {
                             Code = request.Code,
-                            IsDeleted = false,
+                            IsDeleted = request.IsDeleted,
                             Name = request.Name
                         };
 
@@ -90,7 +90,7 @@ namespace Helpdesk.DataLayer
             UnitDTO dto = null;
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var unit = context.Unit.FirstOrDefault(u => u.UnitId == id);
+                var unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == id);
                 if (unit != null)
                 {
                     dto = DAO2DTO(unit);
@@ -113,7 +113,7 @@ namespace Helpdesk.DataLayer
             {
                 var unitIds = context.Helpdeskunit.Where(hu => hu.HelpdeskId == helpdeskId).Select(u => u.UnitId).ToList();
 
-                var unit = context.Unit.Include("Helpdeskunit").FirstOrDefault(u => u.Name.Equals(name) && unitIds.Contains(u.UnitId));
+                var unit = context.Unit.Include("Topic").Include("Helpdeskunit").FirstOrDefault(u => u.Name.Equals(name) && unitIds.Contains(u.UnitId));
                 if (unit != null)
                 {
                     dto = DAO2DTO(unit);
@@ -135,7 +135,7 @@ namespace Helpdesk.DataLayer
             {
                 var unitIds = context.Helpdeskunit.Where(hu => hu.HelpdeskId == helpdeskId).Select(u => u.UnitId).ToList();
 
-                var unit = context.Unit.Include("Helpdeskunit").FirstOrDefault(u => u.Code.Equals(code) && unitIds.Contains(u.UnitId));
+                var unit = context.Unit.Include("Helpdeskunit").Include("Topic").FirstOrDefault(u => u.Code.Equals(code) && unitIds.Contains(u.UnitId));
                 if (unit != null)
                 {
                     dto = DAO2DTO(unit);
@@ -150,7 +150,7 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="id">ID of the helpdesk to retrieve from</param>
         /// <returns>A list of unit DTOs</returns>
-        public List<UnitDTO> GetUnitsByHelpdeskID(int id)
+        public List<UnitDTO> GetUnitsByHelpdeskID(int id, bool getActive)
         {
             List<UnitDTO> unitDTOs = new List<UnitDTO>();
 
@@ -160,12 +160,12 @@ namespace Helpdesk.DataLayer
 
                 foreach (Helpdeskunit helpdeskUnit in helpdeskUnits)
                 {
-                    Unit unit = context.Unit.FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId);
+                    Unit unit = context.Unit.Include("Topic").FirstOrDefault(u => u.UnitId == helpdeskUnit.UnitId);
 
-                    if(!unit.IsDeleted)
-                    {
+                    if (getActive && !unit.IsDeleted)
                         unitDTOs.Add(DAO2DTO(unit));
-                    }
+                    else if (!getActive)
+                        unitDTOs.Add(DAO2DTO(unit));
                 }
             }
 
@@ -192,7 +192,7 @@ namespace Helpdesk.DataLayer
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = "getallhelpdesks";
+                        cmd.CommandText = "GetAllHelpdesks";
                         cmd.CommandType = CommandType.StoredProcedure;
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -312,6 +312,21 @@ namespace Helpdesk.DataLayer
             unitDTO.Code = unit.Code;
             unitDTO.Name = unit.Name;
             unitDTO.IsDeleted = unit.IsDeleted;
+
+            foreach (Topic topic in unit.Topic)
+            {
+                if (!topic.IsDeleted)
+                {
+                    unitDTO.Topics.Add(
+                        new TopicDTO()
+                        {
+                            Name = topic.Name,
+                            IsDeleted = topic.IsDeleted,
+                            TopicId = topic.TopicId,
+                            UnitId = topic.UnitId
+                        });
+                }
+            }
 
             return unitDTO;
         }

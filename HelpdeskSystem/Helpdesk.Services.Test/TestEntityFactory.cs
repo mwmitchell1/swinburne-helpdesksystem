@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using Helpdesk.Common.Requests;
+using Helpdesk.Common.Requests.CheckIn;
 using Helpdesk.Common.Requests.Helpdesk;
 using Helpdesk.Common.Requests.Queue;
+using Helpdesk.Common.Requests.Students;
 using Helpdesk.Common.Requests.Units;
 using Helpdesk.Common.Responses;
+using Helpdesk.Common.Responses.CheckIn;
 using Helpdesk.Common.Responses.Helpdesk;
 using Helpdesk.Common.Responses.Queue;
+using Helpdesk.Common.Responses.Students;
 using Helpdesk.Common.Responses.Units;
 using Helpdesk.Common.Utilities;
 
@@ -40,6 +44,9 @@ namespace Helpdesk.Services.Test
         public AddUpdateUnitResponse Response { get; }
     }
 
+    /// <summary>
+    /// Queue test data to be returned by TestEntityFactory. Includes Request and Response used for DB entity creation.
+    /// </summary>
     public class TestDataQueue
     {
         public TestDataQueue(AddToQueueRequest request, AddToQueueResponse response)
@@ -49,6 +56,34 @@ namespace Helpdesk.Services.Test
         }
         public AddToQueueRequest Request { get; }
         public AddToQueueResponse Response { get; }
+    }
+
+    /// <summary>
+    /// Check in test data to be returned by TestEntityFactory. Includes Request and Response used for DB entity creation.
+    /// </summary>
+    public class TestDataCheckIn
+    {
+        public TestDataCheckIn(CheckInRequest request, CheckInResponse response)
+        {
+            Request = request;
+            Response = response;
+        }
+        public CheckInRequest Request { get; }
+        public CheckInResponse Response { get; }
+    }
+
+    /// <summary>
+    /// Nickname test data to be returned by TestEntityFactory. Includes Request and Response used for DB entity creation.
+    /// </summary>
+    public class TestDataNickname
+    {
+        public TestDataNickname(AddStudentRequest request, AddStudentResponse response)
+        {
+            Request = request;
+            Response = response;
+        }
+        public AddStudentRequest Request { get; }
+        public AddStudentResponse Response { get; }
     }
 
     /// <summary>
@@ -65,7 +100,10 @@ namespace Helpdesk.Services.Test
         {
             HelpdeskFacade = new HelpdeskFacade();
             UnitsFacade = new UnitsFacade();
+            TopicsFacade = new TopicsFacade();
             QueueFacade = new QueueFacade();
+            CheckInFacade = new CheckInFacade();
+            StudentFacade = new StudentFacade();
         }
 
         /// <summary>
@@ -79,6 +117,8 @@ namespace Helpdesk.Services.Test
         {
             var request = new AddHelpdeskRequest();
             if (name == "" && PopulateEmptyStrings) request.Name = AlphaNumericStringGenerator.GetString(10); else request.Name = name;
+
+            request.Name = string.IsNullOrEmpty(name) && PopulateEmptyStrings ? AlphaNumericStringGenerator.GetString(10) : name;
 
             request.HasCheckIn = (bool)hasCheckin;
             request.HasQueue = (bool)hasQueue;
@@ -143,6 +183,46 @@ namespace Helpdesk.Services.Test
             return data;
         }
 
+        public TestDataCheckIn AddCheckIn(int? studentID = null, string nickname = "", string sID = "", int? unitID = null)
+        {
+            var request = new CheckInRequest();
+
+            if (studentID != null) request.StudentID = studentID;
+            if (nickname != null)
+            {
+                if (nickname == "" && PopulateEmptyStrings) request.Nickname = AlphaNumericStringGenerator.GetString(20); else request.Nickname = nickname;
+            }
+            if (sID != null)
+            {
+                if (sID == "" && PopulateEmptyStrings) request.SID = AlphaNumericStringGenerator.GetStudentIDString(); else request.SID = sID;
+            }
+            if (unitID != null) request.UnitID = (int)unitID;
+
+            var response = CheckInFacade.CheckIn(request);
+
+            TestDataCheckIn data = new TestDataCheckIn(request, response);
+            return data;
+        }
+
+        public TestDataNickname AddNickname(string sID = "", string nickname = "")
+        {
+            var request = new AddStudentRequest();
+
+            if (sID != null)
+            {
+                if (sID == "" && PopulateEmptyStrings) request.SID = AlphaNumericStringGenerator.GetStudentIDString(); else request.SID = sID;
+            }
+            if (nickname != null)
+            {
+                if (nickname == "" && PopulateEmptyStrings) request.Nickname = AlphaNumericStringGenerator.GetString(20); else request.Nickname = nickname;
+            }
+
+            var response = StudentFacade.AddStudentNickname(request);
+
+            TestDataNickname data = new TestDataNickname(request, response);
+            return data;
+        }
+
 
         // GETTERS & SETTERS
 
@@ -151,5 +231,8 @@ namespace Helpdesk.Services.Test
         public HelpdeskFacade HelpdeskFacade { get; }
         public UnitsFacade UnitsFacade { get; }
         public QueueFacade QueueFacade { get; }
+        public CheckInFacade CheckInFacade { get; }
+        public StudentFacade StudentFacade { get; }
+        public TopicsFacade TopicsFacade { get; }
     }
 }
