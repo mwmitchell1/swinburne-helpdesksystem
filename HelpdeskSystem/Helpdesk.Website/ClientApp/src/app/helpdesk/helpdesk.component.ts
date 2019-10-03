@@ -83,7 +83,7 @@ export class HelpdeskComponent implements OnInit {
 
     if (!this.checkInForm.valid) {
 
-      if (!this.checkInForm.controls.modalStudentId.value) {
+      if (!this.checkInForm.controls.modalSID.value) {
         this.notifier.notify('warning', 'You must enter in your Student ID.');
       }
 
@@ -101,8 +101,8 @@ export class HelpdeskComponent implements OnInit {
 
     var request = new CheckInRequest();
     request.Nickname = this.checkInForm.controls.modalNickname.value;
+    request.StudentId = this.checkInForm.controls.modalStudentId.value;
     request.SID = this.checkInForm.controls.modalSID.value;
-    request.StudentID = this.checkInForm.controls.modalStudentId.value;
     request.UnitID = this.checkInForm.controls.modalUnitId.value;
     this.service.checkIn(request).subscribe(
       result => {
@@ -159,19 +159,19 @@ export class HelpdeskComponent implements OnInit {
 
     var request = new ValidateNicknameRequest();
     request.Name = this.checkInForm.controls.modalNickname.value;
-    request.SID = this.checkInForm.controls.modalStudentId.value;
+    request.SID = this.checkInForm.controls.modalSID.value;
 
     this.nicknameService.validateNickname(request).subscribe(
       result => {
         if (result.status == 202) {
           if (result.sid)
-            this.checkInForm.controls.modalSID.setValue(result.sid);
+            this.checkInForm.controls.modalSID.setValue(result.studentId);
 
           if (result.nickname)
             this.checkInForm.controls.modalNickname.setValue(result.nickname);
 
           if (result.studentId)
-            this.checkInForm.controls.modalStudentId.setValue(result.studentId);
+            this.checkInForm.controls.modalStudentId.setValue(result.sid);
 
         }
       },

@@ -65,7 +65,7 @@ namespace Helpdesk.Services
                 using (helpdesksystemContext context = new helpdesksystemContext())
                 {
                     if (context.Nicknames.FirstOrDefault(n => n.StudentId == request.StudentID) == null)
-                        throw new NotFoundException("No student found for id " + request.StudentID);
+                            throw new NotFoundException("No student found for id " + request.StudentID);
                 }
 
                 CheckInDataLayer dataLayer = new CheckInDataLayer();
