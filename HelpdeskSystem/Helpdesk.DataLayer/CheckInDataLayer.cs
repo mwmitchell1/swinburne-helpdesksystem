@@ -32,7 +32,7 @@ namespace Helpdesk.DataLayer
                 {
                     UnitId = request.UnitID,
                     CheckInTime = DateTime.Now,
-                    StudentId = request.SID
+                    StudentId = request.StudentID
                 };
 
                 context.Checkinhistory.Add(checkIn);

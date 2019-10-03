@@ -10,11 +10,11 @@ namespace Helpdesk.Common.Requests.CheckIn
     /// </summary>
     public class CheckInRequest : BaseRequest
     {
-        public int? SID { get; set; }
+        public int? StudentID { get; set; }
 
         public string Nickname { get; set; }
 
-        public string StudentID { get; set; }
+        public string SID { get; set; }
 
         public int UnitID { get; set; }
 
@@ -25,9 +25,9 @@ namespace Helpdesk.Common.Requests.CheckIn
             if (UnitID==0)
                 results.Add(new ValidationResult("You must select a unit."));
 
-            if (!SID.HasValue)
+            if (!StudentID.HasValue)
             {
-                if (string.IsNullOrEmpty(Nickname) || string.IsNullOrEmpty(StudentID))
+                if (string.IsNullOrEmpty(Nickname) || string.IsNullOrEmpty(SID))
                     results.Add(new ValidationResult("You must choose a nickname."));
             }
 
