@@ -420,5 +420,38 @@ namespace Helpdesk.Website.Controllers.api
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
+        
+        /// <summary>
+        /// Used to force checkout students and clear queue
+        /// </summary>
+        /// <param name="id">The hepdesk of the ID</param>
+        /// <returns>A response that indicates the result</returns>
+        [HttpDelete]
+        [Route("{id}/clear")]
+        public IActionResult ClearHelpdesk([FromRoute]int id)
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            try
+            {
+                var facade = new HelpdeskFacade();
+                var response = facade.ForceCheckoutQueueRemove(id);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to clear helpdesk queue and/or check ins.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 }
