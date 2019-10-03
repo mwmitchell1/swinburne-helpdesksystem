@@ -1,6 +1,6 @@
 export class CheckInRequest {
-    public StudentID: number;
+    public StudentId?: number;
     public Nickname: string;
-    public SID?: string;
+    public SID: string;
     public UnitID: number;
 }
