@@ -308,20 +308,32 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public int? AddTimeSpan(AddTimeSpanRequest request)
+        public int AddTimeSpan(AddTimeSpanRequest request)
         {
-            int? spanId = null;
+            int spanId;
 
-            Timespans timespan = new Timespans();
-            timespan.HelpdeskId = request.HelpdeskId;
-            timespan.Name = request.Name;
-            timespan.StartDate = request.StartDate;
-            timespan.EndDate = request.EndDate;
+            Timespans timespan = new Timespans
+            {
+                HelpdeskId = request.HelpdeskId,
+                Name = request.Name,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate
+            };
             using (var context = new helpdesksystemContext())
             {
-                context.Timespans.Add(timespan);
-                context.SaveChanges();
-                spanId = timespan.SpanId;
+                Timespans existingTimespan = null;
+                existingTimespan = context.Timespans.FirstOrDefault(t => t.Name == timespan.Name);
+
+                if (existingTimespan == null)
+                {
+                    context.Timespans.Add(timespan);
+                    context.SaveChanges();
+                    spanId = timespan.SpanId;
+                }
+                else
+                {
+                    throw new DuplicateNameException("The nickname " + request.Name + " already exists!");
+                }
             }
             return spanId;
         }
@@ -387,12 +399,23 @@ namespace Helpdesk.DataLayer
 
                 if (timespan == null)
                     return false;
-    
-                timespan.Name = request.Name;
-                timespan.StartDate = request.StartDate;
-                timespan.EndDate = request.EndDate;
 
-                context.SaveChanges();
+                Timespans existingTimespan = null;
+                existingTimespan = context.Timespans.FirstOrDefault(t => t.Name == request.Name);
+
+                // Update if no timespan exists matching the requesting name.
+                // Update anyway if the names match but the the existing timespan is the timespan we want to update.
+                if (existingTimespan == null || existingTimespan.SpanId == id)
+                {
+                    timespan.Name = request.Name;
+                    timespan.StartDate = request.StartDate;
+                    timespan.EndDate = request.EndDate;
+                    context.SaveChanges();
+                }
+                else
+                {
+                    throw new DuplicateNameException("The nickname " + request.Name + " already exists!");
+                }
             }
             return true;
         }
