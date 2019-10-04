@@ -161,6 +161,9 @@ export class HelpdeskComponent implements OnInit {
     request.Name = this.checkInForm.controls.modalNickname.value;
     request.SID = this.checkInForm.controls.modalSID.value;
 
+    if ((!request.SID) && (!request.Name))
+      return;
+
     this.nicknameService.validateNickname(request).subscribe(
       result => {
         if (result.status == 202) {
