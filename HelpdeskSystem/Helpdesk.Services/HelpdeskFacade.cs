@@ -287,28 +287,18 @@ namespace Helpdesk.Services
                     return response;
                 }
 
-                //TODO Need a method to check timespan name in request against names in the database.
-                // Assuming timespans are unique?
-                /*
                 var dataLayer = new HelpdeskDataLayer();
 
-                if (dataLayer.GetTimeSpanByName(request.Name) != null)
-                {
-                    throw new Exception("Unable to add timespan! Timespan already exists!");
-                }
-                */
+                int result = dataLayer.AddTimeSpan(request);
 
-                var dataLayer = new HelpdeskDataLayer();
-
-                int? result = dataLayer.AddTimeSpan(request);
-
-                if (result == null)
-                {
-                    throw new Exception("Unable to add timespan!");
-                }
-
-                response.SpanId = (int)result;
+                response.SpanId = result;
                 response.Status = HttpStatusCode.OK;
+            }
+            catch (DuplicateNameException ex)
+            {
+                s_logger.Error(ex, "Timespan name already exists!");
+                response.Status = HttpStatusCode.BadRequest;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Timespan name already exists!"));
             }
             catch (Exception ex)
             {
@@ -355,6 +345,12 @@ namespace Helpdesk.Services
                 s_logger.Error(ex, "Unable to find timespan!");
                 response.Status = HttpStatusCode.NotFound;
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "Unable to find timespan!"));
+            }
+            catch (DuplicateNameException ex)
+            {
+                s_logger.Error(ex, "Timespan name already exists!");
+                response.Status = HttpStatusCode.BadRequest;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.BadRequest, "Timespan name already exists!"));
             }
             catch (Exception ex)
             {
