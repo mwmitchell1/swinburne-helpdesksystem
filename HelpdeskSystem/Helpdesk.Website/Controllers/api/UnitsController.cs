@@ -17,7 +17,7 @@ namespace Helpdesk.Website.Controllers.api
     {
 
         [HttpPost]
-        [Route("")]
+        [Route("{id}")]
         public IActionResult AddOrUpdateUnit([FromRoute] int id, [FromBody] AddUpdateUnitRequest request)
         {
             if (request == null)

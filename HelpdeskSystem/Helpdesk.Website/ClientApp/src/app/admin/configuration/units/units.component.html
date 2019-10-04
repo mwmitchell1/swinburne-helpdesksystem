@@ -18,9 +18,10 @@
           <td>{{ unit.name }}</td>
           <td>
             <button class="btn btn-danger float-right ml-1" data-toggle="modal" data-target="#modal-unit-delete"
-              [ngClass]="{'disabled': unit.isDeleted}" [attr.disabled]="unit.isDeleted? true : false" (click)="setupDelete(unit.unitId)">Delete</button>
-            <button class="btn btn-secondary float-right" data-toggle="modal" data-target="#modal-unit-edit">
-              <!--(click)="setupEdit(unit)">-->Edit</button>
+              [ngClass]="{'disabled': unit.isDeleted}" [attr.disabled]="unit.isDeleted"
+              (click)="setupDelete(unit.unitId)">Delete</button>
+            <button class="btn btn-secondary float-right" data-toggle="modal" (click)="setUpEdit(unit.unitId)"
+              data-target="#modal-unit-edit">Edit</button>
           </td>
         </tr>
       </tbody>
@@ -48,6 +49,108 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
           <button type="submit" class="btn btn-primary">Yes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add unit Modal -->
+<div class="modal fade" id="modal-unit-add" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add a new unit</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- Modal body and footer wrapped in form -->
+      <form [formGroup]="addForm" (ngSubmit)="addUnit()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="unit-name">Name</label>
+            <input type="text" class="form-control" id="unit-name" name="unit-name" formControlName="unitName" />
+          </div>
+          <div class="form-group">
+            <label for="unit-code">Code</label>
+            <input type="text" class="form-control" id="unit-code" name="unit-code" formControlName="unitCode" />
+          </div>
+          <div class="form-group">
+            <label for="unit-topics">Add Topic</label>
+            <input type="text" class="form-control" id="unit-topic" name="unit-topic" formControlName="unitTopic" />
+            <button type="button" class="btn btn-dark float-right" (click)="addNewTopic()">Add</button>
+          </div>
+          <div>
+            <p>Topics</p>
+            <ul>
+              <li *ngFor="let topic of newTopics">
+                {{topic.name}}
+                <button type="button" class="btn btn-danger" (click)="removeNewTopic(topic)">
+                  Remove
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="CloseAdd()" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!addForm.valid">Add
+            Unit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit unit Modal -->
+<div class="modal fade" id="modal-unit-edit" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form [formGroup]="editForm" (ngSubmit)="editUnit()">
+        <div class="modal-body">
+          <input type="hidden" id="edit-unit-id" name="edit-unit-id" formControlName="editUnitId" />
+          <div class="form-group">
+            <label for="unit-name">Name</label>
+            <input type="text" class="form-control" id="edit-unit-name" name="edit-unit-name"
+              formControlName="editUnitName" />
+          </div>
+          <div class="form-group">
+            <label for="unit-code">Code</label>
+            <input type="text" class="form-control" id="edit-unit-code" name="edit-unit-code"
+              formControlName="editUnitCode" />
+          </div>
+          <div class="form-group">
+            <label for="unit-topics">Add Topic</label>
+            <input type="text" class="form-control" id="edit-unit-topic" name="edit-unit-topic"
+              formControlName="editUnitTopic" />
+            <button type="button" class="btn btn-dark float-right" (click)="addEditTopic()">Add</button>
+          </div>
+          <div>
+            <p>Topics</p>
+            <ul>
+              <li *ngFor="let topic of editTopics">
+                {{topic.name}}
+                <button type="button" class="btn btn-danger" (click)="removeEditTopic(topic)">
+                  Remove
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeEdit()" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" [disabled]="!editForm.valid">Save
+            Unit</button>
         </div>
       </form>
     </div>

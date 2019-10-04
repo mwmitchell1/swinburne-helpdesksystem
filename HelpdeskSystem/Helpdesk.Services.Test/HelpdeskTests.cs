@@ -296,20 +296,64 @@ namespace Helpdesk.Services.Test
         [TestMethod]
         public void AddTimespan()
         {
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            DateTime startDate = DateTime.Today;
-            DateTime endDate = new DateTime(startDate.Year + 1, startDate.Month, startDate.Day, 0, 0, 0);
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest();
-            addTimeSpanRequest.HelpdeskId = 1;
-            addTimeSpanRequest.Name = AlphaNumericStringGenerator.GetString(10);
-            addTimeSpanRequest.StartDate = startDate;
-            addTimeSpanRequest.EndDate = endDate;
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+            // Add timespan.
+            TestDataTimeSpan timespanDataA = testEntityFactory.AddTimeSpan(helpdeskData.Response.HelpdeskID);
 
-            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+            // Check that timespan was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, timespanDataA.Response.Status);
+            Assert.IsTrue(timespanDataA.Response.SpanId > 0);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespan = context.Timespans.FirstOrDefault(t => t.SpanId == timespanDataA.Response.SpanId);
+                Assert.IsNotNull(timespan);
+            }
+        }
+
+        /// <summary>
+        /// Tests adding a timespan with a name that already exists.
+        /// </summary>
+        [TestMethod]
+        public void AddTimespanNameExists()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Add timespan.
+            TestDataTimeSpan timespanDataA = testEntityFactory.AddTimeSpan(helpdeskData.Response.HelpdeskID);
+
+            // Check that timespan was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, timespanDataA.Response.Status);
+            Assert.IsTrue(timespanDataA.Response.SpanId > 0);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var timespan = context.Timespans.FirstOrDefault(t => t.SpanId == timespanDataA.Response.SpanId);
+                Assert.IsNotNull(timespan);
+            }
+
+            // Try to add another timspan with the same name
+            TestDataTimeSpan timespanDataB = testEntityFactory.AddTimeSpan(helpdeskData.Response.HelpdeskID, timespanDataA.Request.Name);
+
+            // Check that timespan was not created due to duplicate name.
+            Assert.AreEqual(HttpStatusCode.BadRequest, timespanDataB.Response.Status);
         }
 
         /// <summary>
@@ -361,22 +405,24 @@ namespace Helpdesk.Services.Test
         /// Test updating a specific timespan's name, start date and end date
         /// </summary>
         [TestMethod]
-        public void UpdateTimespanFound()
+        public void UpdateTimespan()
         {
-            HelpdeskFacade helpdeskFacade = new HelpdeskFacade();
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
 
-            AddTimeSpanRequest addTimeSpanRequest = new AddTimeSpanRequest()
-            {
-                HelpdeskId = 1,
-                Name = AlphaNumericStringGenerator.GetString(10),
-                StartDate = DateTime.Today,
-                EndDate = DateTime.Today.AddYears(1),
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
 
-            };
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
 
-            AddTimeSpanResponse addTimeSpanResponse = helpdeskFacade.AddTimeSpan(addTimeSpanRequest);
+            // Add timespan.
+            TestDataTimeSpan timespanData = testEntityFactory.AddTimeSpan(helpdeskData.Response.HelpdeskID);
 
-            Assert.AreEqual(HttpStatusCode.OK, addTimeSpanResponse.Status);
+            // Check that timespan was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, timespanData.Response.Status);
+            Assert.IsTrue(timespanData.Response.SpanId > 0);
 
             UpdateTimeSpanRequest updateTimespanRequest = new UpdateTimeSpanRequest()
             {
@@ -385,19 +431,62 @@ namespace Helpdesk.Services.Test
                 EndDate = new DateTime(2019, 06, 01),
             };
 
-            UpdateTimeSpanResponse updateTimespanResponse = helpdeskFacade.UpdateTimeSpan(addTimeSpanResponse.SpanId, updateTimespanRequest);
+            UpdateTimeSpanResponse updateTimespanResponse = testEntityFactory.HelpdeskFacade.UpdateTimeSpan(timespanData.Response.SpanId, updateTimespanRequest);
 
             Assert.AreEqual(HttpStatusCode.OK, updateTimespanResponse.Status);
             Assert.IsTrue(updateTimespanResponse.Result);
 
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                var timespan = context.Timespans.FirstOrDefault(u => u.SpanId == addTimeSpanResponse.SpanId);
+                var timespan = context.Timespans.FirstOrDefault(u => u.SpanId == timespanData.Response.SpanId);
 
                 Assert.AreEqual(timespan.StartDate, updateTimespanRequest.StartDate);
                 Assert.AreEqual(timespan.Name, updateTimespanRequest.Name);
                 Assert.AreEqual(timespan.EndDate, updateTimespanRequest.EndDate);
             }
+        }
+        /// <summary>
+        /// Tests updating a timespan to a name that already exists.
+        /// </summary>
+        [TestMethod]
+        public void UpdateTimespanNameExists()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Add timespan.
+            TestDataTimeSpan timespanDataA = testEntityFactory.AddTimeSpan(helpdeskData.Response.HelpdeskID);
+
+            // Check that timespan was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, timespanDataA.Response.Status);
+            Assert.IsTrue(timespanDataA.Response.SpanId > 0);
+
+            // Add another timespan
+            TestDataTimeSpan timespanDataB = testEntityFactory.AddTimeSpan(helpdeskData.Response.HelpdeskID);
+
+            // Check that timespan was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, timespanDataB.Response.Status);
+            Assert.IsTrue(timespanDataB.Response.SpanId > 0);
+
+            // This request will try to update timespan B's name to be the same as A's name, which should fail.
+            var updateTimespanRequest = new UpdateTimeSpanRequest()
+            {
+                Name = timespanDataA.Request.Name,
+                StartDate = new DateTime(2019, 01, 01),
+                EndDate = new DateTime(2019, 06, 01),
+            };
+
+            var updateTimespanResponse = testEntityFactory.HelpdeskFacade.UpdateTimeSpan(timespanDataB.Response.SpanId, updateTimespanRequest);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, updateTimespanResponse.Status);
+            Assert.IsFalse(updateTimespanResponse.Result);
         }
 
         /// <summary>
