@@ -143,13 +143,19 @@ namespace Helpdesk.DataLayer
             {
                 var unitIDs = context.Helpdeskunit.Include("Helpdeskunit").Where(hu => hu.HelpdeskId == id).Select(u => u.UnitId);
                 var topicIDs = context.Topic.Where(t => unitIDs.Contains(t.UnitId)).Select(ti => ti.TopicId).ToList();
-                var queueItems = context.Queueitem.Where(qi => topicIDs.Contains(qi.TopicId)).ToList();
+                var queueItems = context.Queueitem.Include("Topic.Unit").Include("Student").Where(qi => topicIDs.Contains(qi.TopicId)).ToList();
 
                 foreach (Queueitem queueItem in queueItems)
                 {
                     if (queueItem != null && !queueItem.TimeRemoved.HasValue)
                     {
                         QueueItemDTO queueItemDTO = DAO2DTO(queueItem);
+                        var checkIn = context.Checkinqueueitem.Where(ch => ch.QueueItemId == queueItem.ItemId).FirstOrDefault();
+
+                        if (checkIn != null)
+                        {
+                            queueItemDTO.CheckInId = checkIn.CheckInId;
+                        }
                         queueItemDTOs.Add(queueItemDTO);
                     }
                 }
@@ -211,7 +217,10 @@ namespace Helpdesk.DataLayer
             queueItemDTO = new QueueItemDTO();
             queueItemDTO.ItemId = queueItem.ItemId;
             queueItemDTO.StudentId = queueItem.StudentId;
+            queueItemDTO.Nickname = queueItem.Student.NickName;
             queueItemDTO.TopicId = queueItem.TopicId;
+            queueItemDTO.Topic = queueItem.Topic.Name;
+            queueItemDTO.Unit = queueItem.Topic.Unit.Name;
             queueItemDTO.TimeAdded = queueItem.TimeAdded;
             queueItemDTO.TimeHelped = queueItem.TimeHelped;
             queueItemDTO.TimeRemoved = queueItem.TimeRemoved;

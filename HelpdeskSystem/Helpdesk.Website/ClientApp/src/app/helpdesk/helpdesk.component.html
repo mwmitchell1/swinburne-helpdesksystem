@@ -2,15 +2,49 @@
     <h1>{{helpdesk.name}}</h1>
     <div class="row">
         <div class="col-md-12">
-            <button *ngIf="helpdesk.hasCheckIn" class="btn btn-primary checkin-button" data-toggle="modal" data-target="#modal-check-in"
-            [ngClass]="{'check-in-button-large': !helpdesk.hasQueue}">
+            <button *ngIf="helpdesk.hasCheckIn" class="btn btn-primary checkin-button" data-toggle="modal"
+                data-target="#modal-check-in" [ngClass]="{'check-in-button-large': !helpdesk.hasQueue}">
                 Check In<br />
-                <span [ngClass]="{'check-in-count-small': helpdesk.hasQueue, 'check-in-count-large': !helpdesk.hasQueue}">Checked In: {{checkIns.length}}</span>
+                <span
+                    [ngClass]="{'check-in-count-small': helpdesk.hasQueue, 'check-in-count-large': !helpdesk.hasQueue}">Checked
+                    In: {{checkIns.length}}</span>
             </button>
-            <button *ngIf="helpdesk.hasCheckIn" class="btn btn-secondary checkout-button" data-toggle="modal" data-target="#modal-check-out"
-            [ngClass]="{'check-in-button-large': !helpdesk.hasQueue}">
+            <button *ngIf="helpdesk.hasQueue" class="btn queue-button" data-toggle="modal"
+                data-target="#modal-join-queue"
+                [ngClass]="{'btn-dark': helpdesk.hasCheckIn, 'btn-primary': !helpdesk.hasCheckIn}">
+                Join Queue
+            </button>
+            <button *ngIf="helpdesk.hasCheckIn" class="btn btn-secondary checkout-button" data-toggle="modal"
+                data-target="#modal-check-out" [ngClass]="{'check-in-button-large': !helpdesk.hasQueue}">
                 Checkout
             </button>
+        </div>
+    </div>
+    <div *ngIf="helpdesk.hasQueue" class="row">
+        <div class="col-md-10">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Nickname</th>
+                        <th scope="col">Unit</th>
+                        <th scope="col">Topic</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of queue">
+                        <td>{{item.nickname}}</td>
+                        <td>{{item.unit}}</td>
+                        <td>{{item.topic}}</td>
+                        <td>
+                            <button class="btn btn-danger float-right ml-1" data-toggle="modal"
+                                data-target="#modal-user-delete" (click)="setupDelete(user.id)">Remove</button>
+                            <button *ngIf="!item.TimeHelped" class="btn btn-secondary float-right" data-toggle="modal"
+                                data-target="#modal-user-edit" (click)="setupEdit(user)">Collect</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <div *ngIf="helpdesk.hasCheckIn" class="row">
@@ -26,25 +60,24 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" class="form-control" formControlName="modalStudentId" id="modalStudentId"
-                                name="modalStudentId">
+                            <input type="hidden" class="form-control" formControlName="modalStudentId"
+                                id="modalStudentId" name="modalStudentId">
                             <div class="form-group">
                                 <label for="modalSID">Student ID</label>
-                                <input type="text" class="form-control" formControlName="modalSID"
-                                    id="modalSID" name="modalSID" placeholder="What is your student id?"
-                                    (blur)="validateNickname()"
+                                <input type="text" class="form-control" formControlName="modalSID" id="modalSID"
+                                    name="modalSID" placeholder="What is your student id?" (blur)="validateNickname()"
                                     required>
                             </div>
                             <div class="form-group">
                                 <label for="modalNickname">Nickname</label>
                                 <input type="text" class="form-control" id="modalNickname"
-                                    formControlName="modalNickname" name="modalNickname" placeholder="What is your nickname?"
-                                    (blur)="validateNickname()"
-                                    required>
+                                    formControlName="modalNickname" name="modalNickname"
+                                    placeholder="What is your nickname?" (blur)="validateNickname()" required>
                             </div>
                             <div class="form-group" *ngIf="!helpdesk.hasQueue">
                                 <label for="modalUnitId">Unit:</label>
-                                <select class="form-control" id="modalUnitId" name="modalUnitId" formControlName="modalUnitId">
+                                <select class="form-control" id="modalUnitId" name="modalUnitId"
+                                    formControlName="modalUnitId">
                                     <option value="">Which unit are you studying?</option>
                                     <option *ngFor="let unit of units" value="{{unit.unitId}}">
                                         {{unit.name}}
@@ -53,7 +86,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="reset" class="btn btn-secondary" (click)="closeCheckIn()" data-dismiss="modal">Close</button>
+                            <button type="reset" class="btn btn-secondary" (click)="closeCheckIn()"
+                                data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Check In</button>
                         </div>
                     </form>
@@ -74,7 +108,8 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label for="checkOutStudentId">Checked In:</label>
-                                <select class="form-control" id="checkOutStudentId" name="checkOutStudentId" formControlName="checkOutStudentId">
+                                <select class="form-control" id="checkOutStudentId" name="checkOutStudentId"
+                                    formControlName="checkOutStudentId">
                                     <option value="">What is your nickname?</option>
                                     <option *ngFor="let checkIn of checkIns" value="{{checkIn.checkInId}}">
                                         {{checkIn.nickname}}
