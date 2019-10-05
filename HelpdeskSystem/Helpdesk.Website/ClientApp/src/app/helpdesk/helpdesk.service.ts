@@ -10,6 +10,7 @@ import { CheckInRequest } from '../data/requests/check-in/chek-in-request';
 import { CheckInResponse } from '../data/responses/helpdesk/check-in.response';
 import { GetCheckInsResponse } from '../data/responses/helpdesk/get-check-ins.response';
 import { CheckOutRequest } from '../data/requests/check-in/check-out-request';
+import { GetQueueItemsByHelpdeskIDResponse } from '../data/responses/helpdesk/get-queue-items-by-helpdesk-response';
 
 @Injectable()
 export class HelpdeskService {
@@ -76,5 +77,14 @@ export class HelpdeskService {
    */
   getCheckInsByHelpdesk(id: number) {
     return this.client.get<GetCheckInsResponse>("/api/checkin/" + id);
+  }
+  
+  /**
+   * Used to retreive all active queue items for a helpdesk
+   * @param id the id of the helpdesk
+   * @returns the response that contains an array of helpdesk QueueItems
+   */
+  getQueueItemsByHelpdesk(id: number) {
+    return this.client.get<GetQueueItemsByHelpdeskIDResponse>("/api/queue/helpdesk/" + id);
   }
 }

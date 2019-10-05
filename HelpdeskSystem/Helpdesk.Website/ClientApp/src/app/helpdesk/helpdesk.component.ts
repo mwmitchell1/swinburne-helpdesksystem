@@ -11,6 +11,7 @@ import { ValidateNicknameRequest } from "../data/requests/student/validate-nickn
 import { NicknameService } from "../admin/nicknames/nickname.service";
 import { CheckOutRequest } from "../data/requests/check-in/check-out-request";
 import { findIndex } from "rxjs/operators";
+import { QueueItem } from "../data/DTOs/queue-item.dto";
 
 @Component({
   selector: 'app-helpdesk',
@@ -24,6 +25,7 @@ export class HelpdeskComponent implements OnInit {
   public helpdeskId: Number;
   public checkIns: CheckIn[] = [];
   public units: Unit[] = [];
+  public queue: QueueItem[] = [];
 
   constructor(private service: HelpdeskService
     , private notifier: NotifierService
@@ -56,7 +58,20 @@ export class HelpdeskComponent implements OnInit {
                 this.notifier.notify('error', "Unable to retreive check ins, please contact admin");
               }
             }
-          )
+          );
+        }
+
+        if (this.helpdesk.hasQueue) {
+          this.service.getQueueItemsByHelpdesk(this.route.snapshot.params.id).subscribe(
+            result => {
+              this.queue = result.queueItems;
+            },
+            error => {
+              if (error.status != 404) {
+                this.notifier.notify('error', "Unable to retreive queue items, please contact admin");
+              }
+            }
+          );
         }
       },
       error => {
