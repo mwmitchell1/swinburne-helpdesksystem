@@ -201,6 +201,7 @@ namespace Helpdesk.Services.Test
             ValidateNicknameRequest request = new ValidateNicknameRequest()
             {
                 Name = AlphaNumericStringGenerator.GetString(10),
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
             };
 
             var facade = new StudentFacade();
