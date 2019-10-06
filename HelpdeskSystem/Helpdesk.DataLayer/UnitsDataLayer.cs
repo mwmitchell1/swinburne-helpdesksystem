@@ -43,7 +43,7 @@ namespace Helpdesk.DataLayer
 
                         unitId = newUnit.UnitId;
 
-                        if (!(unitId.HasValue || unitId.Value == 0))
+                        if (!unitId.HasValue || unitId.Value == 0)
                         {
                             trans.Rollback();
                             throw new Exception("Unable to add unit");
