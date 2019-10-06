@@ -25,6 +25,7 @@ namespace Helpdesk.Website.Controllers.api
 		/// <param name="request"></param>
 		/// <returns></returns>
 		[HttpPost]
+        [Route("")]
 		public IActionResult AddToQueue([FromBody] AddToQueueRequest request)
 		{
 			try

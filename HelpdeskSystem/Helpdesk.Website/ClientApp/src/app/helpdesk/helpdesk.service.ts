@@ -11,6 +11,8 @@ import { CheckInResponse } from '../data/responses/helpdesk/check-in.response';
 import { GetCheckInsResponse } from '../data/responses/helpdesk/get-check-ins.response';
 import { CheckOutRequest } from '../data/requests/check-in/check-out-request';
 import { GetQueueItemsByHelpdeskIDResponse } from '../data/responses/helpdesk/get-queue-items-by-helpdesk-response';
+import { AddToQueueRequest } from '../data/requests/queue/add-to-queue-request';
+import { AddToQueueResponse } from '../data/responses/helpdesk/add-to-queue-response';
 
 @Injectable()
 export class HelpdeskService {
@@ -86,5 +88,13 @@ export class HelpdeskService {
    */
   getQueueItemsByHelpdesk(id: number) {
     return this.client.get<GetQueueItemsByHelpdeskIDResponse>("/api/queue/helpdesk/" + id);
+  }
+
+  /**
+   * Used to join the queue for a particular helpdesk
+   * @param request the student information for the queue item
+   */
+  addToQueue(request: AddToQueueRequest) {
+    return this.client.post<AddToQueueResponse>('/api/queue', request);
   }
 }

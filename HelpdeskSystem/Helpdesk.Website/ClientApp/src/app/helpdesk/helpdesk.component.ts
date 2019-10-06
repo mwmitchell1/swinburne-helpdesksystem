@@ -10,8 +10,9 @@ import { CheckInRequest } from "../data/requests/check-in/chek-in-request";
 import { ValidateNicknameRequest } from "../data/requests/student/validate-nickname-request";
 import { NicknameService } from "../admin/nicknames/nickname.service";
 import { CheckOutRequest } from "../data/requests/check-in/check-out-request";
-import { findIndex } from "rxjs/operators";
 import { QueueItem } from "../data/DTOs/queue-item.dto";
+import { Topic } from "../data/DTOs/topic.dto";
+import { AddToQueueRequest } from "../data/requests/queue/add-to-queue-request";
 
 @Component({
   selector: 'app-helpdesk',
@@ -20,26 +21,42 @@ import { QueueItem } from "../data/DTOs/queue-item.dto";
 })
 export class HelpdeskComponent implements OnInit {
   public checkInForm: FormGroup;
-  checkOutForm;
+  public checkOutForm: FormGroup;
+  public joinForm: FormGroup;
   public helpdesk: Helpdesk = new Helpdesk();
   public helpdeskId: Number;
   public checkIns: CheckIn[] = [];
   public units: Unit[] = [];
+  public topics: Topic[] = [];
   public queue: QueueItem[] = [];
+  public showTopic: boolean = false;
+  public ding: HTMLAudioElement;
 
   constructor(private service: HelpdeskService
     , private notifier: NotifierService
     , private route: ActivatedRoute
     , private builder: FormBuilder
     , private nicknameService: NicknameService) {
+
+      this.ding = new Audio('../../../assets/sounds/ding.wav');
+      this.ding.load();
+
     this.checkInForm = this.builder.group({
-      modalSID: new FormControl(''),
-      modalStudentId: new FormControl('', [Validators.required]),
+      modalSID: new FormControl('', [Validators.required]),
+      modalStudentId: new FormControl(''),
       modalNickname: new FormControl('', [Validators.required]),
       modalUnitId: new FormControl(''),
     });
     this.checkOutForm = this.builder.group({
       checkOutStudentId: new FormControl("", [Validators.required])
+    });
+    this.joinForm = this.builder.group({
+      modalJoinCheckId: new FormControl(""),
+      modalJoinStudentId: new FormControl(""),
+      modalJoinSID: new FormControl(""),
+      modalJoinNickname: new FormControl(""),
+      modalJoinUnitId: new FormControl(""),
+      modalJoinTopicId: new FormControl("", [Validators.required])
     });
   }
 
@@ -47,7 +64,6 @@ export class HelpdeskComponent implements OnInit {
     this.service.getHelpdeskById(this.route.snapshot.params.id).subscribe(
       result => {
         this.helpdesk = result.helpdesk;
-
         if (this.helpdesk.hasCheckIn) {
           this.service.getCheckInsByHelpdesk(this.route.snapshot.params.id).subscribe(
             result => {
@@ -62,16 +78,7 @@ export class HelpdeskComponent implements OnInit {
         }
 
         if (this.helpdesk.hasQueue) {
-          this.service.getQueueItemsByHelpdesk(this.route.snapshot.params.id).subscribe(
-            result => {
-              this.queue = result.queueItems;
-            },
-            error => {
-              if (error.status != 404) {
-                this.notifier.notify('error', "Unable to retreive queue items, please contact admin");
-              }
-            }
-          );
+          this.getQueueItems();
         }
       },
       error => {
@@ -124,6 +131,8 @@ export class HelpdeskComponent implements OnInit {
         var checkIn = new CheckIn();
         checkIn.checkInId = result.checkInID;
         checkIn.nickname = request.Nickname;
+        checkIn.unitId = request.UnitID;
+        checkIn.studentId = result.studentID;
         this.checkIns.push(checkIn);
         $('#modal-check-in').modal('hide');
         this.checkInForm.reset();
@@ -202,6 +211,125 @@ export class HelpdeskComponent implements OnInit {
         }
       }
     );
+  }
 
-  };
+  validateQueueNickname() {
+
+    var request = new ValidateNicknameRequest();
+    request.Name = this.joinForm.controls.modalJoinNickname.value;
+    request.SID = this.joinForm.controls.modalJoinSID.value;
+
+    if ((!request.SID) && (!request.Name))
+      return;
+
+    this.nicknameService.validateNickname(request).subscribe(
+      result => {
+        if (result.status == 202) {
+          if (result.sid)
+            this.joinForm.controls.modalJoinSID.setValue(result.studentId);
+
+          if (result.nickname)
+            this.joinForm.controls.modalJoinNickname.setValue(result.nickname);
+
+          if (result.studentId)
+            this.joinForm.controls.modalJoinStudentId.setValue(result.sid);
+
+        }
+      },
+      error => {
+        if (error.status == 400) {
+          this.notifier.notify('warning', 'This nickname is already taken, please choose another.');
+        }
+        else {
+          this.notifier.notify('error', 'Unable to validate nickname, please contact admin.');
+        }
+      }
+    );
+  }
+
+  getQueueItems() {
+    this.queue = [];
+
+    this.service.getQueueItemsByHelpdesk(this.route.snapshot.params.id).subscribe(
+      result => {
+        this.queue = result.queueItems;
+      },
+      error => {
+        if (error.status != 404) {
+          this.notifier.notify('error', "Unable to retreive queue items, please contact admin");
+        }
+      }
+    );
+  }
+
+  populateTopics(value: number) {
+
+    if (value) {
+      if (this.helpdesk.hasCheckIn) {
+        var checkIn = this.checkIns.find(c => c.checkInId == value);
+        this.topics = this.units.find( u => u.unitId == checkIn.unitId).topics;
+        this.showTopic = true; 
+      } else {
+        this.showTopic = true;
+        this.topics = this.units.find(u => u.unitId == value).topics;
+      }
+    } else {
+      this.showTopic = false;
+      this.topics = [];
+    }
+  }
+
+  joinQueue() {
+    var valid: boolean = true;
+
+    if (this.helpdesk.hasCheckIn) {
+      if (!this.joinForm.controls.modalJoinCheckId.value) {
+        this.notifier.notify('warning', 'You must select your nickname.');
+        valid = false;
+      }
+    }
+    else {
+      if ((!this.joinForm.controls.modalJoinStudentId.value) && ((!this.joinForm.controls.modalJoinNickname.value) || (!this.joinForm.controls.modalJoinSID.value))) {
+        this.notifier.notify('warning', 'You must enter a nickname and your student id.')
+        valid = false;
+      }
+    }
+
+    if ((!this.joinForm.controls.modalJoinUnitId.value) && (!this.helpdesk.hasCheckIn)) {
+      this.notifier.notify('warning', 'You must select a unit.');
+      valid = false;
+    }
+
+    if (!this.joinForm.controls.modalJoinTopicId.value) {
+      this.notifier.notify('warning', 'You must select a topic.');
+      valid = false;
+    }
+
+    if (!valid)
+      return;
+
+    var request = new AddToQueueRequest();
+    request.nickname = this.joinForm.controls.modalJoinNickname.value
+    request.sid = this.joinForm.controls.modalJoinSID.value;
+
+    if (this.helpdesk.hasCheckIn) {
+      request.checkInID = this.joinForm.controls.modalJoinCheckId.value;
+      request.studentID = this.checkIns.find(c => c.checkInId == request.checkInID).studentId;
+    } else {
+      request.studentID = this.joinForm.controls.modalJoinStudentId.value;
+    }
+    request.topicID = this.joinForm.controls.modalJoinTopicId.value;
+
+    this.service.addToQueue(request).subscribe(
+      result => {
+        this.getQueueItems();
+        $('#modal-join-queue').modal('hide');
+        this.joinForm.reset();
+        this.ding.play();
+      },
+      error => {
+        this.notifier.notify('error', 'Unable to join queue, please contact admin.');
+      }
+    );
+  }
 }
