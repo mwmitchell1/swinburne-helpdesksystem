@@ -87,4 +87,16 @@ export class SetUpComponent implements OnInit {
         this.notifierSerive.notify('error', 'Unable to update helpdesk, please contact admin.');
       });
   }
+
+  ClearHelpdesk() {
+    this.configService.ClearHelpdesk(this.id).subscribe(
+      result => {
+        this.notifierSerive.notify('success', 'Helpdesk cleared');
+      },
+      error => {
+        this.notifierSerive.notify('error', 'Unable to clear helpdesk please contact admin');
+      }
+    );
+  }
 }
+

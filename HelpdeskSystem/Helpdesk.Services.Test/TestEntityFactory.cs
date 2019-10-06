@@ -31,6 +31,20 @@ namespace Helpdesk.Services.Test
     }
 
     /// <summary>
+    /// TimeSpan test data to be returned by TestEntityFactory. Includes Request and Response used for DB entity creation.
+    /// </summary>
+    public class TestDataTimeSpan
+    {
+        public TestDataTimeSpan (AddTimeSpanRequest request, AddTimeSpanResponse response)
+        {
+            Request = request;
+            Response = response;
+        }
+        public AddTimeSpanRequest Request { get; }
+        public AddTimeSpanResponse Response { get; }
+    }
+
+    /// <summary>
     /// Unit test data to be returned by TestEntityFactory. Includes Request and Response used for DB entity creation.
     /// </summary>
     public class TestDataUnit
@@ -126,6 +140,27 @@ namespace Helpdesk.Services.Test
             var response = HelpdeskFacade.AddHelpdesk(request);
 
             TestDataHelpdesk data = new TestDataHelpdesk(request, response);
+            return data;
+        }
+
+        public TestDataTimeSpan AddTimeSpan(int? helpdeskID = null, string name = "", DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var request = new AddTimeSpanRequest();
+
+            if (helpdeskID != null) request.HelpdeskId = (int)helpdeskID;
+
+            if (name == "" && PopulateEmptyStrings) request.Name = AlphaNumericStringGenerator.GetString(10); else request.Name = name;
+
+            if (startDate == null) request.StartDate = DateTime.Now;
+
+            if (endDate == null)  {
+                request.EndDate = DateTime.Now;
+                request.EndDate.AddDays(1);
+            }
+
+            var response = HelpdeskFacade.AddTimeSpan(request);
+
+            TestDataTimeSpan data = new TestDataTimeSpan(request, response);
             return data;
         }
 

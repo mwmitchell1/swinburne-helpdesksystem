@@ -45,7 +45,7 @@ namespace Helpdesk.Services
 
                 if (!request.StudentID.HasValue)
                 {
-                    if (studentFacade.GetStudentByNickname(request.Nickname).Status!=HttpStatusCode.NotFound)
+                    if (studentFacade.GetStudentByNickname(request.Nickname).Status != HttpStatusCode.NotFound)
                     {
                         response.Status = HttpStatusCode.BadRequest;
                         return response;
@@ -62,24 +62,24 @@ namespace Helpdesk.Services
                     request.StudentID = addStudentResponse.StudentID;
                 }
 
-                //Will change to facade method when get student by id method is implemented
                 using (helpdesksystemContext context = new helpdesksystemContext())
                 {
                     if (context.Nicknames.FirstOrDefault(n => n.StudentId == request.StudentID) == null)
-                        throw new NotFoundException("No student found for id " + request.StudentID);
+                            throw new NotFoundException("No student found for id " + request.StudentID);
                 }
 
                 CheckInDataLayer dataLayer = new CheckInDataLayer();
                 int checkInID = dataLayer.CheckIn(request);
 
+                response.StudentID = request.StudentID.Value;
                 response.CheckInID = checkInID;
                 response.Status = HttpStatusCode.OK;
             }
             catch (NotFoundException ex)
             {
-                s_logger.Warn(ex, "No student found for id "+request.StudentID);
+                s_logger.Warn(ex, "No student found for id " + request.SID);
                 response.Status = HttpStatusCode.NotFound;
-                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No student found for id " + request.StudentID));
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No student found for id " + request.SID));
             }
             catch (Exception ex)
             {

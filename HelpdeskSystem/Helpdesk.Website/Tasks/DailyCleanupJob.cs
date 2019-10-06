@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using Helpdesk.Common.Responses;
+using Helpdesk.Common.Responses.Helpdesk;
 using Helpdesk.Services;
 using Microsoft.Extensions.Logging;
 using NLog;
@@ -19,10 +23,18 @@ namespace Helpdesk.Website
             try
             {
                 var facade = new HelpdeskFacade();
-                DateTime dateTime = DateTime.Now;
-                if (!facade.ForceCheckoutQueueRemove(dateTime).Result)
+                var helpdeskIds = facade.GetHelpdesks().Helpdesks.Select(h => h.HelpdeskID).ToList();
+
+                foreach(int id in helpdeskIds)
                 {
-                    s_logger.Error("Unable to remove queue items and check-ins.");
+                    ForceCheckoutQueueRemoveResponse result = facade.ForceCheckoutQueueRemove(id);
+                    if (result.Status != HttpStatusCode.OK)
+                    {
+                        foreach (StatusMessage message in result.StatusMessages)
+                        {
+                            s_logger.Error(message);
+                        }
+                    }
                 }
             }
             catch (Exception ex)

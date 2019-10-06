@@ -9,6 +9,11 @@ import { GetUnitsByHelpdeskIdResponse } from '../data/responses/units/get-by-hel
 import { CheckInRequest } from '../data/requests/check-in/chek-in-request';
 import { CheckInResponse } from '../data/responses/helpdesk/check-in.response';
 import { GetCheckInsResponse } from '../data/responses/helpdesk/get-check-ins.response';
+import { CheckOutRequest } from '../data/requests/check-in/check-out-request';
+import { GetQueueItemsByHelpdeskIDResponse } from '../data/responses/helpdesk/get-queue-items-by-helpdesk-response';
+import { AddToQueueRequest } from '../data/requests/queue/add-to-queue-request';
+import { AddToQueueResponse } from '../data/responses/helpdesk/add-to-queue-response';
+import { UpdateQueueItemStatusRequest } from '../data/requests/queue/update-queue-item-status-request';
 
 @Injectable()
 export class HelpdeskService {
@@ -60,11 +65,41 @@ export class HelpdeskService {
   }
 
   /**
+   * This function is used to check out a student
+   * @param id the check in id
+   * @param request request indicating the the checkout is not forced
+   */
+  checkOut(id: number, request: CheckOutRequest) {
+    return this.client.post<CheckInResponse>("/api/checkin/" + id , request);
+  }
+
+  /**
    * Used to get the check ins for the helpdesk id required
    * @param id The id of the helpdesk
    * @returns The response with the check ins if they are any
    */
   getCheckInsByHelpdesk(id: number) {
     return this.client.get<GetCheckInsResponse>("/api/checkin/" + id);
+  }
+  
+  /**
+   * Used to retreive all active queue items for a helpdesk
+   * @param id the id of the helpdesk
+   * @returns the response that contains an array of helpdesk QueueItems
+   */
+  getQueueItemsByHelpdesk(id: number) {
+    return this.client.get<GetQueueItemsByHelpdeskIDResponse>("/api/queue/helpdesk/" + id);
+  }
+
+  /**
+   * Used to join the queue for a particular helpdesk
+   * @param request the student information for the queue item
+   */
+  addToQueue(request: AddToQueueRequest) {
+    return this.client.post<AddToQueueResponse>('/api/queue', request);
+  }
+
+  updateQueueItemStatus(id: number, request: UpdateQueueItemStatusRequest) {
+    return this.client.post<UpdateQueueItemStatusRequest>('/api/queue/' + id + '/UpdateQueueItemStatus', request);
   }
 }

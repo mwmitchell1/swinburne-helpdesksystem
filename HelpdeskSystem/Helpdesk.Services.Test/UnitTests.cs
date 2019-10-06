@@ -306,6 +306,26 @@ namespace Helpdesk.Services.Test
             // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
             TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID);
 
+            Topic topic = new Topic()
+            {
+                Name = AlphaNumericStringGenerator.GetString(10),
+                IsDeleted = false,
+                UnitId = unitData.Response.UnitID
+            };
+            Topic deletedTopic = new Topic()
+            {
+                Name = AlphaNumericStringGenerator.GetString(10),
+                IsDeleted = true,
+                UnitId = unitData.Response.UnitID
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Topic.Add(topic);
+                context.Topic.Add(deletedTopic);
+                context.SaveChanges();
+            }
+
             // Check that unit was created successfully.
             Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
             Assert.IsTrue(unitData.Response.UnitID > 0);
@@ -317,6 +337,8 @@ namespace Helpdesk.Services.Test
             // Check that unit response is okay and that names match.
             Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
             Assert.AreEqual(unitData.Request.Name, getUnitResponse.Unit.Name);
+            Assert.IsTrue(getUnitResponse.Unit.Topics.Count == 1);
+            Assert.AreEqual(topic.Name, getUnitResponse.Unit.Topics[0].Name);
         }
 
         [TestMethod]
@@ -456,8 +478,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, deleteUnitResponse.Status);
 
             // Try getting the unit that was just deleted. Should be NotFound.
+            //Will update unit test when get unit method is implemented that excludes units
+            //with IsDeleted = true
             getUnitResponse = unitsFacade.GetUnit(unitData.Response.UnitID);
-            Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
             Assert.IsTrue(getUnitResponse.Unit.IsDeleted);
         }
 

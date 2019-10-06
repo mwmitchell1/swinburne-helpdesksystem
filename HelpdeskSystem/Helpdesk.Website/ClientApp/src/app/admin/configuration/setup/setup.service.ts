@@ -4,6 +4,7 @@ import { GetHelpdeskResponse } from "src/app/data/responses/configuration/get-re
 import { Observable } from "rxjs/internal/Observable";
 import { UpdateHelpdeskRequest } from "src/app/data/requests/configuration/update-request";
 import { UpdateHelpdeskResponse } from "src/app/data/responses/configuration/update-response";
+import { ForceCheckoutQueueRemoveResponse } from "src/app/data/responses/helpdesk/force-checkout-queue-remove-response";
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,7 @@ export class SetUpService {
       return this.http.patch<UpdateHelpdeskResponse>('/api/helpdesk/' + id, request);
     }
 
+
   /**
    * HTTP request to create a helpdesk
    * @param helpdesk
@@ -27,4 +29,8 @@ export class SetUpService {
   createHelpdesk(helpdesk: UpdateHelpdeskRequest) {
     return this.http.post<UpdateHelpdeskRequest>('api/helpdesk', helpdesk);
   }
+
+    ClearHelpdesk(id: number) {
+      return this.http.delete<ForceCheckoutQueueRemoveResponse>('/api/helpdesk/' + id + '/clear');
+    }
 }

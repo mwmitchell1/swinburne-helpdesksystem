@@ -194,5 +194,77 @@ namespace Helpdesk.Services.Test
 
             Assert.AreEqual(HttpStatusCode.BadRequest, editStudentNicknameResponse.Status);
         }
+
+        [TestMethod]
+        public void ValidateNicknameNew()
+        {
+            ValidateNicknameRequest request = new ValidateNicknameRequest()
+            {
+                Name = AlphaNumericStringGenerator.GetString(10),
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            var facade = new StudentFacade();
+
+            var response = facade.ValidateNickname(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+        }
+
+        [TestMethod]
+        public void ValidateNicknameOldValid()
+        {
+            Nicknames nickname = new Nicknames()
+            {
+                NickName = AlphaNumericStringGenerator.GetString(10),
+                Sid = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Nicknames.Add(nickname);
+                context.SaveChanges();
+            }
+
+            ValidateNicknameRequest request = new ValidateNicknameRequest()
+            {
+                Name = nickname.NickName,
+                SID = nickname.Sid
+            };
+
+            var facade = new StudentFacade();
+
+            var response = facade.ValidateNickname(request);
+
+            Assert.AreEqual(HttpStatusCode.Accepted, response.Status);
+        }
+
+        [TestMethod]
+        public void ValidateNicknameOldInValid()
+        {
+            Nicknames nickname = new Nicknames()
+            {
+                NickName = AlphaNumericStringGenerator.GetString(10),
+                Sid = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Nicknames.Add(nickname);
+                context.SaveChanges();
+            }
+
+            ValidateNicknameRequest request = new ValidateNicknameRequest()
+            {
+                Name = nickname.NickName,
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            var facade = new StudentFacade();
+
+            var response = facade.ValidateNickname(request);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
+        }
     }
 }

@@ -8,19 +8,20 @@
     }
   },
   "profiles": {
+    "Helpdesk.Website": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://swin.helpdesk.edu.au:5001;http://swin.helpdesk.edu.au:5000"
+    },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
-    "Helpdesk.Website": {
-      "commandName": "Project",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://swin.helpdesk.edu.au:5001;http://swin.helpdesk.edu.au:5000"
     }
   }
 }

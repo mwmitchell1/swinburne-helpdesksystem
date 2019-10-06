@@ -264,38 +264,38 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="dateTime"></param>
         /// <returns></returns>
-        public bool ForceCheckoutQueueRemove(DateTime? dateTime = null)
+        public bool ForceCheckoutQueueRemove(int id)
         {
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
-                DateTime time;
+                DateTime time = DateTime.Now;
+                
+                var unitIds = context.Helpdeskunit.Where(hu => hu.HelpdeskId == id).Select(hu => hu.UnitId).ToList();
 
-                if (dateTime == null)
+                foreach(int unitId in unitIds)
                 {
-                    time = DateTime.Now;
-                }
-                else
-                {
-                    time = (DateTime)dateTime;
-                }
-
-                var queueItems = context.Queueitem.Where(q => q.TimeRemoved == null).ToList();
-                var checkins = context.Checkinhistory.Where(c => c.CheckoutTime == null).ToList();
-
-                foreach (Queueitem queueItem in queueItems)
-                {
-                    if (queueItem.TimeRemoved == null)
+                    List<Checkinhistory> checkins = context.Checkinhistory.Where(c => c.CheckoutTime == null && c.UnitId == unitId).ToList();
+                    foreach (Checkinhistory checkin in checkins)
                     {
-                        queueItem.TimeRemoved = time;
+                        if (checkin.CheckoutTime == null)
+                        {
+                            checkin.CheckoutTime = time;
+                            checkin.ForcedCheckout = true;
+                        }
                     }
-                }
 
-                foreach (Checkinhistory checkin in checkins)
-                {
-                    if (checkin.CheckoutTime == null)
+                    var topicIds = context.Topic.Where(t => t.UnitId == unitId).Select(t => t.TopicId).ToList();
+
+                    foreach (int topicId in topicIds)
                     {
-                        checkin.CheckoutTime = time;
-                        checkin.ForcedCheckout = true;
+                        List<Queueitem> queueItems = context.Queueitem.Where(q => q.TimeRemoved == null && q.TopicId == topicId).ToList();
+                        foreach (Queueitem queueItem in queueItems)
+                        {
+                            if (queueItem.TimeRemoved == null)
+                            {
+                                queueItem.TimeRemoved = time;
+                            }
+                        }
                     }
                 }
                 context.SaveChanges();
@@ -308,20 +308,32 @@ namespace Helpdesk.DataLayer
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public int? AddTimeSpan(AddTimeSpanRequest request)
+        public int AddTimeSpan(AddTimeSpanRequest request)
         {
-            int? spanId = null;
+            int spanId;
 
-            Timespans timespan = new Timespans();
-            timespan.HelpdeskId = request.HelpdeskId;
-            timespan.Name = request.Name;
-            timespan.StartDate = request.StartDate;
-            timespan.EndDate = request.EndDate;
+            Timespans timespan = new Timespans
+            {
+                HelpdeskId = request.HelpdeskId,
+                Name = request.Name,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate
+            };
             using (var context = new helpdesksystemContext())
             {
-                context.Timespans.Add(timespan);
-                context.SaveChanges();
-                spanId = timespan.SpanId;
+                Timespans existingTimespan = null;
+                existingTimespan = context.Timespans.FirstOrDefault(t => t.Name == timespan.Name);
+
+                if (existingTimespan == null)
+                {
+                    context.Timespans.Add(timespan);
+                    context.SaveChanges();
+                    spanId = timespan.SpanId;
+                }
+                else
+                {
+                    throw new DuplicateNameException("The nickname " + request.Name + " already exists!");
+                }
             }
             return spanId;
         }
@@ -387,12 +399,23 @@ namespace Helpdesk.DataLayer
 
                 if (timespan == null)
                     return false;
-    
-                timespan.Name = request.Name;
-                timespan.StartDate = request.StartDate;
-                timespan.EndDate = request.EndDate;
 
-                context.SaveChanges();
+                Timespans existingTimespan = null;
+                existingTimespan = context.Timespans.FirstOrDefault(t => t.Name == request.Name);
+
+                // Update if no timespan exists matching the requesting name.
+                // Update anyway if the names match but the the existing timespan is the timespan we want to update.
+                if (existingTimespan == null || existingTimespan.SpanId == id)
+                {
+                    timespan.Name = request.Name;
+                    timespan.StartDate = request.StartDate;
+                    timespan.EndDate = request.EndDate;
+                    context.SaveChanges();
+                }
+                else
+                {
+                    throw new DuplicateNameException("The nickname " + request.Name + " already exists!");
+                }
             }
             return true;
         }

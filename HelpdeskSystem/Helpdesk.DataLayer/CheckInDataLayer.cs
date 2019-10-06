@@ -108,7 +108,9 @@ namespace Helpdesk.DataLayer
             CheckInDTO dto = new CheckInDTO()
             {
                 CheckInId = checkIn.CheckInId,
-                Nickname = checkIn.Student.NickName
+                Nickname = checkIn.Student.NickName,
+                UnitId = checkIn.UnitId,
+                StudentId = checkIn.StudentId.Value
             };
 
             return dto;
