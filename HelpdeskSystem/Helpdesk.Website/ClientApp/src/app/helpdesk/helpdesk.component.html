@@ -38,12 +38,12 @@
                         <td>{{item.topic}}</td>
                         <td>
                             <button class="btn btn-danger float-right ml-1" data-toggle="modal"
-                                data-target="#modal-user-delete" (click)="setupDelete(user.id)">Remove</button>
-                            <button *ngIf="!item.TimeHelped" class="btn btn-secondary float-right ml-1"
+                                data-target="#modal-user-delete" (click)="remove(item.itemId)">Remove</button>
+                            <button *ngIf="!item.timeHelped" class="btn btn-secondary float-right ml-1"
                                 data-toggle="modal" data-target="#modal-user-edit"
-                                (click)="setupEdit(user)">Edit</button>
-                            <button *ngIf="!item.TimeHelped" class="btn btn-dark float-right" data-toggle="modal"
-                                data-target="#modal-user-edit" (click)="setupEdit(user)">Collect</button>
+                                (click)="setupEdit(item.itemId)">Edit</button>
+                            <button *ngIf="!item.timeHelped" class="btn btn-dark float-right" data-toggle="modal"
+                                data-target="#modal-user-edit" (click)="collect(item.itemId)">Collect</button>
                         </td>
                     </tr>
                 </tbody>
