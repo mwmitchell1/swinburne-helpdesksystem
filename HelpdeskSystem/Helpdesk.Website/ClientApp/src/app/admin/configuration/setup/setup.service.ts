@@ -10,7 +10,7 @@ import { UpdateHelpdeskResponse } from "src/app/data/responses/configuration/upd
 })
 export class SetUpService {
   constructor(private http: HttpClient) { }
-    
+
     GetHelpdesk(id: number): Observable<GetHelpdeskResponse> {
         return this.http.get<GetHelpdeskResponse>('/api/helpdesk/' + id);
     }
@@ -19,4 +19,12 @@ export class SetUpService {
     {
       return this.http.patch<UpdateHelpdeskResponse>('/api/helpdesk/' + id, request);
     }
+
+  /**
+   * HTTP request to create a helpdesk
+   * @param helpdesk
+   */
+  createHelpdesk(helpdesk: UpdateHelpdeskRequest) {
+    return this.http.post<UpdateHelpdeskRequest>('api/helpdesk', helpdesk);
+  }
 }
