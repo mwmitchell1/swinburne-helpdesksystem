@@ -101,7 +101,8 @@ INSERT INTO  HelpdeskSettings (Name, HasCheckIn, HasQueue) VALUES ('Test Helpdes
 INSERT INTO Unit (Code, Name) VALUES ('COS00000', 'Test Unit');
 
 DECLARE @UnitID INT = @@IDENTITY
-INSERT INTO Topic (UnitID, Name, IsDeleted) VALUES (@UnitID, 'Test Topic', 0);
+INSERT INTO Topic (UnitID, Name, IsDeleted) VALUES (1, 'Test Topic', 0);
+INSERT INTO Topic (UnitID, Name, IsDeleted) VALUES (1, 'Test Topic 2', 0);
 INSERT INTO helpdeskunit (HelpdeskID, UnitID) VALUES(1,1);
 
 GO
