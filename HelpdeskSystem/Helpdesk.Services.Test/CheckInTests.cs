@@ -280,7 +280,7 @@ namespace Helpdesk.Services.Test
 
             CheckInRequest request = new CheckInRequest()
             {
-                StudentID = nickname.StudentId
+                SID = nickname.Sid
             };
 
             CheckInFacade facade = new CheckInFacade();

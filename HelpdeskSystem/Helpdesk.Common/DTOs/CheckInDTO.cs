@@ -8,5 +8,7 @@ namespace Helpdesk.Common.DTOs
     {
         public int CheckInId { get; set; }
         public string Nickname { get; set; }
+        public int UnitId { get; set; }
+        public int StudentId { get; set; }
     }
 }

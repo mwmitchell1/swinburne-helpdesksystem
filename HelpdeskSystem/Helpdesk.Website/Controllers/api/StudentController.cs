@@ -21,12 +21,45 @@ namespace Helpdesk.Website.Controllers.api
     public class StudentController : BaseApiController
     {
         /// <summary>
+        /// Gets a student by their nickname.
+        /// </summary>
+        /// <param name="nickname"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult GetStudentByNickname([FromRoute] string nickname)
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            try
+            {
+                var facade = new StudentFacade();
+                var response = facade.GetStudentByNickname(nickname);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get student by nickname.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
         /// Edits a specific student's nickname with the given information
         /// </summary>
         /// <param name="id">ID of the student to be updated</param>
         /// <param name="request">Request that contains the new nickname</param>
         /// <returns>A response which indicates success or failure</returns>
-        [AllowAnonymous]
         [HttpPatch]
         [Route("nickname/{id}")]
         public IActionResult EditStudentNickname([FromRoute] int id, [FromBody] EditStudentNicknameRequest request)
@@ -55,6 +88,38 @@ namespace Helpdesk.Website.Controllers.api
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to edit student's nickname.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("validate")]
+        public IActionResult ValidateNickname([FromBody] ValidateNicknameRequest request)
+        {
+            try
+            {
+                var facade = new StudentFacade();
+                var response = facade.ValidateNickname(request);
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.Accepted:
+                        return Accepted(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to validate student's nickname.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }

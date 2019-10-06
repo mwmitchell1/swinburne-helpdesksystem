@@ -16,6 +16,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0E51B7E2-D97D-44EE-AA42-410C55E26ADE}"
 	ProjectSection(SolutionItems) = preProject
 		DataBaseScripts\BuildSchema.mysql = DataBaseScripts\BuildSchema.mysql
+		DataBaseScripts\BuildSchema.sql = DataBaseScripts\BuildSchema.sql
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpdesk.Services.Test", "Helpdesk.Services.Test\Helpdesk.Services.Test.csproj", "{47DD39E9-BC5F-4E76-A274-DED3D96587A1}"

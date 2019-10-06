@@ -99,6 +99,9 @@ CREATE TABLE TimeSpans (
 INSERT INTO [User] (Username, Password, FirstTime) VALUES ('Admin', 'cMzZAHM41tgd07YnFiG5z5qX6gA=', 0);
 INSERT INTO  HelpdeskSettings (Name, HasCheckIn, HasQueue) VALUES ('Test Helpdesk', 1, 1);
 INSERT INTO Unit (Code, Name) VALUES ('COS00000', 'Test Unit');
+
+DECLARE @UnitID INT = @@IDENTITY
+INSERT INTO Topic (UnitID, Name, IsDeleted) VALUES (@UnitID, 'Test Topic', 0);
 INSERT INTO helpdeskunit (HelpdeskID, UnitID) VALUES(1,1);
 
 GO

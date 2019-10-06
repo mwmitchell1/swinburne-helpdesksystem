@@ -10,5 +10,7 @@ namespace Helpdesk.Common.Responses.CheckIn
     public class CheckInResponse : BaseResponse
     {
         public int CheckInID { get; set; }
+
+        public int StudentID { get; set; }
     }
 }

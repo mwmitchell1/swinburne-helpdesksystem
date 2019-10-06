@@ -13,9 +13,9 @@ namespace Helpdesk.Common.Requests.Helpdesk
         [Required(AllowEmptyStrings = false, ErrorMessage = "{0} cannot be empty!")]
         public string Name { get; set; }
 
-        public DateTime? StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
