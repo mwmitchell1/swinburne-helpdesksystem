@@ -13,6 +13,9 @@ import { CheckOutRequest } from '../data/requests/check-in/check-out-request';
 import { GetQueueItemsByHelpdeskIDResponse } from '../data/responses/helpdesk/get-queue-items-by-helpdesk-response';
 import { AddToQueueRequest } from '../data/requests/queue/add-to-queue-request';
 import { AddToQueueResponse } from '../data/responses/helpdesk/add-to-queue-response';
+import { UpdateQueueItemStatusRequest } from '../data/requests/queue/update-queue-item-status-request';
+import { UpdateQueueItemRequest } from '../data/requests/queue/update-queue-item-request';
+import { UpdateQueueItemResponse } from '../data/responses/helpdesk/update-queue-item-response';
 
 @Injectable()
 export class HelpdeskService {
@@ -96,5 +99,13 @@ export class HelpdeskService {
    */
   addToQueue(request: AddToQueueRequest) {
     return this.client.post<AddToQueueResponse>('/api/queue', request);
+  }
+
+  updateQueueItemStatus(id: number, request: UpdateQueueItemStatusRequest) {
+    return this.client.post<UpdateQueueItemStatusRequest>('/api/queue/' + id + '/UpdateQueueItemStatus', request);
+  }
+
+  updateQueueItem(id: number, request: UpdateQueueItemRequest) {
+    return this.client.post<UpdateQueueItemResponse>('/api/queue/' + id, request);
   }
 }
