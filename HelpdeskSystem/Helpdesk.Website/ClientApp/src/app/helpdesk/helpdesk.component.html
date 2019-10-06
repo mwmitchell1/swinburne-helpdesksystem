@@ -3,19 +3,19 @@
     <div class="row">
         <div class="col-md-12">
             <button *ngIf="helpdesk.hasCheckIn" class="btn btn-primary checkin-button" data-toggle="modal"
-                data-target="#modal-check-in" [ngClass]="{'check-in-button-large': !helpdesk.hasQueue}">
+                data-target="#modal-check-in" [ngClass]="{'check-in-button-large': !helpdesk.hasQueue, 'button-small': helpdesk.hasQueue}">
                 Check In<br />
                 <span
                     [ngClass]="{'check-in-count-small': helpdesk.hasQueue, 'check-in-count-large': !helpdesk.hasQueue}">Checked
                     In: {{checkIns.length}}</span>
             </button>
-            <button *ngIf="helpdesk.hasQueue" class="btn queue-button" data-toggle="modal"
+            <button *ngIf="helpdesk.hasQueue" class="btn button-small" data-toggle="modal"
                 data-target="#modal-join-queue"
                 [ngClass]="{'btn-dark': helpdesk.hasCheckIn, 'btn-primary': !helpdesk.hasCheckIn}">
                 Join Queue
             </button>
             <button *ngIf="helpdesk.hasCheckIn" class="btn btn-secondary checkout-button" data-toggle="modal"
-                data-target="#modal-check-out" [ngClass]="{'check-in-button-large': !helpdesk.hasQueue}">
+                data-target="#modal-check-out" [ngClass]="{'check-in-button-large': !helpdesk.hasQueue, 'button-small': helpdesk.hasQueue}">
                 Checkout
             </button>
         </div>
@@ -39,12 +39,80 @@
                         <td>
                             <button class="btn btn-danger float-right ml-1" data-toggle="modal"
                                 data-target="#modal-user-delete" (click)="setupDelete(user.id)">Remove</button>
-                            <button *ngIf="!item.TimeHelped" class="btn btn-secondary float-right" data-toggle="modal"
+                            <button *ngIf="!item.TimeHelped" class="btn btn-secondary float-right ml-1"
+                                data-toggle="modal" data-target="#modal-user-edit"
+                                (click)="setupEdit(user)">Edit</button>
+                            <button *ngIf="!item.TimeHelped" class="btn btn-dark float-right" data-toggle="modal"
                                 data-target="#modal-user-edit" (click)="setupEdit(user)">Collect</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="modal fade" id="modal-join-queue" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form [formGroup]="joinForm" (ngSubmit)="joinQueue(joinForm.value)">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="joinModalLabel">Join Queue</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group" *ngIf="helpdesk.hasCheckIn">
+                                <label for="modalJoinCheckId">Unit:</label>
+                                <select class="form-control" id="modalJoinCheckId" name="modalJoinCheckId"
+                                    formControlName="modalJoinCheckId" (change)="populateTopics($event.target.value)">
+                                    <option value="">What is your nickname?</option>
+                                    <option *ngFor="let checkIn of checkIns" value="{{checkIn.checkInId}}">
+                                        {{checkIn.nickname}}
+                                    </option>
+                                </select>
+                            </div>
+                            <input type="hidden" *ngIf="!helpdesk.hasCheckIn" class="form-control"
+                                formControlName="modalJoinStudentId" id="modalJoinStudentId" name="modalJoinStudentId">
+                            <div class="form-group" *ngIf="!helpdesk.hasCheckIn">
+                                <label for="modalJoinSID">Student ID</label>
+                                <input type="text" class="form-control" formControlName="modalJoinSID" id="modalJoinSID"
+                                    name="modalJoinSID" placeholder="What is your student id?"
+                                    (blur)="validateQueueNickname()" required>
+                            </div>
+                            <div class="form-group" *ngIf="!helpdesk.hasCheckIn">
+                                <label for="modalJoinNickname">Nickname</label>
+                                <input type="text" class="form-control" id="modalJoinNickname"
+                                    formControlName="modalJoinNickname" name="modalJoinNickname"
+                                    placeholder="What is your nickname?" (blur)="validateQueueNickname()" required>
+                            </div>
+                            <div class="form-group" *ngIf="!helpdesk.hasCheckIn">
+                                <label for="modalJoinUnitId">Unit:</label>
+                                <select (change)="populateTopics($event.target.value)" class="form-control"
+                                    id="modalJoinUnitId" name="modalJoinUnitId" formControlName="modalJoinUnitId">
+                                    <option value="">Which unit are you studying?</option>
+                                    <option *ngFor="let unit of units" value="{{unit.unitId}}">
+                                        {{unit.name}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group" *ngIf="showTopic">
+                                <label for="modalJoinTopicId">Topic:</label>
+                                <select class="form-control" id="modalJoinTopicId" name="modalJoinTopicId"
+                                    formControlName="modalJoinTopicId">
+                                    <option value="">Which topic do you need help on?</option>
+                                    <option *ngFor="let topic of topics" value="{{topic.topicId}}">
+                                        {{topic.name}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="reset" class="btn btn-secondary" (click)="closeJoinQueue()"
+                                data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Join Queue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
     <div *ngIf="helpdesk.hasCheckIn" class="row">
@@ -74,7 +142,7 @@
                                     formControlName="modalNickname" name="modalNickname"
                                     placeholder="What is your nickname?" (blur)="validateNickname()" required>
                             </div>
-                            <div class="form-group" *ngIf="!helpdesk.hasQueue">
+                            <div class="form-group">
                                 <label for="modalUnitId">Unit:</label>
                                 <select class="form-control" id="modalUnitId" name="modalUnitId"
                                     formControlName="modalUnitId">

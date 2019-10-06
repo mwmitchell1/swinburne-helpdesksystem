@@ -71,6 +71,7 @@ namespace Helpdesk.Services
                 CheckInDataLayer dataLayer = new CheckInDataLayer();
                 int checkInID = dataLayer.CheckIn(request);
 
+                response.StudentID = request.StudentID.Value;
                 response.CheckInID = checkInID;
                 response.Status = HttpStatusCode.OK;
             }
