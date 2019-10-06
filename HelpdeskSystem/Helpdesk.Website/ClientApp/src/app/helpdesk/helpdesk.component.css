@@ -13,3 +13,7 @@
     height: 100%;
     display:inline-block;
 }
+
+.button-small {
+    height: 65px;
+}
