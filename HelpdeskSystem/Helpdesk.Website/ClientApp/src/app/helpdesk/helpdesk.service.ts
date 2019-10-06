@@ -14,6 +14,8 @@ import { GetQueueItemsByHelpdeskIDResponse } from '../data/responses/helpdesk/ge
 import { AddToQueueRequest } from '../data/requests/queue/add-to-queue-request';
 import { AddToQueueResponse } from '../data/responses/helpdesk/add-to-queue-response';
 import { UpdateQueueItemStatusRequest } from '../data/requests/queue/update-queue-item-status-request';
+import { UpdateQueueItemRequest } from '../data/requests/queue/update-queue-item-request';
+import { UpdateQueueItemResponse } from '../data/responses/helpdesk/update-queue-item-response';
 
 @Injectable()
 export class HelpdeskService {
@@ -101,5 +103,9 @@ export class HelpdeskService {
 
   updateQueueItemStatus(id: number, request: UpdateQueueItemStatusRequest) {
     return this.client.post<UpdateQueueItemStatusRequest>('/api/queue/' + id + '/UpdateQueueItemStatus', request);
+  }
+
+  updateQueueItem(id: number, request: UpdateQueueItemRequest) {
+    return this.client.post<UpdateQueueItemResponse>('/api/queue/' + id, request);
   }
 }
