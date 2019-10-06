@@ -13,6 +13,7 @@ import { CheckOutRequest } from "../data/requests/check-in/check-out-request";
 import { QueueItem } from "../data/DTOs/queue-item.dto";
 import { Topic } from "../data/DTOs/topic.dto";
 import { AddToQueueRequest } from "../data/requests/queue/add-to-queue-request";
+import { UpdateQueueItemStatusRequest } from "../data/requests/queue/update-queue-item-status-request";
 
 @Component({
   selector: 'app-helpdesk',
@@ -329,6 +330,36 @@ export class HelpdeskComponent implements OnInit {
       },
       error => {
         this.notifier.notify('error', 'Unable to join queue, please contact admin.');
+      }
+    );
+  }
+
+  remove(id: number) {
+    var request = new UpdateQueueItemStatusRequest();
+    request.TimeRemoved = new Date();
+
+    this.service.updateQueueItemStatus(id, request).subscribe(
+      result => {
+        var item = this.queue.find(q => q.ItemId == id);
+        this.getQueueItems();
+      },
+      error => {
+        this.notifier.notify('error', 'Unable to remove queue item, please contact admin');
+      }
+    );
+  }
+
+  collect(id: number) {
+    var request = new UpdateQueueItemStatusRequest();
+    request.TimeHelped = new Date();
+
+    this.service.updateQueueItemStatus(id, request).subscribe(
+      result => {
+        var item = this.queue.find(q => q.ItemId == id);
+        this.getQueueItems();
+      },
+      error => {
+        this.notifier.notify('error', 'Unable to remove queue item, please contact admin');
       }
     );
   }
