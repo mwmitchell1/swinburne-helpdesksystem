@@ -3,6 +3,8 @@ import { Helpdesk } from '../data/DTOs/helpdesk.dto';
 import { HelpdeskService } from '../helpdesk/helpdesk.service';
 import { NotifierService } from 'angular-notifier';
 import { UpdateHelpdeskRequest } from '../data/requests/configuration/update-request';
+import { UnitsService } from './configuration/units/units.service';
+import {SetUpService} from "./configuration/setup/setup.service";
 
 @Component({
   selector: 'app-admin',
@@ -14,7 +16,7 @@ export class AdminComponent {
   public helpdesks: Helpdesk[];
   private createRequest: UpdateHelpdeskRequest = new UpdateHelpdeskRequest();
 
-  constructor(private helpdeskService: HelpdeskService, private notifier: NotifierService) {
+  constructor(private helpdeskService: HelpdeskService, private notifier: NotifierService, private setupService: SetUpService) {
     helpdeskService.getActiveHelpdesks().subscribe(
       result => {
         this.helpdesks = result.helpdesks;
@@ -27,6 +29,14 @@ export class AdminComponent {
 
 
   createHelpdesk(form) {
+
+    this.setupService.createHelpdesk(this.createRequest).subscribe(
+      result => {
+        console.log(result);
+      }, error => {
+        console.log(error);
+      }
+    );
 
   }
 }
