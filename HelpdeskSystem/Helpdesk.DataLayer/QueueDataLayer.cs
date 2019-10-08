@@ -99,7 +99,7 @@ namespace Helpdesk.DataLayer
                 // something went wrong. Shouldn't happen if the facade validation did its job.
                 // Means both Helped and Removed values are assigned or null.
                 // Could also mean a TimeHelped or TimeRemoved was provided twice.
-                // E.g. you tried to provide TimeHelped when TimeHelped was alrady set in the table.
+                // E.g. you tried to provide TimeHelped when TimeHelped was alrady set for that queue item.
                 return false;
             }
         }
@@ -147,7 +147,8 @@ namespace Helpdesk.DataLayer
 
                 foreach (Queueitem queueItem in queueItems)
                 {
-                    if (queueItem != null && !queueItem.TimeRemoved.HasValue)
+                    // Only get queueItems that haven't been removed yet.
+                    if (queueItem.TimeRemoved == null)
                     {
                         QueueItemDTO queueItemDTO = DAO2DTO(queueItem);
                         var checkIn = context.Checkinqueueitem.Where(ch => ch.QueueItemId == queueItem.ItemId).FirstOrDefault();

@@ -97,7 +97,7 @@ namespace Helpdesk.Services
             }
             catch(Exception ex)
             {
-                s_logger.Error(ex, "Unable to add unti to system");
+                s_logger.Error(ex, "Unable to add unit to system");
                 response.Status = HttpStatusCode.InternalServerError;
                 response.StatusMessages = new List<StatusMessage>();
             }
@@ -129,6 +129,12 @@ namespace Helpdesk.Services
             {
                 s_logger.Warn(ex, $"Unable to find the unit with id [{id}]");
                 response.Status = HttpStatusCode.NotFound;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get unit!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get unit!"));
             }
 
             return response;

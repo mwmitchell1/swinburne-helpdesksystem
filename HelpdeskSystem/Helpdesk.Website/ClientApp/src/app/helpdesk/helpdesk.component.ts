@@ -14,6 +14,7 @@ import { QueueItem } from "../data/DTOs/queue-item.dto";
 import { Topic } from "../data/DTOs/topic.dto";
 import { AddToQueueRequest } from "../data/requests/queue/add-to-queue-request";
 import { UpdateQueueItemStatusRequest } from "../data/requests/queue/update-queue-item-status-request";
+import { UpdateQueueItemRequest } from "../data/requests/queue/update-queue-item-request";
 
 @Component({
   selector: 'app-helpdesk',
@@ -24,6 +25,7 @@ export class HelpdeskComponent implements OnInit {
   public checkInForm: FormGroup;
   public checkOutForm: FormGroup;
   public joinForm: FormGroup;
+  public editQueueForm: FormGroup;
   public helpdesk: Helpdesk = new Helpdesk();
   public helpdeskId: Number;
   public checkIns: CheckIn[] = [];
@@ -39,8 +41,8 @@ export class HelpdeskComponent implements OnInit {
     , private builder: FormBuilder
     , private nicknameService: NicknameService) {
 
-      this.ding = new Audio('../../../assets/sounds/ding.wav');
-      this.ding.load();
+    this.ding = new Audio('../../../assets/sounds/ding.wav');
+    this.ding.load();
 
     this.checkInForm = this.builder.group({
       modalSID: new FormControl('', [Validators.required]),
@@ -58,6 +60,13 @@ export class HelpdeskComponent implements OnInit {
       modalJoinNickname: new FormControl(""),
       modalJoinUnitId: new FormControl(""),
       modalJoinTopicId: new FormControl("", [Validators.required])
+    });
+
+    this.editQueueForm = this.builder.group({
+      modalEditItemId: new FormControl(""),
+      modalEditNickname: new FormControl(""),
+      modalEditUnitId: new FormControl(""),
+      modalEditTopicId: new FormControl("")
     });
   }
 
@@ -129,6 +138,7 @@ export class HelpdeskComponent implements OnInit {
     request.UnitID = this.checkInForm.controls.modalUnitId.value;
     this.service.checkIn(request).subscribe(
       result => {
+        this.notifier.notify('success', 'Check in successful');
         var checkIn = new CheckIn();
         checkIn.checkInId = result.checkInID;
         checkIn.nickname = request.Nickname;
@@ -163,6 +173,7 @@ export class HelpdeskComponent implements OnInit {
     var id = this.checkOutForm.controls.checkOutStudentId.value;
     this.service.checkOut(id, request).subscribe(
       result => {
+        this.notifier.notify('success', 'Checkout successful');
         $('#modal-check-out').modal('hide');
         this.checkOutForm.reset();
         var checkIn = this.checkIns.find(c => c.checkInId == id);
@@ -268,8 +279,8 @@ export class HelpdeskComponent implements OnInit {
     if (value) {
       if (this.helpdesk.hasCheckIn) {
         var checkIn = this.checkIns.find(c => c.checkInId == value);
-        this.topics = this.units.find( u => u.unitId == checkIn.unitId).topics;
-        this.showTopic = true; 
+        this.topics = this.units.find(u => u.unitId == checkIn.unitId).topics;
+        this.showTopic = true;
       } else {
         this.showTopic = true;
         this.topics = this.units.find(u => u.unitId == value).topics;
@@ -323,6 +334,7 @@ export class HelpdeskComponent implements OnInit {
 
     this.service.addToQueue(request).subscribe(
       result => {
+        this.notifier.notify('success', 'Successfully joined queue.');
         this.getQueueItems();
         $('#modal-join-queue').modal('hide');
         this.joinForm.reset();
@@ -334,13 +346,80 @@ export class HelpdeskComponent implements OnInit {
     );
   }
 
+  closeJoinQueue() {
+    this.joinForm.reset();
+    this.topics = [];
+    this.showTopic = false;
+  }
+
+  setupEdit(id: number) {
+    var item = this.queue.find(i => i.itemId == id);
+
+    this.editQueueForm.controls.modalEditItemId.setValue(item.itemId);
+    this.editQueueForm.controls.modalEditNickname.setValue(item.nickname);
+
+    if (!this.helpdesk.hasCheckIn) {
+      var unitId = this.units.find(u => u.name == item.nickname).unitId;
+      this.populateTopics(unitId);
+      this.editQueueForm.controls.modalEditUnitId.setValue(unitId);
+    }
+    else {
+      this.populateTopics(item.checkInId);
+    }
+
+    var topicId = this.topics.find(t => t.name == item.topic).topicId;
+    this.editQueueForm.controls.modalEditTopicId.setValue(topicId);
+  }
+
+  editQueue() {
+
+    var valid = true;
+
+    if (!this.helpdesk.hasCheckIn) {
+      if (!this.editQueueForm.controls.modalEditUnitId.value) {
+        this.notifier.notify('warning', 'You must select a Unit');
+        valid = false;
+      }
+    }
+
+    if (!this.editQueueForm.controls.modalEditTopicId.value) {
+      this.notifier.notify('warning', 'You must select a Topic');
+      valid = false;
+    }
+
+    if (!valid)
+      return false;
+
+    var request = new UpdateQueueItemRequest();
+    request.topicId = this.editQueueForm.controls.modalEditTopicId.value;
+
+    this.service.updateQueueItem(this.editQueueForm.controls.modalEditItemId.value, request).subscribe(
+      result => {
+        this.notifier.notify('success', 'Item change saved');
+        this.getQueueItems();
+        this.editQueueForm.reset();
+        $('#modal-edit-queue').modal('hide');
+      },
+      error => {
+        this.notifier.notify('error', 'Unable to update queue item, please contact admin.');
+      }
+    );
+  }
+
+  closeEditQueue() {
+    this.editQueueForm.reset();
+    this.topics = [];
+    this.showTopic = false;
+  }
+
   remove(id: number) {
     var request = new UpdateQueueItemStatusRequest();
     request.TimeRemoved = new Date();
 
     this.service.updateQueueItemStatus(id, request).subscribe(
       result => {
-        var item = this.queue.find(q => q.ItemId == id);
+        this.notifier.notify('success', 'Item removed from queue');
+        var item = this.queue.find(q => q.itemId == id);
         this.getQueueItems();
       },
       error => {
@@ -355,7 +434,8 @@ export class HelpdeskComponent implements OnInit {
 
     this.service.updateQueueItemStatus(id, request).subscribe(
       result => {
-        var item = this.queue.find(q => q.ItemId == id);
+        this.notifier.notify('success', 'Item collected');
+        var item = this.queue.find(q => q.itemId == id);
         this.getQueueItems();
       },
       error => {
