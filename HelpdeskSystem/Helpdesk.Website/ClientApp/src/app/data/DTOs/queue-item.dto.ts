@@ -1,8 +1,8 @@
 export class QueueItem {
-    public ItemId: number;
-    public CheckInId?: number;
-    public Nickname: string;
-    public Topic: string;
+    public itemId: number;
+    public checkInId?: number;
+    public nickname: string;
+    public topic: string;
     public Unit: string;
     public TimeAdded: Date;
     public TimeHelped?: Date;
