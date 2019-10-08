@@ -65,7 +65,8 @@
 
 <!--      Uses queue - checkbox   -->
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="create-has-queue" id="create-has-queue" [(ngModel)]="createRequest.hasQueue">
+            <input class="form-check-input" type="checkbox" name="create-has-queue" id="create-has-queue"
+                   [(ngModel)]="createRequest.hasQueue" [disabled]="createRequest.isDisabled" #hasQueue="ngModel">
             <label class="form-check-label" for="create-has-queue">
               Uses queue
             </label>
@@ -73,7 +74,8 @@
 
 <!--      Uses check-in - checkbox    -->
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="create-has-check-in" id="create-has-check-in" [(ngModel)]="createRequest.hasCheckIn">
+            <input class="form-check-input" type="checkbox" name="create-has-check-in" id="create-has-check-in"
+                   [(ngModel)]="createRequest.hasCheckIn" [disabled]="createRequest.isDisabled" #hasCheckIn="ngModel">
             <label class="form-check-label" for="create-has-check-in">
               Uses check-in
             </label>
@@ -81,12 +83,18 @@
 
 <!--      Disable helpdesk - checkbox    -->
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="create-is-disabled" id="create-is-disabled" [(ngModel)]="createRequest.isDisabled">
+            <input class="form-check-input" type="checkbox" name="create-is-disabled" id="create-is-disabled" [(ngModel)]="createRequest.isDisabled" #isDisabled="ngModel">
             <label class="form-check-label" for="create-is-disabled">
               Disable this helpdesk
             </label>
           </div>
 
+<!--      Checkbox validation message    -->
+          <div class="invalid-feedback"
+               *ngIf="!hasQueue.pristine || !hasCheckIn.pristine || !isDisabled.pristine"
+               [ngClass]="{'d-block': (!createRequest.isDisabled && !createRequest.hasCheckIn && !createRequest.hasQueue)}">
+            Queue and/or Check-in must be checked if helpdesk is not disabled
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
