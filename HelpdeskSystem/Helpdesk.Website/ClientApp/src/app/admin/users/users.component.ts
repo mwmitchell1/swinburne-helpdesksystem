@@ -12,11 +12,11 @@ import { UpdateUserRequest } from '../../data/requests/users/update-request';
   templateUrl: './users.component.html'
 })
 export class UsersComponent {
-  private users: User[];
+  public users: User[];
   deleteForm;
-  private readonly userToAdd: AddUserRequest;
-  private userToEdit: UpdateUserRequest;
-  private userToEditId: number;
+  public readonly userToAdd: AddUserRequest;
+  public userToEdit: UpdateUserRequest;
+  public userToEditId: number;
 
   constructor(private usersService: UsersService
     , private notifierService: NotifierService

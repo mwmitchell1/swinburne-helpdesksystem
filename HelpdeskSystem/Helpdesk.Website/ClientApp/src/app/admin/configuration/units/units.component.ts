@@ -13,7 +13,7 @@ import { AddUpdateUnitRequest } from 'src/app/data/requests/units/add-unit-respo
   templateUrl: './units.component.html'
 })
 export class UnitsComponent {
-  private units: Unit[];
+  public units: Unit[];
   public newTopics: Topic[];
   public editTopics: Topic[];
   public deleteForm: FormGroup = this.builder.group({

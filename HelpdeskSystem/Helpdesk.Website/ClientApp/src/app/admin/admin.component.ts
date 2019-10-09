@@ -14,7 +14,7 @@ import {SetUpService} from "./configuration/setup/setup.service";
 
 export class AdminComponent {
   public helpdesks: Helpdesk[];
-  private createRequest: UpdateHelpdeskRequest = new UpdateHelpdeskRequest();
+  public createRequest: UpdateHelpdeskRequest = new UpdateHelpdeskRequest();
 
   constructor(private helpdeskService: HelpdeskService, private notifier: NotifierService, private setupService: SetUpService) {
     helpdeskService.getActiveHelpdesks().subscribe(

@@ -19,7 +19,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private helpdeskLink: string;
   private adminLink: string;
   private logoutLink: string;
-  private isAdminRoute: boolean;
+  public isAdminRoute: boolean;
 
   private activeHelpdeskSub;
   private adminRouteSub;
