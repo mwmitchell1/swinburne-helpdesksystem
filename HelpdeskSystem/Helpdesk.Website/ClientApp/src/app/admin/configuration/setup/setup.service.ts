@@ -22,13 +22,13 @@ export class SetUpService {
     }
 
 
-  /**
-   * HTTP request to create a helpdesk
-   * @param helpdesk
-   */
-  createHelpdesk(helpdesk: UpdateHelpdeskRequest) {
-    return this.http.post<UpdateHelpdeskRequest>('api/helpdesk', helpdesk);
-  }
+    /**
+     * HTTP request to create a helpdesk
+     * @param helpdesk
+     */
+    createHelpdesk(helpdesk: UpdateHelpdeskRequest) {
+      return this.http.post<UpdateHelpdeskRequest>('api/helpdesk', helpdesk);
+    }
 
     ClearHelpdesk(id: number) {
       return this.http.delete<ForceCheckoutQueueRemoveResponse>('/api/helpdesk/' + id + '/clear');

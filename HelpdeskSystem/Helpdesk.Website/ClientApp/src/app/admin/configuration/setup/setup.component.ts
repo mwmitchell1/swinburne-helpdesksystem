@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RoutesRecognized } from '@angular/router';
 import { NotifierService } from 'angular-notifier';
 import { SetUpService } from './setup.service';
 import { UpdateHelpdeskRequest } from 'src/app/data/requests/configuration/update-request';
+import { Helpdesk } from '../../../data/DTOs/helpdesk.dto';
 
 @Component({
   selector: 'app-admin-setup',
@@ -14,7 +15,10 @@ export class SetUpComponent implements OnInit {
 
   private returnUrl;
   private id;
-  configForm
+  configForm;
+
+  private helpdesk: Helpdesk;
+  private updateRequest: UpdateHelpdeskRequest;
 
   constructor(private builder: FormBuilder,
     private service: AuthenticationService,
@@ -31,7 +35,6 @@ export class SetUpComponent implements OnInit {
     })
   }
 
-  public helpdesk;
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -72,11 +75,11 @@ export class SetUpComponent implements OnInit {
     if (!isValid)
       return;
 
-    var updateHelpdeskRequest = new UpdateHelpdeskRequest();
-    updateHelpdeskRequest.name = data.name;
-    updateHelpdeskRequest.hasCheckIn = data.hasCheck;
-    updateHelpdeskRequest.hasQueue = data.hasQueue;
-    updateHelpdeskRequest.isDisabled = data.isDisabled;
+    // var updateHelpdeskRequest = new UpdateHelpdeskRequest();
+    // updateHelpdeskRequest.name = data.name;
+    // updateHelpdeskRequest.hasCheckIn = data.hasCheck;
+    // updateHelpdeskRequest.hasQueue = data.hasQueue;
+    // updateHelpdeskRequest.isDisabled = data.isDisabled;
 
     this.configService.UpdateHelpdesk(this.id, updateHelpdeskRequest).subscribe(result => {
       if (result.status == 200) {
