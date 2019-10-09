@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Helpdesk.Common.DTOs
 {
+    /// <summary>
+    /// used as a transfer object to return to the database
+    /// </summary>
     public class NicknameDTO
     {
         public int ID { get; set; }

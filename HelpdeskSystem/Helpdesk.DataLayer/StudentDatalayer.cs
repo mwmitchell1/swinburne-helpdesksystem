@@ -17,6 +17,27 @@ namespace Helpdesk.DataLayer
     public class StudentDatalayer
     {
         /// <summary>
+        /// used to retreive all nicknames in the database
+        /// </summary>
+        /// <returns>The list of nicknames as DTOs</returns>
+        public List<NicknameDTO> GetAllNicknames()
+        {
+            List<NicknameDTO> nicknameDTOs = new List<NicknameDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var nicknames = context.Nicknames.ToList();
+
+                foreach (var nickname in nicknames)
+                {
+                    nicknameDTOs.Add(DAO2DTO(nickname));
+                }
+            }
+
+            return nicknameDTOs;
+        }
+
+        /// <summary>
         /// Used to get a student nickname by the nickname
         /// </summary>
         /// <param name="nickname">The nickname to look up</param>

@@ -4,6 +4,7 @@ using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests.Students;
 using Helpdesk.Common.Responses;
 using Helpdesk.Common.Responses.Students;
+using Helpdesk.Common.Utilities;
 using Helpdesk.Data.Models;
 using Helpdesk.DataLayer;
 using NLog;
@@ -22,6 +23,33 @@ namespace Helpdesk.Services
         private static Logger s_logger = LogManager.GetCurrentClassLogger();
 
         private readonly AppSettings _appSettings;
+
+        /// <summary>
+        /// Used to get all of the student nicknames
+        /// </summary>
+        /// <returns>The response with the nickname list</returns>
+        public GetAllNicknamesResponse GetAllNicknames()
+        {
+            GetAllNicknamesResponse response = new GetAllNicknamesResponse();
+
+            try
+            {
+                var dataLayer = new StudentDatalayer();
+                response.Nicknames = dataLayer.GetAllNicknames();
+
+                if (response.Nicknames.Count > 0)
+                    response.Status = HttpStatusCode.OK;
+                else
+                    response.Status = HttpStatusCode.NotFound;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to a get nicknames");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to get nicknames"));
+            }
+            return response;
+        }
 
         /// <summary>
         /// Used to get the studnet by their nickname
@@ -201,6 +229,39 @@ namespace Helpdesk.Services
                 response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to validate student's nickname!"));
             }
 
+            return response;
+        }
+
+        /// <summary>
+        /// Used to generate a new random nickname for admin purposes
+        /// </summary>
+        /// <returns>The response containing the nickname</returns>
+        public GenerateNicknameResponse GenerateNickname()
+        {
+            var response = new GenerateNicknameResponse();
+            try
+            {
+                string nickname = AlphaNumericStringGenerator.GetString(20);
+
+                var dataLayer = new StudentDatalayer();
+
+                var existingUsername = dataLayer.GetStudentNicknameByNickname(nickname);
+
+                while (existingUsername != null)
+                {
+                    nickname = AlphaNumericStringGenerator.GetString(20);
+                    existingUsername = dataLayer.GetStudentNicknameByNickname(nickname);
+                }
+
+                response.Nickname = nickname;
+                response.Status = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to generate nickname!");
+                response.Status = HttpStatusCode.InternalServerError;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.InternalServerError, "Unable to generate nickname!"));
+            }
             return response;
         }
     }

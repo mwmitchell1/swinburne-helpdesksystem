@@ -21,11 +21,46 @@ namespace Helpdesk.Website.Controllers.api
     public class StudentController : BaseApiController
     {
         /// <summary>
+        /// Used to get all of the student nicknames
+        /// </summary>
+        /// <returns>The response with the nickname list</returns>
+        [HttpGet]
+        [Route("")]
+        public IActionResult GetAllNicknames()
+        {
+            if (!IsAuthorized())
+                return Unauthorized();
+
+            try
+            {
+                var facade = new StudentFacade();
+                var response = facade.GetAllNicknames();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to get student by nickname.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
         /// Gets a student by their nickname.
         /// </summary>
         /// <param name="nickname"></param>
         /// <returns></returns>
         [HttpGet]
+        [Route("nickname")]
         public IActionResult GetStudentByNickname([FromRoute] string nickname)
         {
             if (!IsAuthorized())
@@ -120,6 +155,41 @@ namespace Helpdesk.Website.Controllers.api
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to validate student's nickname.");
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Used as an endpoint to generate nickname
+        /// </summary>
+        /// <returns>The response that indicates success</returns>
+        [HttpGet]
+        [Route("generate")]
+        public IActionResult GenerateNickname()
+        {
+            try
+            {
+                var facade = new StudentFacade();
+                var response = facade.GenerateNickname();
+
+                switch (response.Status)
+                {
+                    case HttpStatusCode.OK:
+                        return Ok(response);
+                    case HttpStatusCode.Accepted:
+                        return Accepted(response);
+                    case HttpStatusCode.BadRequest:
+                        return BadRequest(BuildBadRequestMessage(response));
+                    case HttpStatusCode.InternalServerError:
+                        return StatusCode(StatusCodes.Status500InternalServerError);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
+                }
+                s_logger.Fatal("This code should be unreachable, unknown result has occured.");
+            }
+            catch (Exception ex)
+            {
+                s_logger.Error(ex, "Unable to generate nickname.");
             }
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
