@@ -1,8 +1,15 @@
 #swinburne-logo {
-    width: 75px;
-    height: 75px;
+    height: 128px;
   }
 
 .navbar {
     padding: 0px;
+}
+
+.navbar-brand {
+  font-size: 50px;
+}
+
+.nav-item.btn {
+  font-size: 20px;
 }
