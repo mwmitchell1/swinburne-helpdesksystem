@@ -3,6 +3,5 @@ export class Helpdesk {
     public name: string;
     public hasCheckIn: boolean;
     public hasQueue: boolean;
-    public isDisable: boolean;
+    public isDisabled: boolean;
 }
-  
