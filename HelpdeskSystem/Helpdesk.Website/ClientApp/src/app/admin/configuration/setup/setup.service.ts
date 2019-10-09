@@ -16,8 +16,7 @@ export class SetUpService {
         return this.http.get<GetHelpdeskResponse>('/api/helpdesk/' + id);
     }
 
-    UpdateHelpdesk(id: number, request: UpdateHelpdeskRequest)
-    {
+    updateHelpdesk(id: number, request: UpdateHelpdeskRequest) {
       return this.http.patch<UpdateHelpdeskResponse>('/api/helpdesk/' + id, request);
     }
 

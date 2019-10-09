@@ -18,14 +18,13 @@ export class SetUpComponent implements OnInit {
   configForm;
 
   private helpdesk: Helpdesk;
-  private updateRequest: UpdateHelpdeskRequest;
 
   constructor(private builder: FormBuilder,
     private service: AuthenticationService,
     private configService: SetUpService,
     private route: ActivatedRoute,
     private _router: Router,
-    private notifierSerive: NotifierService) {
+    private notifier: NotifierService) {
 
     this.configForm = builder.group({
       name: new FormControl(),
@@ -33,6 +32,8 @@ export class SetUpComponent implements OnInit {
       hasCheck: ['false'],
       isDisabled: ['false']
     })
+
+    this.helpdesk = new Helpdesk();
   }
 
 
@@ -57,47 +58,86 @@ export class SetUpComponent implements OnInit {
         });
       },
       error => {
-        this.notifierSerive.notify('error', 'Unable to retreive helpdesk configuration, pleae contact admin');
+        this.notifier.notify('error', 'Unable to retreive helpdesk configuration, pleae contact admin');
       }
     )
   }
 
-  UpdateHelpdesk() {
+  // UpdateHelpdesk() {
+  //
+  //   var data = this.configForm.value;
+  //   var isValid: boolean = true;
+  //
+  //   if (!data.name) {
+  //     this.notifierSerive.notify('warning', 'You must enter in a helpdesk name.');
+  //     isValid = false;
+  //   }
+  //
+  //   if (!isValid)
+  //     return;
+  //
+  //   // var updateHelpdeskRequest = new UpdateHelpdeskRequest();
+  //   // updateHelpdeskRequest.name = data.name;
+  //   // updateHelpdeskRequest.hasCheckIn = data.hasCheck;
+  //   // updateHelpdeskRequest.hasQueue = data.hasQueue;
+  //   // updateHelpdeskRequest.isDisabled = data.isDisabled;
+  //
+  //   this.configService.UpdateHelpdesk(this.id, updateHelpdeskRequest).subscribe(result => {
+  //     if (result.status == 200) {
+  //       this.notifierSerive.notify('success', 'Helpdesk updated successfully.');
+  //     }
+  //   },
+  //     error => {
+  //       this.notifierSerive.notify('error', 'Unable to update helpdesk, please contact admin.');
+  //     });
+  // }
 
-    var data = this.configForm.value;
-    var isValid: boolean = true;
+  // TODO: update helpdesk list on update/create
+  updateHelpdesk(form) {
 
-    if (!data.name) {
-      this.notifierSerive.notify('warning', 'You must enter in a helpdesk name.');
-      isValid = false;
+    let allowSubmit = true;
+    const updateRequest: UpdateHelpdeskRequest = this.helpdesk;
+    // delete updateRequest.id;
+
+    console.log(updateRequest);
+
+    // Check if name has been touched - do not allow submit - required to show invalid msg on submit
+    if (!updateRequest.hasOwnProperty('name')) {
+      form.controls['settings-name'].markAsDirty();
+      allowSubmit = false;
     }
 
-    if (!isValid)
-      return;
+    // Checkbox validation
+    if (!updateRequest.isDisabled && !updateRequest.hasCheckIn && !updateRequest.hasQueue) {
+      allowSubmit = false;
+    }
 
-    // var updateHelpdeskRequest = new UpdateHelpdeskRequest();
-    // updateHelpdeskRequest.name = data.name;
-    // updateHelpdeskRequest.hasCheckIn = data.hasCheck;
-    // updateHelpdeskRequest.hasQueue = data.hasQueue;
-    // updateHelpdeskRequest.isDisabled = data.isDisabled;
+    // If not allowed to submit, end function
+    if (!allowSubmit) { return; }
 
-    this.configService.UpdateHelpdesk(this.id, updateHelpdeskRequest).subscribe(result => {
-      if (result.status == 200) {
-        this.notifierSerive.notify('success', 'Helpdesk updated successfully.');
+    // Allowed to submit - send request
+    this.configService.updateHelpdesk(this.id, updateRequest).subscribe(
+      result => {
+        // $('#modal-helpdesk-add').modal('hide');
+        // form.reset();
+
+        this.notifier.notify('success', 'Helpdesk edited successfully!');
+      }, error => {
+        console.log(error);
+        this.notifier.notify('error', 'Could not edit helpdesk, please contact helpdesk admin.');
       }
-    },
-      error => {
-        this.notifierSerive.notify('error', 'Unable to update helpdesk, please contact admin.');
-      });
+    );
+
+
   }
 
   ClearHelpdesk() {
     this.configService.ClearHelpdesk(this.id).subscribe(
       result => {
-        this.notifierSerive.notify('success', 'Helpdesk cleared');
+        this.notifier.notify('success', 'Helpdesk cleared');
       },
       error => {
-        this.notifierSerive.notify('error', 'Unable to clear helpdesk please contact admin');
+        this.notifier.notify('error', 'Unable to clear helpdesk please contact admin');
       }
     );
   }

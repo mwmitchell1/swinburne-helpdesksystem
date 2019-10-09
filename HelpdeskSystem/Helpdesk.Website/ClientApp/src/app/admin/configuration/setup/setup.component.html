@@ -2,38 +2,38 @@
 
 <div class="row">
     <div class="col-md-4">
-      <form>
+      <form (ngSubmit)="updateHelpdesk(editHelpdeskForm)" #editHelpdeskForm="ngForm">
         <!--      Helpdesk Name    -->
         <div class="form-group">
-          <label for="helpdesk-add-name">Helpdesk Name</label>
-          <input type="text" class="form-control" [ngClass]="{'is-invalid': !(createName.valid || createName.pristine)}"
-                 id="helpdesk-add-name" name="helpdesk-add-name"
-                 required maxlength="20" [(ngModel)]="helpdesk.name" #createName="ngModel">
-          <div class="invalid-feedback" [hidden]="createName.valid || createName.pristine">Helpdesk name is required</div>
+          <label for="settings-name">Helpdesk Name</label>
+          <input type="text" class="form-control" [ngClass]="{'is-invalid': !(name.valid || name.pristine)}"
+                 id="settings-name" name="settings-name"
+                 required maxlength="20" [(ngModel)]="helpdesk.name" #name="ngModel">
+          <div class="invalid-feedback" [hidden]="name.valid || name.pristine">Helpdesk name is required</div>
         </div>
 
         <!--      Uses queue - checkbox   -->
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="create-has-queue" id="create-has-queue"
+          <input class="form-check-input" type="checkbox" name="settings-has-queue" id="settings-has-queue"
                  [(ngModel)]="helpdesk.hasQueue" [disabled]="helpdesk.isDisabled" #hasQueue="ngModel">
-          <label class="form-check-label" for="create-has-queue">
+          <label class="form-check-label" for="settings-has-queue">
             Uses queue
           </label>
         </div>
 
         <!--      Uses check-in - checkbox    -->
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="create-has-check-in" id="create-has-check-in"
+          <input class="form-check-input" type="checkbox" name="settings-has-check-in" id="settings-has-check-in"
                  [(ngModel)]="helpdesk.hasCheckIn" [disabled]="helpdesk.isDisabled" #hasCheckIn="ngModel">
-          <label class="form-check-label" for="create-has-check-in">
+          <label class="form-check-label" for="settings-has-check-in">
             Uses check-in
           </label>
         </div>
 
         <!--      Disable helpdesk - checkbox    -->
         <div class="form-check">
-          <input class="form-check-input" type="checkbox" name="create-is-disabled" id="create-is-disabled" [(ngModel)]="helpdesk.isDisabled" #isDisabled="ngModel">
-          <label class="form-check-label" for="create-is-disabled">
+          <input class="form-check-input" type="checkbox" name="settings-is-disabled" id="settings-is-disabled" [(ngModel)]="helpdesk.isDisabled" #isDisabled="ngModel">
+          <label class="form-check-label" for="settings-is-disabled">
             Disable this helpdesk
           </label>
         </div>
