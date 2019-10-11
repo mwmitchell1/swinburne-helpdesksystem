@@ -90,7 +90,7 @@
                                 <label for="modalJoinUnitId">Unit:</label>
                                 <select (change)="populateTopics($event.target.value)" class="form-control"
                                     id="modalJoinUnitId" name="modalJoinUnitId" formControlName="modalJoinUnitId">
-                                    <option value="">Which unit are you studying?</option>
+                                    <option value="" disabled>Which unit are you studying?</option>
                                     <option *ngFor="let unit of units" value="{{unit.unitId}}">
                                         {{unit.name}}
                                     </option>
@@ -100,7 +100,7 @@
                                 <label for="modalJoinTopicId">Topic:</label>
                                 <select class="form-control" id="modalJoinTopicId" name="modalJoinTopicId"
                                     formControlName="modalJoinTopicId">
-                                    <option value="">Which topic do you need help on?</option>
+                                    <option value="" disabled>Which topic do you need help on?</option>
                                     <option *ngFor="let topic of topics" value="{{topic.topicId}}">
                                         {{topic.name}}
                                     </option>
@@ -138,7 +138,7 @@
                                 <label for="modalEditUnitId">Unit:</label>
                                 <select (change)="populateTopics($event.target.value)" class="form-control"
                                     id="modalEditUnitId" name="modalEditUnitId" formControlName="modalEditUnitId">
-                                    <option value="">Which unit are you studying?</option>
+                                    <option value="" disabled>Which unit are you studying?</option>
                                     <option *ngFor="let unit of units" value="{{unit.unitId}}">
                                         {{unit.name}}
                                     </option>
@@ -148,7 +148,7 @@
                                 <label for="modalEditTopicId">Topic:</label>
                                 <select class="form-control" id="modalEditTopicId" name="modalEditTopicId"
                                     formControlName="modalEditTopicId">
-                                    <option value="">Which topic do you need help on?</option>
+                                    <option value="" disabled>Which topic do you need help on?</option>
                                     <option *ngFor="let topic of topics" value="{{topic.topicId}}">
                                         {{topic.name}}
                                     </option>
@@ -196,7 +196,7 @@
                                 <label for="modalUnitId">Unit:</label>
                                 <select class="form-control" id="modalUnitId" name="modalUnitId"
                                     formControlName="modalUnitId">
-                                    <option value="">Which unit are you studying?</option>
+                                    <option value="" disabled>Which unit are you studying?</option>
                                     <option *ngFor="let unit of units" value="{{unit.unitId}}">
                                         {{unit.name}}
                                     </option>
@@ -228,7 +228,7 @@
                                 <label for="checkOutStudentId">Checked In:</label>
                                 <select class="form-control" id="checkOutStudentId" name="checkOutStudentId"
                                     formControlName="checkOutStudentId">
-                                    <option value="">What is your nickname?</option>
+                                    <option value="" disabled>What is your nickname?</option>
                                     <option *ngFor="let checkIn of checkIns" value="{{checkIn.checkInId}}">
                                         {{checkIn.nickname}}
                                     </option>

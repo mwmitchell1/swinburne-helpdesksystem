@@ -58,15 +58,15 @@ export class HelpdeskComponent implements OnInit {
       modalJoinStudentId: new FormControl(""),
       modalJoinSID: new FormControl(""),
       modalJoinNickname: new FormControl(""),
-      modalJoinUnitId: new FormControl(""),
-      modalJoinTopicId: new FormControl("", [Validators.required])
+      modalJoinUnitId: new FormControl(''),
+      modalJoinTopicId: new FormControl('', [Validators.required])
     });
 
     this.editQueueForm = this.builder.group({
       modalEditItemId: new FormControl(""),
       modalEditNickname: new FormControl(""),
-      modalEditUnitId: new FormControl(""),
-      modalEditTopicId: new FormControl("")
+      modalEditUnitId: new FormControl(''),
+      modalEditTopicId: new FormControl('')
     });
   }
 
@@ -192,6 +192,9 @@ export class HelpdeskComponent implements OnInit {
   }
 
   closeCheckOut() {
+    this.checkOutForm.controls.modalEditUnitId.setValue('');
+    this.checkOutForm.controls.modalJoinTopicId.setValue('');
+    this.checkOutForm.controls.modalJoinCheckId.setValue('');
     this.checkOutForm.reset();
   }
 
@@ -352,6 +355,9 @@ export class HelpdeskComponent implements OnInit {
 
   closeJoinQueue() {
     this.joinForm.reset();
+    this.joinForm.controls.modalJoinCheckId.setValue('');
+    this.joinForm.controls.modalJoinUnitId.setValue('');
+    this.joinForm.controls.modalJoinTopicId.setValue('');
     this.topics = [];
     this.showTopic = false;
   }
