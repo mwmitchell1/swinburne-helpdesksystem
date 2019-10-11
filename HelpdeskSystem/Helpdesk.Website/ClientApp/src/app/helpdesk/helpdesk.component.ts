@@ -173,6 +173,10 @@ export class HelpdeskComponent implements OnInit {
     var id = this.checkOutForm.controls.checkOutStudentId.value;
     this.service.checkOut(id, request).subscribe(
       result => {
+
+        if (this.helpdesk.hasQueue)
+          this.getQueueItems();
+          
         this.notifier.notify('success', 'Checkout successful');
         $('#modal-check-out').modal('hide');
         this.checkOutForm.reset();
@@ -218,7 +222,7 @@ export class HelpdeskComponent implements OnInit {
         if (error.status == 400) {
           this.notifier.notify('warning', 'This nickname is already taken, please choose another.');
         }
-        else {
+        else if (error.sttaus != 404) {
           this.notifier.notify('error', 'Unable to validate nickname, please contact admin.');
         }
       }
@@ -252,7 +256,7 @@ export class HelpdeskComponent implements OnInit {
         if (error.status == 400) {
           this.notifier.notify('warning', 'This nickname is already taken, please choose another.');
         }
-        else {
+        else if (error.status != 404) {
           this.notifier.notify('error', 'Unable to validate nickname, please contact admin.');
         }
       }
@@ -359,9 +363,9 @@ export class HelpdeskComponent implements OnInit {
     this.editQueueForm.controls.modalEditNickname.setValue(item.nickname);
 
     if (!this.helpdesk.hasCheckIn) {
-      var unitId = this.units.find(u => u.name == item.nickname).unitId;
-      this.populateTopics(unitId);
-      this.editQueueForm.controls.modalEditUnitId.setValue(unitId);
+      var unitSelected = this.units.find(u => u.name == item.unit).unitId;
+      this.populateTopics(unitSelected);
+      this.editQueueForm.controls.modalEditUnitId.setValue(unitSelected);
     }
     else {
       this.populateTopics(item.checkInId);

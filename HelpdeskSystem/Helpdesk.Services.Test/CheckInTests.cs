@@ -349,6 +349,103 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
+        /// Used to ensure that when checking out any queue items associated with that user are removed from the queue
+        /// </summary>
+        [TestMethod]
+        public void CheckOutWithQueueItems()
+        {
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            Topic topic = new Topic()
+            {
+                Name = AlphaNumericStringGenerator.GetString(10),
+                IsDeleted = false
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Unit.Add(unit);
+                topic.UnitId = unit.UnitId;
+                context.Topic.Add(topic);
+                context.SaveChanges();
+            }
+
+            CheckInRequest request = new CheckInRequest()
+            {
+                UnitID = unit.UnitId,
+                Nickname = AlphaNumericStringGenerator.GetString(10),
+                SID = AlphaNumericStringGenerator.GetStudentIDString()
+            };
+
+            CheckInFacade facade = new CheckInFacade();
+
+            CheckInResponse response = facade.CheckIn(request);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.Status);
+            Assert.IsTrue(response.CheckInID > 0);
+
+            Queueitem queueitem = new Queueitem()
+            {
+                StudentId = response.StudentID,
+                TopicId = topic.TopicId,
+                TimeAdded = DateTime.Now
+            };
+
+
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Queueitem.Add(queueitem);
+
+                Checkinqueueitem checkinqueueitem = new Checkinqueueitem()
+                {
+                    CheckInId = response.CheckInID,
+                    QueueItemId = queueitem.ItemId
+                };
+                context.Checkinqueueitem.Add(checkinqueueitem);
+
+                context.SaveChanges();
+            }
+
+            CheckOutRequest coRequest = new CheckOutRequest()
+            {
+                ForcedCheckout = false
+            };
+
+            CheckOutResponse coResponse = facade.CheckOut(coRequest, response.CheckInID);
+
+            Assert.AreEqual(HttpStatusCode.OK, coResponse.Status);
+            Assert.IsTrue(coResponse.Result);
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                Checkinhistory checkOut = context.Checkinhistory.FirstOrDefault(co => co.CheckInId == response.CheckInID);
+                Queueitem item = context.Queueitem.FirstOrDefault(qi => qi.ItemId == queueitem.ItemId);
+
+                Assert.IsNotNull(checkOut);
+
+                var baseTime = DateTime.Now.AddMinutes(-1);
+                var addTime = checkOut.CheckoutTime;
+                var timeDiff = baseTime.CompareTo(addTime);
+                Assert.IsTrue(timeDiff == -1);
+
+                Assert.AreEqual(coRequest.ForcedCheckout, checkOut.ForcedCheckout);
+
+                Assert.IsNotNull(item);
+
+                var baseQueueTime = DateTime.Now.AddMinutes(-1);
+                var removeQueueTime = item.TimeRemoved;
+                var queueTimeDiff = baseQueueTime.CompareTo(removeQueueTime);
+                Assert.IsTrue(queueTimeDiff == -1);
+            }
+        }
+
+        /// <summary>
         /// Test checking out works with forced checkout
         /// </summary>
         [TestMethod]

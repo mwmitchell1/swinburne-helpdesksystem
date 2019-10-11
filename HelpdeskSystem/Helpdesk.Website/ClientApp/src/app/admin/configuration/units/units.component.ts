@@ -51,7 +51,10 @@ export class UnitsComponent {
       result => {
         this.units = result.units;
       }, error => {
-        this.notifier.notify('error', 'Unable to get units, please contact helpdesk admin.');
+        if (error.status != 404)
+        {
+          this.notifier.notify('error', 'Unable to get units, please contact helpdesk admin.');
+        }
       }
     );
   }
@@ -74,7 +77,7 @@ export class UnitsComponent {
         if (result.status == 200) {
           this.notifier.notify('success', 'Unit deleted successfully.');
           this.updateUnitsList();
-          var modal = $('#modal-user-delete').modal('hide');
+          $('#modal-user-delete').modal('hide');
         }
       },
       error => {

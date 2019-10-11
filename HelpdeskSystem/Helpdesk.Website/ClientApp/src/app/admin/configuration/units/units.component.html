@@ -18,7 +18,7 @@
           <td>{{ unit.name }}</td>
           <td>
             <button class="btn btn-danger float-right ml-1" data-toggle="modal" data-target="#modal-unit-delete"
-              [ngClass]="{'disabled': unit.isDeleted}" [attr.disabled]="unit.isDeleted"
+              [ngClass]="{'disabled': unit.isDeleted}" [disabled]="unit.isDeleted"
               (click)="setupDelete(unit.unitId)">Delete</button>
             <button class="btn btn-secondary float-right" data-toggle="modal" (click)="setUpEdit(unit.unitId)"
               data-target="#modal-unit-edit">Edit</button>

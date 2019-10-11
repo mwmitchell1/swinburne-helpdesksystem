@@ -17,7 +17,10 @@ export class HomeComponent {
         this.helpdesks = result.helpdesks;
       },
       error => {
-        this.notifier.notify('error', "Unable to load dashboard, please contact administrators");
+        if (error.status != 404)
+        {
+          this.notifier.notify('error', "Unable to load dashboard, please contact administrators");
+        }
       }
     );
   }

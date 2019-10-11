@@ -209,8 +209,12 @@ namespace Helpdesk.Services
                             response.Status = HttpStatusCode.Accepted;
                         }
                     }
+                    else
+                    {
+                        response.Status = HttpStatusCode.NotFound;
+                    }
                 }
-                else if (existingNickname.StudentID == request.SID)
+                else if (existingNickname.StudentID == request.SID || string.IsNullOrEmpty(request.SID))
                 {
                     response.Nickname = existingNickname.Nickname;
                     response.StudentId = existingNickname.StudentID;

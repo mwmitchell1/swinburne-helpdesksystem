@@ -165,6 +165,33 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
+        /// Used to retreive all of the queue items for a check in
+        /// </summary>
+        /// <param name="checkInId">The id of the students check in</param>
+        /// <returns>The list of queue items for that check in</returns>
+        public List<QueueItemDTO> GetQueueItemsByCheckIn(int checkInId)
+        {
+            List<QueueItemDTO> queueItems = new List<QueueItemDTO>();
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                var itemIds = context.Checkinqueueitem.Where(cq => cq.CheckInId == checkInId).Select(cq => cq.QueueItemId);
+
+                foreach (int id in itemIds)
+                {
+                    var item = context.Queueitem.Include("Topic.Unit").Include("Student").Where(i => i.ItemId == id).FirstOrDefault();
+
+                    if (item != null && item.TimeRemoved == null)
+                    {
+                        queueItems.Add(DAO2DTO(item));
+                    }
+                }
+            }
+
+            return queueItems;
+        }
+
+        /// <summary>
         /// Used to get a datatable with all of the helpdesk records
         /// </summary>
         /// <returns>Datatable with the helpdesk records</returns>

@@ -1,10 +1,10 @@
-import {Component, ViewChild} from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Helpdesk } from '../data/DTOs/helpdesk.dto';
 import { HelpdeskService } from '../helpdesk/helpdesk.service';
 import { NotifierService } from 'angular-notifier';
 import { UpdateHelpdeskRequest } from '../data/requests/configuration/update-request';
 import { UnitsService } from './configuration/units/units.service';
-import {SetUpService} from "./configuration/setup/setup.service";
+import { SetUpService } from "./configuration/setup/setup.service";
 
 @Component({
   selector: 'app-admin',
@@ -17,16 +17,21 @@ export class AdminComponent {
   public createRequest: UpdateHelpdeskRequest = new UpdateHelpdeskRequest();
 
   constructor(private helpdeskService: HelpdeskService, private notifier: NotifierService, private setupService: SetUpService) {
-    helpdeskService.getActiveHelpdesks().subscribe(
+    this.getHelpdesks();
+  }
+
+  getHelpdesks() {
+    this.helpdeskService.getActiveHelpdesks().subscribe(
       result => {
         this.helpdesks = result.helpdesks;
       },
       error => {
-        this.notifier.notify('error', "Unable to load dashboard, please contact administrators");
+        if (error.status != 404) {
+          this.notifier.notify('error', "Unable to helpdesks, please contact administrators");
+        }
       }
     );
   }
-
 
   createHelpdesk(form) {
 
@@ -40,7 +45,7 @@ export class AdminComponent {
 
     // Checkbox validation
     if (!this.createRequest.isDisabled && !this.createRequest.hasCheckIn && !this.createRequest.hasQueue) {
-        allowSubmit = false;
+      allowSubmit = false;
     }
 
     // If not allowed to submit, end function
@@ -49,6 +54,7 @@ export class AdminComponent {
     // Allowed to submit - send request
     this.setupService.createHelpdesk(this.createRequest).subscribe(
       result => {
+        this.getHelpdesks();
         $('#modal-helpdesk-add').modal('hide');
         form.reset();
 

@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Linq;
 using System.Text;
+using Helpdesk.Common.Requests.Queue;
 
 namespace Helpdesk.Services
 {
@@ -65,7 +66,7 @@ namespace Helpdesk.Services
                 using (helpdesksystemContext context = new helpdesksystemContext())
                 {
                     if (context.Nicknames.FirstOrDefault(n => n.StudentId == request.StudentID) == null)
-                            throw new NotFoundException("No student found for id " + request.StudentID);
+                        throw new NotFoundException("No student found for id " + request.StudentID);
                 }
 
                 CheckInDataLayer dataLayer = new CheckInDataLayer();
@@ -107,6 +108,18 @@ namespace Helpdesk.Services
 
                 if (result == false)
                     throw new NotFoundException("Unable to find check in item!");
+
+                QueueDataLayer queueDataLayer = new QueueDataLayer();
+                var queueItems = queueDataLayer.GetQueueItemsByCheckIn(id);
+                UpdateQueueItemStatusRequest removeRequest = new UpdateQueueItemStatusRequest()
+                {
+                    TimeRemoved = DateTime.Now
+                };
+
+                foreach (var item in queueItems)
+                {
+                    queueDataLayer.UpdateQueueItemStatus(item.ItemId, removeRequest);
+                }
 
                 response.Result = result;
                 response.Status = HttpStatusCode.OK;
