@@ -2,85 +2,53 @@
 
 <div class="row">
     <div class="col-md-4">
-        <form [formGroup]="configForm" (ngSubmit)="UpdateHelpdesk()">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label for="name">Helpdesk Name</label>
-                        <input name="name" type="name" class="form-control" formControlName="name"
-                            id="name" required>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-12">
-                            Uses Queue
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 radio">
-                            <div class="radio">
-                                <label><input type="radio" name="hasQueue" value="true" formControlName="hasQueue"> Yes</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3 radio">
-                            <div class="radio">
-                                <label><input type="radio" name="hasQueue" value="false" formControlName="hasQueue"> No</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-12">
-                            Uses Check In
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 radio">
-                            <div class="radio">
-                                <label><input type="radio" name="hasCheck" value="true" formControlName="hasCheck"> Yes</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3 radio">
-                            <div class="radio">
-                                <label><input type="radio" name="hasCheck" value="false" formControlName="hasCheck"> No</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-12">
-                            Is Disabled
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3 radio">
-                            <div class="radio">
-                                <label><input type="radio" ng-value="" name="isDisabled" value="true" formControlName="isDisabled"> Yes</label>
-                            </div>
-                        </div>
-                        <div class="col-md-3 radio">
-                            <div class="radio">
-                                <label><input type="radio" name="isDisabled" value="false" formControlName="isDisabled"> No</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary float-right">Save</button>
-                    <button type="button" class="btn btn-secondary float-left" (click)="ClearHelpdesk()">Clear Helpdesk Items</button>
-                </div>
-            </div>
-        </form>
+      <form (ngSubmit)="updateHelpdesk(editHelpdeskForm)" #editHelpdeskForm="ngForm">
+        <!--      Helpdesk Name    -->
+        <div class="form-group">
+          <label for="settings-name">Helpdesk Name</label>
+          <input type="text" class="form-control" [ngClass]="{'is-invalid': !(name.valid || name.pristine)}"
+                 id="settings-name" name="settings-name"
+                 required maxlength="20" [(ngModel)]="helpdesk.name" #name="ngModel">
+          <div class="invalid-feedback" [hidden]="name.valid || name.pristine">Helpdesk name is required</div>
+        </div>
+
+        <!--      Uses queue - checkbox   -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="settings-has-queue" id="settings-has-queue"
+                 [(ngModel)]="helpdesk.hasQueue" [disabled]="helpdesk.isDisabled" #hasQueue="ngModel">
+          <label class="form-check-label" for="settings-has-queue">
+            Uses queue
+          </label>
+        </div>
+
+        <!--      Uses check-in - checkbox    -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="settings-has-check-in" id="settings-has-check-in"
+                 [(ngModel)]="helpdesk.hasCheckIn" [disabled]="helpdesk.isDisabled" #hasCheckIn="ngModel">
+          <label class="form-check-label" for="settings-has-check-in">
+            Uses check-in
+          </label>
+        </div>
+
+        <!--      Disable helpdesk - checkbox    -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="settings-is-disabled" id="settings-is-disabled" [(ngModel)]="helpdesk.isDisabled" #isDisabled="ngModel">
+          <label class="form-check-label" for="settings-is-disabled">
+            Disable this helpdesk
+          </label>
+        </div>
+
+        <!--      Checkbox validation message    -->
+        <div class="invalid-feedback"
+             *ngIf="!hasQueue.pristine || !hasCheckIn.pristine || !isDisabled.pristine"
+             [ngClass]="{'d-block': (!helpdesk.isDisabled && !helpdesk.hasCheckIn && !helpdesk.hasQueue)}">
+          Queue and/or Check-in must be checked if helpdesk is not disabled
+        </div>
+
+        <div class="mt-3">
+          <button type="button" class="btn btn-secondary" (click)="ClearHelpdesk()">Clear Helpdesk Items</button>
+          <button type="submit" class="btn btn-primary float-right">Save</button>
+        </div>
+      </form>
     </div>
 </div>

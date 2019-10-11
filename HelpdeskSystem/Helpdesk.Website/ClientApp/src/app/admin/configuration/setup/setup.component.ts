@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
-import { AuthenticationService } from 'src/app/authentication/authentication.service';
 import { ActivatedRoute, Router, RoutesRecognized } from '@angular/router';
 import { NotifierService } from 'angular-notifier';
 import { SetUpService } from './setup.service';
 import { UpdateHelpdeskRequest } from 'src/app/data/requests/configuration/update-request';
+import { Helpdesk } from '../../../data/DTOs/helpdesk.dto';
 
 @Component({
   selector: 'app-admin-setup',
@@ -12,89 +11,76 @@ import { UpdateHelpdeskRequest } from 'src/app/data/requests/configuration/updat
 })
 export class SetUpComponent implements OnInit {
 
-  private returnUrl;
   private id;
-  configForm
+  private helpdesk: Helpdesk;
 
-  constructor(private builder: FormBuilder,
-    private service: AuthenticationService,
-    private configService: SetUpService,
-    private route: ActivatedRoute,
-    private _router: Router,
-    private notifierSerive: NotifierService) {
+  constructor(private configService: SetUpService,
+              private route: ActivatedRoute,
+              private notifier: NotifierService) {
 
-    this.configForm = builder.group({
-      name: new FormControl(),
-      hasQueue: ['false'],
-      hasCheck: ['false'],
-      isDisabled: ['false']
-    })
+    this.helpdesk = new Helpdesk();
   }
 
-  public helpdesk;
-
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.returnUrl = params.return;
-    });
-
     this.route.parent.params.subscribe(params => {
-      this.id = +params["id"];
+      this.id = +params['id'];
     });
 
     this.configService.GetHelpdesk(this.id).subscribe(
       result => {
         this.helpdesk = result.helpdesk;
-
-        this.configForm.patchValue({
-          name: this.helpdesk.name,
-          hasQueue: this.helpdesk.hasQueue.toString(),
-          hasCheck: this.helpdesk.hasCheckIn.toString(),
-          isDisabled: this.helpdesk.isDisabled.toString(),
-        });
       },
       error => {
-        this.notifierSerive.notify('error', 'Unable to retreive helpdesk configuration, pleae contact admin');
+        this.notifier.notify('error', 'Unable to retrieve helpdesk configuration, please contact admin');
       }
-    )
+    );
   }
 
-  UpdateHelpdesk() {
 
-    var data = this.configForm.value;
-    var isValid: boolean = true;
+  // TODO: update helpdesk list on update/create
+  /**
+   * Validates form data and sends request to update helpdesk settings
+   * @param form ngForm passed from component
+   */
+  updateHelpdesk(form) {
+    let allowSubmit = true;
+    // Assign form data to request object
+    const updateRequest: UpdateHelpdeskRequest = this.helpdesk;
 
-    if (!data.name) {
-      this.notifierSerive.notify('warning', 'You must enter in a helpdesk name.');
-      isValid = false;
+    console.log(updateRequest);
+
+    // Check if name has been touched - do not allow submit - required to show invalid msg on submit
+    if (!updateRequest.hasOwnProperty('name')) {
+      form.controls['settings-name'].markAsDirty();
+      allowSubmit = false;
     }
 
-    if (!isValid)
-      return;
+    // Checkbox validation
+    if (!updateRequest.isDisabled && !updateRequest.hasCheckIn && !updateRequest.hasQueue) {
+      allowSubmit = false;
+    }
 
-    var updateHelpdeskRequest = new UpdateHelpdeskRequest();
-    updateHelpdeskRequest.name = data.name;
-    updateHelpdeskRequest.hasCheckIn = data.hasCheck;
-    updateHelpdeskRequest.hasQueue = data.hasQueue;
-    updateHelpdeskRequest.isDisabled = data.isDisabled;
+    // If not allowed to submit, end function
+    if (!allowSubmit) { return; }
 
-    this.configService.UpdateHelpdesk(this.id, updateHelpdeskRequest).subscribe(result => {
-      if (result.status == 200) {
-        this.notifierSerive.notify('success', 'Helpdesk updated successfully.');
+    // Allowed to submit - send request
+    this.configService.updateHelpdesk(this.id, updateRequest).subscribe(
+      result => {
+        this.notifier.notify('success', 'Helpdesk edited successfully!');
+      }, error => {
+        console.log(error);
+        this.notifier.notify('error', 'Could not edit helpdesk, please contact helpdesk admin.');
       }
-    },
-      error => {
-        this.notifierSerive.notify('error', 'Unable to update helpdesk, please contact admin.');
-      });
+    );
   }
 
   ClearHelpdesk() {
     this.configService.ClearHelpdesk(this.id).subscribe(
       result => {
-        this.notifierSerive.notify('success', 'Helpdesk cleared');
+        this.notifier.notify('success', 'Helpdesk cleared');
       },
       error => {
-        this.notifierSerive.notify('error', 'Unable to clear helpdesk please contact admin');
+        this.notifier.notify('error', 'Unable to clear helpdesk please contact admin');
       }
     );
   }

@@ -16,19 +16,18 @@ export class SetUpService {
         return this.http.get<GetHelpdeskResponse>('/api/helpdesk/' + id);
     }
 
-    UpdateHelpdesk(id: number, request: UpdateHelpdeskRequest)
-    {
+    updateHelpdesk(id: number, request: UpdateHelpdeskRequest) {
       return this.http.patch<UpdateHelpdeskResponse>('/api/helpdesk/' + id, request);
     }
 
 
-  /**
-   * HTTP request to create a helpdesk
-   * @param helpdesk
-   */
-  createHelpdesk(helpdesk: UpdateHelpdeskRequest) {
-    return this.http.post<UpdateHelpdeskRequest>('api/helpdesk', helpdesk);
-  }
+    /**
+     * HTTP request to create a helpdesk
+     * @param helpdesk
+     */
+    createHelpdesk(helpdesk: UpdateHelpdeskRequest) {
+      return this.http.post<UpdateHelpdeskRequest>('api/helpdesk', helpdesk);
+    }
 
     ClearHelpdesk(id: number) {
       return this.http.delete<ForceCheckoutQueueRemoveResponse>('/api/helpdesk/' + id + '/clear');
