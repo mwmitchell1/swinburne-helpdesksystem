@@ -126,7 +126,7 @@ export class HelpdeskComponent implements OnInit {
       return;
     }
 
-    if (!this.checkInForm.controls.modalUnitId.value && !this.helpdesk.hasQueue) {
+    if ((!this.checkInForm.controls.modalUnitId.value) && (!this.helpdesk.hasQueue)) {
       this.notifier.notify('warning', 'You must select a unit.');
       return;
     }
@@ -147,6 +147,7 @@ export class HelpdeskComponent implements OnInit {
         this.checkIns.push(checkIn);
         $('#modal-check-in').modal('hide');
         this.checkInForm.reset();
+        this.checkInForm.controls.modalUnitId.setValue('');
       },
       error => {
         this.notifier.notify('error', "Unable to check in.");
@@ -156,6 +157,7 @@ export class HelpdeskComponent implements OnInit {
 
   closeCheckIn() {
     this.checkInForm.reset();
+    this.checkInForm.controls.modalUnitId.setValue('');
   }
 
   checkOut() {
@@ -182,6 +184,7 @@ export class HelpdeskComponent implements OnInit {
         this.checkOutForm.reset();
         var checkIn = this.checkIns.find(c => c.checkInId == id);
         this.checkIns.splice(this.checkIns.indexOf(checkIn), 1);
+        this.checkOutForm.controls.checkOutStudentId.setValue('');
       },
       error => {
         if (error.status != 404) {
@@ -192,10 +195,8 @@ export class HelpdeskComponent implements OnInit {
   }
 
   closeCheckOut() {
-    this.checkOutForm.controls.modalEditUnitId.setValue('');
-    this.checkOutForm.controls.modalJoinTopicId.setValue('');
-    this.checkOutForm.controls.modalJoinCheckId.setValue('');
     this.checkOutForm.reset();
+    this.checkOutForm.controls.checkOutStudentId.setValue('');
   }
 
   validateNickname() {
@@ -346,6 +347,9 @@ export class HelpdeskComponent implements OnInit {
         $('#modal-join-queue').modal('hide');
         this.joinForm.reset();
         this.ding.play();
+        this.joinForm.controls.modalJoinTopicId.setValue('');
+        this.joinForm.controls.modalJoinCheckId.setValue('');
+        this.joinForm.controls.modalJoinUnitId.setValue('');
       },
       error => {
         this.notifier.notify('error', 'Unable to join queue, please contact admin.');
