@@ -13,6 +13,7 @@ import { AddUpdateUnitRequest } from 'src/app/data/requests/units/add-unit-respo
   templateUrl: './units.component.html'
 })
 export class UnitsComponent {
+  private errorMsg: string;
   public units: Unit[];
   public newTopics: Topic[];
   public editTopics: Topic[];
@@ -50,9 +51,11 @@ export class UnitsComponent {
     this.unitsService.getUnitsByHelpdeskId(this.route.parent.snapshot.params.id).subscribe(
       result => {
         this.units = result.units;
+        // console.log('units', this.units);
       }, error => {
-        if (error.status != 404)
-        {
+        if (error.status === 404) {
+          this.errorMsg = 'This helpdesk does not have any units.';
+        } else {
           this.notifier.notify('error', 'Unable to get units, please contact helpdesk admin.');
         }
       }
@@ -209,7 +212,7 @@ export class UnitsComponent {
         if (!this.addForm.controls.unitName.value) {
           this.notifier.notify('warning', 'You must enter in a unit name.');
         }
-  
+
         if ((!this.addForm.controls.unitCode.value) || this.addForm.controls.unitCode.value.length != 8) {
           this.notifier.notify('warning', 'You must enter in a 8 character unit code.');
         }
