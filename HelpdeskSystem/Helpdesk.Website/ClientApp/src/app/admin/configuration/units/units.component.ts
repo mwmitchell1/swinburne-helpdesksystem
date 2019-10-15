@@ -80,7 +80,7 @@ export class UnitsComponent {
         if (result.status == 200) {
           this.notifier.notify('success', 'Unit deleted successfully.');
           this.updateUnitsList();
-          $('#modal-user-delete').modal('hide');
+          $('#modal-unit-delete').modal('hide');
         }
       },
       error => {
