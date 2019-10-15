@@ -90,6 +90,11 @@ export class HelpdeskComponent implements OnInit {
         if (this.helpdesk.hasQueue) {
           this.getQueueItems();
         }
+
+        if (this.helpdesk.hasQueue && (!this.helpdesk.hasCheckIn))
+          $(document).on('shown.bs.modal', '#modal-join-queue', function () {
+            $('#modalJoinSID').focus();
+          });
       },
       error => {
         this.notifier.notify('error', "Unable to retreive helpdesk information, please contact admin");
@@ -109,6 +114,10 @@ export class HelpdeskComponent implements OnInit {
         }
       }
     )
+
+    $(document).on('shown.bs.modal', '#modal-check-in', function () {
+      $('#modalSID').focus();
+    });
   }
 
   checkIn() {
@@ -178,7 +187,7 @@ export class HelpdeskComponent implements OnInit {
 
         if (this.helpdesk.hasQueue)
           this.getQueueItems();
-          
+
         this.notifier.notify('success', 'Checkout successful');
         $('#modal-check-out').modal('hide');
         this.checkOutForm.reset();
