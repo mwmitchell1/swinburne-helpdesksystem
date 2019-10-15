@@ -4,7 +4,8 @@
 
 <div class="row mt-3">
   <div class="col-6">
-    <table class="table table-striped">
+    <h3 *ngIf="units.length < 1">{{errorMsg}}</h3>
+    <table class="table table-striped" *ngIf="units.length > 0">
       <thead>
         <tr>
           <th scope="col">Unit Code</th>
