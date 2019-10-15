@@ -13,3 +13,4 @@ HelpdeskSystem/Helpdesk.DataLayer/obj/
 HelpdeskSystem/Helpdesk.Services.Test/obj/
 HelpdeskSystem/Helpdesk.Services.Test/bin/
 appsettings.json
+.idea
