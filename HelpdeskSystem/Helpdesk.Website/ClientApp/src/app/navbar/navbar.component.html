@@ -1,9 +1,13 @@
 <header>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a href="https://www.swinburne.edu.au"><img src="../../assets/images/SwinLogo.jpg" alt="Swinburne logo"
-        id="swinburne-logo"></a>
-    <div class="container">
-      <a class="navbar-brand" href="#">Swinburne Helpdesk <span *ngIf="isAdminRoute"> - Admin</span></a>
+<!--    <a href="https://www.swinburne.edu.au"><img src="../../assets/images/smallSwinLogo.jpg" alt="Swinburne logo"-->
+<!--        id="swinburne-logo"></a>-->
+    <div [ngClass]="{'container': !isAdminRoute, 'container-fluid': isAdminRoute}">
+      <a class="navbar-brand" href="#">
+<!--        <img src="../../assets/images/smallSwinLogo.jpg" alt="Swinburne logo" id="swinburne-logo">-->
+        Swinburne Helpdesk
+        <span *ngIf="isAdminRoute"> - Admin</span>
+      </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
         <span class="navbar-toggler-icon"></span>
       </button>
