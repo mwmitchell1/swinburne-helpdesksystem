@@ -31,6 +31,8 @@ import { HelpdeskComponent } from './helpdesk/helpdesk.component';
 
 import { UsersService } from './admin/users/users.service';
 import { UnitsService } from './admin/configuration/units/units.service';
+import {PasswordResetComponent} from "./authentication/password-reset/password-reset.component";
+import {PasswordResetService} from "./authentication/password-reset/password-reset.service";
 
 
 @NgModule({
@@ -47,7 +49,8 @@ import { UnitsService } from './admin/configuration/units/units.service';
     NicknamesComponent,
     ReportingComponent,
     ConfigurationComponent,
-    HelpdeskComponent
+    HelpdeskComponent,
+    PasswordResetComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -89,7 +92,8 @@ import { UnitsService } from './admin/configuration/units/units.service';
     HelpdeskService,
     RouteStateService,
     UsersService,
-    UnitsService],
+    UnitsService,
+    PasswordResetService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
