@@ -1,11 +1,26 @@
 #swinburne-logo {
-    height: 40px;
+  /*float: right;*/
+  /*padding-left: auto;*/
+  /*padding-right: auto;*/
+  /*height: 50px;*/
+  /*margin-left: 20px;*/
+  /*position: absolute;*/
+  height: 55px;
+
+}
+
+.navbar-brand {
+  /*font-size: 50px;*/
+}
+
+.nav-item.btn {
+  /*font-size: 20px;*/
 }
 
 .navbar {
-    padding: 0px;
+    /*padding: 0px;*/
 }
 
-header {
-  padding-bottom: 10px;
-}
+/*header {*/
+/*  padding-bottom: 10px;*/
+/*}*/

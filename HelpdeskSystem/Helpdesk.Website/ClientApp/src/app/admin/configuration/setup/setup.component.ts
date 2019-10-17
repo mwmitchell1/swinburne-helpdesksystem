@@ -12,7 +12,7 @@ import { Helpdesk } from '../../../data/DTOs/helpdesk.dto';
 export class SetUpComponent implements OnInit {
 
   private id;
-  private helpdesk: Helpdesk;
+  public helpdesk: Helpdesk;
 
   constructor(private configService: SetUpService,
               private route: ActivatedRoute,
