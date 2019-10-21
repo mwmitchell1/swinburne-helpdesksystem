@@ -61,6 +61,31 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
+        /// Test adding a unit to the database with a topic name that
+        /// is too large is handled correctly
+        /// </summary>
+        [TestMethod]
+        public void AddUnitTopicNameTooLong()
+        {
+            // Fill empty string parameters "" with auto-generated string.
+            testEntityFactory.PopulateEmptyStrings = true;
+
+            // Add test helpdesk.
+            TestDataHelpdesk helpdeskData = testEntityFactory.AddHelpdesk();
+
+            // Check that helpdesk was created successfully.
+            Assert.AreEqual(HttpStatusCode.OK, helpdeskData.Response.Status);
+            Assert.IsTrue(helpdeskData.Response.HelpdeskID > 0);
+
+            // Create a unit. ID provided is 0, which will indicates creation of new helpdesk.
+            List<string> topics = new List<string>(new string[] { AlphaNumericStringGenerator.GetString(51),});
+            TestDataUnit unitData = testEntityFactory.AddUpdateUnit(0, helpdeskData.Response.HelpdeskID, "", "", false, topics);
+
+            // Check that unit was created successfully.
+            Assert.AreEqual(HttpStatusCode.BadRequest, unitData.Response.Status);
+        }
+
+        /// <summary>
         /// Test adding a unit to the database with no helpdesk id to reference.
         /// </summary>
         [TestMethod]

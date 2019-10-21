@@ -26,5 +26,25 @@ namespace Helpdesk.Common.Requests.Units
         {
             Topics = new List<string>();
         }
+
+        public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var results = new List<ValidationResult>();
+            int i = 0;
+            foreach(string s in Topics)
+            {
+                if(s.Length>50)
+                {
+                    i++;
+                }
+            }
+
+            if(i>0)
+            {
+                results.Add(new ValidationResult("Topic names cannot be larger than 50 characters, you have " + i + " topics that break this rule"));
+            }
+
+            return results;
+        }
     }
 }
