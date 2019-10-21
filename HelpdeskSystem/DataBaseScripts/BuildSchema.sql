@@ -285,3 +285,66 @@ BEGIN
 	FROM CheckInQueueItem
 END
 GO
+
+/*
+CREATE PROCEDURE GetRepeatVisitsSingle
+    @pHelpdeskID INT,
+    @pStartDate DATETIME,
+    @pEndDate DATETIME
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @tHelpDeskCheckInJoin TABLE (HelpdeskID INT, CheckInID INT, CheckInTime DATETIME)
+    DECLARE @tRepeats TABLE (HelpdeskID INT, StudentID INT, CheckInID INT, CheckInTime DATETIME)
+    DECLARE @tRepeatCheck TABLE (StudentID INT)
+    DECLARE @vStudentID INT
+    DECLARE @vCheckInID INT
+    DECLARE @vCheckInTime DATETIME
+
+    DECLARE sorter CURSOR FOR
+        SELECT *
+        FROM @tHelpDeskCheckInJoin
+
+    -- First get all checkins that match the requested helpdesk id and are within the start and end dates.
+    INSERT INTO @tHelpDeskCheckInJoin(HelpdeskID, CheckInId, CheckInTime)
+    SELECT      HelpdeskSettings.HelpdeskID,
+                CheckInHistory.CheckInID, 
+                CheckInHistory.CheckInTime
+    FROM        CheckInHistory
+                INNER JOIN HelpdeskUnit ON CheckInHistory.UnitID = HelpdeskUnit.UnitID
+                INNER JOIN HelpdeskSettings ON HelpdeskUnit.HelpdeskID = HelpdeskSettings.HelpdeskID
+                INNER JOIN NickNames ON NickNames.StudentID = CheckInHistory.StudentID
+    WHERE       @pHelpdeskID = HelpdeskSettings.HelpdeskID
+                AND CheckInHistory.CheckInTime >= @pStartDate
+                AND CheckInHistory.CheckInTime <= @pEndDate;
+    
+    -- Loop through filtered temp table @tHelpDeskCheckInJoin and check if its CheckInId exists in @tRepeatCheck.
+    -- If if does, add the row to tRepeats; if not, add it to tRepeatCheck.
+    -- If it wasn't added the first time and the same CheckInId 
+    WHILE 1=1
+    BEGIN
+        FETCH NEXT FROM sorter
+            INTO @vCheckInID, @vCheckInTime
+        IF @@FETCH_STATUS <> 0
+        BEGIN
+            -- Fetched all rows; break loop.
+            BREAK
+        END
+        ELSE IF NOT EXISTS (SELECT StudentID FROM @tRepeatCheck WHERE StudentID = @vStudentID)
+        BEGIN
+            INSERT INTO @tRepeatCheck (StudentID)
+            VALUES (@vStudentID)
+        END
+        ELSE
+        BEGIN
+            INSERT INTO @tRepeats (CheckInID, CheckInTime)
+            VALUES (@vCheckInID, @vCheckInTime)
+        END
+    END
+
+    SELECT * FROM @tRepeats
+    RETURN
+END
+GO
+*/
