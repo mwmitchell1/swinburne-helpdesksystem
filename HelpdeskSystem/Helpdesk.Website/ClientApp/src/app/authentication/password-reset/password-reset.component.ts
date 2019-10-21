@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { PasswordResetService } from './password-reset.service';
-import { UpdateUserRequest } from '../../data/requests/users/update-request';
 
 @Component({
   selector: 'app-password-reset',
@@ -9,18 +8,7 @@ import { UpdateUserRequest } from '../../data/requests/users/update-request';
 
 export class PasswordResetComponent {
 
-  private new: string;
-  private confirm: string;
-
-  // private updateRequest: UpdateUserRequest;
-
   constructor(private passwordService: PasswordResetService) {
-    // this.updateRequest = new UpdateUserRequest();
-  }
-
-
-  setPassword(user) {
-
   }
 
 }
