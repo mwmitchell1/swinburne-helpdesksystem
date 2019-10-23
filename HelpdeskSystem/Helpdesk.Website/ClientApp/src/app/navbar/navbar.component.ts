@@ -33,7 +33,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.dropdownLabel = 'No helpdesk selected';
     this.dropdownPrefix = 'helpdesk';
     this.adminLink = 'admin';
-    this.logoutLink = 'logout'
+    this.logoutLink = 'logout';
   }
 
   ngOnInit(): void {
