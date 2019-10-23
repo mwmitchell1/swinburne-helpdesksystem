@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { NotifierService } from 'angular-notifier';
-import { pipe } from 'rxjs';
 import { DatePipe } from '@angular/common';
 import { ReportingService } from './reporting.service';
 
@@ -23,21 +21,21 @@ export class ReportingComponent {
         });
 
         const url = window.URL.createObjectURL(blob);
-        var link = document.createElement("a");
-        link.setAttribute("href", url);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
 
-        var pipe = new DatePipe('en-AU');
-        var now = new Date();
+        const pipe: DatePipe = new DatePipe('en-AU');
+        const now = new Date();
 
-        link.setAttribute("download", "database_export_" + pipe.transform(now, 'yyyyMMdd_hhmm') + ".zip");
-        link.style.display = "none";
+        link.setAttribute('download', 'database_export_' + pipe.transform(now, 'yyyyMMdd_hhmm') + '.zip');
+        link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       },
       error => {
-          this.notifier.notify('error', 'Unable to export database, please contact administrator')
+          this.notifier.notify('error', 'Unable to export database, please contact administrator');
       }
-    )
+    );
   }
 }

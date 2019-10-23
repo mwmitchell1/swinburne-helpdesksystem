@@ -77,34 +77,35 @@ export class UnitsComponent {
   deleteUnit(data) {
     this.unitsService.deleteUnit(data.unitId).subscribe(
       result => {
-        if (result.status == 200) {
+        if (result.status === 200) {
           this.notifier.notify('success', 'Unit deleted successfully.');
           this.updateUnitsList();
           $('#modal-unit-delete').modal('hide');
         }
       },
       error => {
-        if (error.status == 500) {
+        if (error.status === 500) {
           this.notifier.notify('error', 'Unable to delete user please contact helpdesk admin');
         }
       });
   }
 
   addNewTopic() {
-    var newTopicName = this.addForm.controls.unitTopic.value;
+    const newTopicName: string = this.addForm.controls.unitTopic.value;
+
     if (!newTopicName) {
       this.notifier.notify('warning', 'You must enter a topic to add it.');
       return;
     }
 
-    var existingTopic = this.newTopics.find(t => t.name == newTopicName);
+    const existingTopic: Topic = this.newTopics.find(t => t.name === newTopicName);
 
     if (existingTopic) {
       this.notifier.notify('warning', 'Unit already has ' + newTopicName + ' topic.');
       return;
     }
 
-    var topic = new Topic();
+    const topic: Topic = new Topic();
     topic.name = newTopicName;
     this.newTopics.push(topic);
     this.addForm.controls.unitTopic.setValue(null);
@@ -112,7 +113,7 @@ export class UnitsComponent {
 
   removeNewTopic(topicToRemove: Topic) {
     event.preventDefault();
-    var topic: Topic = this.newTopics.find(t => t.name == topicToRemove.name);
+    const topic: Topic = this.newTopics.find(t => t.name === topicToRemove.name);
 
     this.newTopics.splice(this.newTopics.indexOf(topic), 1);
   }
@@ -130,17 +131,17 @@ export class UnitsComponent {
         this.notifier.notify('warning', 'You must enter in a unit name.');
       }
 
-      if ((!this.addForm.controls.unitCode.value) || this.addForm.controls.unitCode.value.length != 8) {
+      if ((!this.addForm.controls.unitCode.value) || this.addForm.controls.unitCode.value.length !== 8) {
         this.notifier.notify('warning', 'You must enter in a 8 character unit code.');
       }
     }
 
-    var request = new AddUpdateUnitRequest();
-    var id: number = 0;
-    var helpdeskId: number;
+    const request = new AddUpdateUnitRequest();
+    const id = 0;
+    let helpdeskId: number;
 
     this.route.parent.params.subscribe(params => {
-      helpdeskId = +params["id"];
+      helpdeskId = +params['id'];
     });
     request.Name = this.addForm.controls.unitName.value;
     request.Code = this.addForm.controls.unitCode.value;
@@ -156,13 +157,13 @@ export class UnitsComponent {
       this.newTopics = [];
       this.updateUnitsList();
     },
-    error => {
-      this.notifier.notify('error', 'Unable to add unit to helpdesk, please contact admin.');
-    });
+      error => {
+        this.notifier.notify('error', 'Unable to add unit to helpdesk, please contact admin.');
+      });
   }
 
   setUpEdit(id: number) {
-    var unit = this.units.find(u => u.unitId == id);
+    const unit: Unit = this.units.find(u => u.unitId === id);
 
     this.editForm.controls.editUnitName.setValue(unit.name);
     this.editForm.controls.editUnitCode.setValue(unit.code);
@@ -171,20 +172,20 @@ export class UnitsComponent {
   }
 
   addEditTopic() {
-    var newTopicName = this.editForm.controls.editUnitTopic.value;
+    const newTopicName = this.editForm.controls.editUnitTopic.value;
     if (!newTopicName) {
       this.notifier.notify('warning', 'You must enter a topic to add it.');
       return;
     }
 
-    var existingTopic = this.editTopics.find(t => t.name == newTopicName);
+    const existingTopic = this.editTopics.find(t => t.name === newTopicName);
 
     if (existingTopic) {
       this.notifier.notify('warning', 'Unit already has ' + newTopicName + ' topic.');
       return;
     }
 
-    var topic = new Topic();
+    const topic = new Topic();
     topic.name = newTopicName;
     this.editTopics.push(topic);
     this.addForm.controls.unitTopic.setValue(null);
@@ -192,7 +193,7 @@ export class UnitsComponent {
 
   removeEditTopic(topicToRemove: Topic) {
     event.preventDefault();
-    var topic: Topic = this.editTopics.find(t => t.name == topicToRemove.name);
+    const topic: Topic = this.editTopics.find(t => t.name === topicToRemove.name);
 
     this.editTopics.splice(this.editTopics.indexOf(topic), 1);
   }
@@ -207,23 +208,22 @@ export class UnitsComponent {
 
       if (!this.editForm.controls.unitId.value) {
         this.notifier.notify('error', 'UnitId not found, please contact admin.');
-      }
-      else {
+      } else {
         if (!this.addForm.controls.unitName.value) {
           this.notifier.notify('warning', 'You must enter in a unit name.');
         }
 
-        if ((!this.addForm.controls.unitCode.value) || this.addForm.controls.unitCode.value.length != 8) {
+        if ((!this.addForm.controls.unitCode.value) || this.addForm.controls.unitCode.value.length !== 8) {
           this.notifier.notify('warning', 'You must enter in a 8 character unit code.');
         }
       }
     }
 
-    var request = new AddUpdateUnitRequest();
-    var helpdeskId: number;
+    const request = new AddUpdateUnitRequest();
+    let helpdeskId: number;
 
     this.route.parent.params.subscribe(params => {
-      helpdeskId = +params["id"];
+      helpdeskId = +params['id'];
     });
     request.Name = this.editForm.controls.editUnitName.value;
     request.Code = this.editForm.controls.editUnitCode.value;
@@ -239,8 +239,8 @@ export class UnitsComponent {
       this.editTopics = [];
       this.updateUnitsList();
     },
-    error => {
-      this.notifier.notify('error', 'Unable to save unit, please contact admin.');
-    });
+      error => {
+        this.notifier.notify('error', 'Unable to save unit, please contact admin.');
+      });
   }
 }

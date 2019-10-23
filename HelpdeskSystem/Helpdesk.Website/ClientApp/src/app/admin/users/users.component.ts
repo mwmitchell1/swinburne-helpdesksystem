@@ -79,17 +79,16 @@ export class UsersComponent {
   deleteUser(data) {
     this.usersService.deleteUser(data.userId).subscribe(
       result => {
-        if (result.status == 200) {
+        if (result.status === 200) {
           this.notifierService.notify('success', 'User deleted successfully.');
           this.updateUserList();
-          var modal = $('#modal-user-delete').modal('hide');
+          $('#modal-user-delete').modal('hide');
         }
       },
       error => {
-        if (error.status == 500) {
+        if (error.status === 500) {
           this.notifierService.notify('error', 'Unable to delete user please contact helpdesk admin');
-        }
-        else if (error.status == 403) {
+        } else if (error.status === 403) {
           this.notifierService.notify('warning', 'You cannot delete this user');
         }
       });

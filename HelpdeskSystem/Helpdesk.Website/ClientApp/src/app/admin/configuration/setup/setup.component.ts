@@ -36,8 +36,6 @@ export class SetUpComponent implements OnInit {
     );
   }
 
-
-  // TODO: update helpdesk list on update/create
   /**
    * Validates form data and sends request to update helpdesk settings
    * @param form ngForm passed from component
@@ -74,6 +72,9 @@ export class SetUpComponent implements OnInit {
     );
   }
 
+  /**
+   * Used to clear all check ins and queue items for the helpdesk
+   */
   ClearHelpdesk() {
     this.configService.ClearHelpdesk(this.id).subscribe(
       result => {

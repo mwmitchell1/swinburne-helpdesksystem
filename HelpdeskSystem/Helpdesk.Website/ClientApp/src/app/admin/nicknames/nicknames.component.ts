@@ -34,7 +34,7 @@ export class NicknamesComponent implements OnInit {
         this.nicknames = result.nicknames;
       },
       error => {
-        if (error.status != 404) {
+        if (error.status !== 404) {
           this.notifier.notify('error', 'Unable to retreive nicknames, please contact admin');
         }
       }
@@ -42,7 +42,7 @@ export class NicknamesComponent implements OnInit {
   }
 
   setUpEdit(id: number) {
-    var nickname = this.nicknames.find(n => n.id == id)
+    const nickname = this.nicknames.find(n => n.id === id);
 
     this.editForm.controls.modalEditId.setValue(nickname.id);
     this.editForm.controls.modalEditNickname.setValue(nickname.nickname);
@@ -68,22 +68,21 @@ export class NicknamesComponent implements OnInit {
       }
     }
 
-    var request = new EditStudentNicknameRequest();
+    const request = new EditStudentNicknameRequest();
     request.nickname = this.editForm.controls.modalEditNickname.value;
 
     this.service.editNickname(this.editForm.controls.modalEditId.value, request).subscribe(
       result => {
         this.getNicknames();
         this.editForm.reset();
-        $("#modal-student-edit").modal('hide')
+        $('#modal-student-edit').modal('hide');
         this.notifier.notify('success', 'Student nickname updated');
       },
       error => {
 
-        if (error.status == 400) {
-          this.notifier.notify('warning', 'Nickname already exists please choose another.')
-        }
-        else {
+        if (error.status === 400) {
+          this.notifier.notify('warning', 'Nickname already exists please choose another.');
+        } else {
           this.notifier.notify('error', 'Unable to save nickname, please contact admin');
         }
       }
