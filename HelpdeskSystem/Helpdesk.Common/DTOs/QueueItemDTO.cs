@@ -10,6 +10,7 @@ namespace Helpdesk.Common.DTOs
         public string Nickname { get; set; }
         public int TopicId { get; set; }
         public string Topic { get; set; }
+        public string Description { get; set; }
         public string Unit { get; set; }
         public DateTime TimeAdded { get; set; }
         public DateTime? TimeHelped { get; set; }

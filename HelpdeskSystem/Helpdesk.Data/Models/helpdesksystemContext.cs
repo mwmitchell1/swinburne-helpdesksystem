@@ -215,6 +215,11 @@ namespace Helpdesk.Data.Models
                     .HasColumnName("TopicID")
                     .HasColumnType("int(11)");
 
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.HasOne(d => d.Student)
                     .WithMany(p => p.Queueitem)
                     .HasForeignKey(d => d.StudentId)

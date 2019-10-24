@@ -62,14 +62,16 @@ export class HelpdeskComponent implements OnInit {
       modalJoinSID: new FormControl(''),
       modalJoinNickname: new FormControl(''),
       modalJoinUnitId: new FormControl(''),
-      modalJoinTopicId: new FormControl('', [Validators.required])
+      modalJoinTopicId: new FormControl('', [Validators.required]),
+      modalJoinDescription: new FormControl('', [Validators.required])
     });
 
     this.editQueueForm = this.builder.group({
       modalEditItemId: new FormControl(''),
       modalEditNickname: new FormControl(''),
       modalEditUnitId: new FormControl(''),
-      modalEditTopicId: new FormControl('')
+      modalEditTopicId: new FormControl(''),
+      modalEditDescription: new FormControl('', [Validators.required])
     });
   }
 
@@ -326,11 +328,11 @@ export class HelpdeskComponent implements OnInit {
    * Used to populate the topics in the various modals
    * @param value the information required for populating the topics
    */
-  populateTopics(value: number) {
+  populateTopics(value?: number) {
 
-    if (value) {
+    if (value !== null) {
       if (this.helpdesk.hasCheckIn) {
-        const checkIn = this.checkIns.find(c => c.checkInId === value);
+        const checkIn = this.checkIns.find(c => c.checkInId == value);
         this.topics = this.units.find(u => u.unitId === checkIn.unitId).topics;
         this.showTopic = true;
       } else {
@@ -363,6 +365,11 @@ export class HelpdeskComponent implements OnInit {
         valid = false;
     }
 
+    if (!this.joinForm.controls.modalJoinDescription.value) {
+      this.notifier.notify('warning', 'You must enter in a description');
+      valid = false;
+    }
+
     if ((!this.joinForm.controls.modalJoinUnitId.value) && (!this.helpdesk.hasCheckIn)) {
       this.notifier.notify('warning', 'You must select a unit.');
       valid = false;
@@ -380,10 +387,11 @@ export class HelpdeskComponent implements OnInit {
     const request = new AddToQueueRequest();
     request.nickname = this.joinForm.controls.modalJoinNickname.value;
     request.sid = this.joinForm.controls.modalJoinSID.value;
+    request.description = this.joinForm.controls.modalJoinDescription.value;
 
     if (this.helpdesk.hasCheckIn) {
       request.checkInID = this.joinForm.controls.modalJoinCheckId.value;
-      request.studentID = this.checkIns.find(c => c.checkInId === request.checkInID).studentId;
+      request.studentID = this.checkIns.find(c => c.checkInId == request.checkInID).studentId;
     } else {
       request.studentID = this.joinForm.controls.modalJoinStudentId.value;
     }
@@ -427,6 +435,7 @@ export class HelpdeskComponent implements OnInit {
 
     this.editQueueForm.controls.modalEditItemId.setValue(item.itemId);
     this.editQueueForm.controls.modalEditNickname.setValue(item.nickname);
+    this.editQueueForm.controls.modalEditNickname.setValue(item.description);
 
     if (!this.helpdesk.hasCheckIn) {
       const unitSelected = this.units.find(u => u.name === item.unit).unitId;
@@ -452,6 +461,11 @@ export class HelpdeskComponent implements OnInit {
         this.notifier.notify('warning', 'You must select a Unit');
         valid = false;
       }
+    }
+
+    if (!this.editQueueForm.controls.modalEditDescription.value) {
+      this.notifier.notify('warning', 'You must enter in a description');
+        valid = false;
     }
 
     if (!this.editQueueForm.controls.modalEditTopicId.value) {
