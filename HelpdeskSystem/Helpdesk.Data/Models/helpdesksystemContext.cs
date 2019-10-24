@@ -121,7 +121,7 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.HelpdeskId)
                     .HasColumnName("HelpdeskID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.IsDeleted).HasColumnType("bit");
 
@@ -146,15 +146,15 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.HelpdeskUnitId)
                     .HasColumnName("HelpdeskUnitID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.HelpdeskId)
                     .HasColumnName("HelpdeskID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.HasOne(d => d.Helpdesk)
                     .WithMany(p => p.Helpdeskunit)
@@ -205,7 +205,7 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.ItemId)
                     .HasColumnName("ItemID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.StudentId)
                     .HasColumnName("StudentID")
@@ -213,7 +213,7 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.TopicId)
                     .HasColumnName("TopicID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.Description)
                     .IsRequired()
@@ -264,7 +264,7 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.TopicId)
                     .HasColumnName("TopicID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.IsDeleted).HasColumnType("bit");
 
@@ -275,7 +275,7 @@ namespace Helpdesk.Data.Models
 
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.HasOne(d => d.Unit)
                     .WithMany(p => p.Topic)
@@ -288,7 +288,7 @@ namespace Helpdesk.Data.Models
             {
                 entity.Property(e => e.UnitId)
                     .HasColumnName("UnitID")
-                    .HasColumnType("int(11)");
+                    .HasColumnType("int");
 
                 entity.Property(e => e.IsDeleted).HasColumnType("boolean");
 

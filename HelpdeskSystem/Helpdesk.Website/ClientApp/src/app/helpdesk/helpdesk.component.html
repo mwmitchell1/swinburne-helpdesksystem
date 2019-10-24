@@ -30,6 +30,7 @@
                         <th scope="col">Nickname</th>
                         <th scope="col">Unit</th>
                         <th scope="col">Topic</th>
+                        <th scope="col">Description</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -38,6 +39,7 @@
                         <td>{{item.nickname}}</td>
                         <td>{{item.unit}}</td>
                         <td>{{item.topic}}</td>
+                        <td>{{item.description}}</td>
                         <td>
                             <button class="btn btn-danger float-right ml-1" data-toggle="modal"
                                 (click)="remove(item.itemId)">Remove</button>

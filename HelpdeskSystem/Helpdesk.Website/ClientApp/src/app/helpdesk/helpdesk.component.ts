@@ -337,7 +337,7 @@ export class HelpdeskComponent implements OnInit {
         this.showTopic = true;
       } else {
         this.showTopic = true;
-        this.topics = this.units.find(u => u.unitId === value).topics;
+        this.topics = this.units.find(u => u.unitId == value).topics;
       }
     } else {
       this.showTopic = false;

@@ -660,7 +660,7 @@ namespace Helpdesk.Services.Test
             GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
 
             // Check that there are two units in the response (Layouts, Lifecycle).
-            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+            Assert.IsTrue(topicResponse.Topics.Count() == 3);
 
             // Add test queue item, pass in topic [0].
             TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
@@ -736,7 +736,7 @@ namespace Helpdesk.Services.Test
             GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
 
             // Check that there are two units in the response (Layouts, Lifecycle).
-            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+            Assert.IsTrue(topicResponse.Topics.Count() == 3);
 
             // Add test queue item, pass in topic [0].
             TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
@@ -788,7 +788,7 @@ namespace Helpdesk.Services.Test
             GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
 
             // Check that there are two units in the response (Layouts, Lifecycle).
-            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+            Assert.IsTrue(topicResponse.Topics.Count() == 3);
 
             // Add test queue item, pass in topic [0].
             TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
@@ -907,7 +907,7 @@ namespace Helpdesk.Services.Test
             GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
 
             // Check that there are two units in the response (Layouts, Lifecycle).
-            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+            Assert.IsTrue(topicResponse.Topics.Count() == 3);
 
             // Add test queue item, pass in topic [0].
             TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
