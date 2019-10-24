@@ -6,6 +6,9 @@ import { DeleteUnitResponse } from 'src/app/data/responses/units/delete-unit..re
 import { AddUpdateUnitRequest } from 'src/app/data/requests/units/add-unit-response';
 import { AddUpdateUnitResponse } from 'src/app/data/responses/units/add-update-unit-response';
 
+/**
+ * Used to call the CRUD APIs for units
+ */
 @Injectable()
 export class UnitsService {
   constructor(private http: HttpClient) { }

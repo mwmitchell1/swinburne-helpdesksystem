@@ -9,6 +9,9 @@ import { Helpdesk } from '../../../data/DTOs/helpdesk.dto';
   selector: 'app-admin-setup',
   templateUrl: './setup.component.html'
 })
+/**
+ * This component is used to perform CRUD functions and UI logic for the set up page
+ */
 export class SetUpComponent implements OnInit {
 
   private id;

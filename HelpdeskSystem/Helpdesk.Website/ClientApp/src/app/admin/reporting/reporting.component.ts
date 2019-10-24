@@ -7,12 +7,18 @@ import { ReportingService } from './reporting.service';
   selector: 'app-admin-reporting',
   templateUrl: './reporting.component.html'
 })
+/**
+ * Used to handle UI functionality for reporting
+ */
 export class ReportingComponent {
 
   constructor (private service: ReportingService, private notifier: NotifierService) {
 
   }
 
+  /**
+   * Used to get a full database copy as a ZIP file of CSVs
+   */
   ExportDatabase() {
     this.service.exportDatabase().subscribe(
       result => {

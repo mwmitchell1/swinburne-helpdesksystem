@@ -1,7 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-
-import { Helpdesk } from '../data/DTOs/helpdesk.dto';
 import { HttpClient } from '@angular/common/http';
 import { GetHelpdesksResponse } from '../data/responses/helpdesk/get-all-response';
 import { GetHelpdeskResponse } from '../data/responses/configuration/get-response';
@@ -18,6 +15,9 @@ import { UpdateQueueItemRequest } from '../data/requests/queue/update-queue-item
 import { UpdateQueueItemResponse } from '../data/responses/helpdesk/update-queue-item-response';
 
 @Injectable()
+/**
+ * Used to call the CRUD APIs for helpdesks
+ */
 export class HelpdeskService {
 
   constructor(private client: HttpClient) {
@@ -28,7 +28,7 @@ export class HelpdeskService {
    * @return Helpdesk[]
    */
   getHelpdesks() {
-    return this.client.get<GetHelpdesksResponse>("/api/helpdesk/")
+    return this.client.get<GetHelpdesksResponse>('/api/helpdesk/');
   }
 
   /**
@@ -36,7 +36,7 @@ export class HelpdeskService {
    * @return Helpdesk[]
    */
   getActiveHelpdesks() {
-    return this.client.get<GetHelpdesksResponse>("/api/helpdesk/active")
+    return this.client.get<GetHelpdesksResponse>('/api/helpdesk/active');
   }
 
   /**
@@ -45,7 +45,7 @@ export class HelpdeskService {
    * @return GetHelpdeskResponse
    */
   getHelpdeskById(id: number) {
-    return this.client.get<GetHelpdeskResponse>("/api/helpdesk/" + id);
+    return this.client.get<GetHelpdeskResponse>('/api/helpdesk/' + id);
   }
 
   /**
@@ -54,7 +54,7 @@ export class HelpdeskService {
    * @returns GetUnitsByHelpdeskIdResponse
    */
   getActiveUnitsByHelpdeskId(id: number) {
-    return this.client.get<GetUnitsByHelpdeskIdResponse>("/api/units/helpdesk/" + id + '/active');
+    return this.client.get<GetUnitsByHelpdeskIdResponse>('/api/units/helpdesk/' + id + '/active');
   }
 
   /**
@@ -63,7 +63,7 @@ export class HelpdeskService {
    * @returns the response that indicates success
    */
   checkIn(request: CheckInRequest) {
-    return this.client.post<CheckInResponse>("/api/checkin/", request);
+    return this.client.post<CheckInResponse>('/api/checkin/', request);
   }
 
   /**
@@ -72,7 +72,7 @@ export class HelpdeskService {
    * @param request request indicating the the checkout is not forced
    */
   checkOut(id: number, request: CheckOutRequest) {
-    return this.client.post<CheckInResponse>("/api/checkin/" + id , request);
+    return this.client.post<CheckInResponse>('/api/checkin/' + id , request);
   }
 
   /**
@@ -81,16 +81,16 @@ export class HelpdeskService {
    * @returns The response with the check ins if they are any
    */
   getCheckInsByHelpdesk(id: number) {
-    return this.client.get<GetCheckInsResponse>("/api/checkin/" + id);
+    return this.client.get<GetCheckInsResponse>('/api/checkin/' + id);
   }
-  
+
   /**
    * Used to retreive all active queue items for a helpdesk
    * @param id the id of the helpdesk
    * @returns the response that contains an array of helpdesk QueueItems
    */
   getQueueItemsByHelpdesk(id: number) {
-    return this.client.get<GetQueueItemsByHelpdeskIDResponse>("/api/queue/helpdesk/" + id);
+    return this.client.get<GetQueueItemsByHelpdeskIDResponse>('/api/queue/helpdesk/' + id);
   }
 
   /**
@@ -101,10 +101,20 @@ export class HelpdeskService {
     return this.client.post<AddToQueueResponse>('/api/queue', request);
   }
 
+/**
+ * Used to call the the update Queue item status API
+ * @param id the id of the queue item
+ * @param request the information for the status update
+ */
   updateQueueItemStatus(id: number, request: UpdateQueueItemStatusRequest) {
     return this.client.post<UpdateQueueItemStatusRequest>('/api/queue/' + id + '/UpdateQueueItemStatus', request);
   }
 
+  /**
+   * Used to call the API to update and edited queue item
+   * @param id the id of the item to be updated
+   * @param request the updated information for the queue item
+   */
   updateQueueItem(id: number, request: UpdateQueueItemRequest) {
     return this.client.post<UpdateQueueItemResponse>('/api/queue/' + id, request);
   }

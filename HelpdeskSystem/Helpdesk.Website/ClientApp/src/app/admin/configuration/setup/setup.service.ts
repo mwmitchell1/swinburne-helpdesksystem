@@ -9,6 +9,9 @@ import { ForceCheckoutQueueRemoveResponse } from 'src/app/data/responses/helpdes
 @Injectable({
   providedIn: 'root',
 })
+/**
+ * used to call the CRUD APIs for Set Up
+ */
 export class SetUpService {
   constructor(private http: HttpClient) { }
 

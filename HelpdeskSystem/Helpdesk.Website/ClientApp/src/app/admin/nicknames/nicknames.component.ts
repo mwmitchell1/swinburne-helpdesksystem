@@ -10,7 +10,9 @@ import { EditStudentNicknameRequest } from 'src/app/data/requests/student/edit-s
   selector: 'app-admin-nicknames',
   templateUrl: './nicknames.component.html'
 })
-
+/**
+ * Used to handle Get & Edit funtionality of the nickname administration
+ */
 export class NicknamesComponent implements OnInit {
 
   public nicknames: Nickname[] = [];
@@ -24,10 +26,14 @@ export class NicknamesComponent implements OnInit {
     private notifier: NotifierService,
     private builder: FormBuilder) {
   }
+
   ngOnInit() {
     this.getNicknames();
   }
 
+  /**
+   * This used to get all of the nick names for display
+   */
   getNicknames() {
     this.service.getNickames().subscribe(
       result => {
@@ -41,6 +47,10 @@ export class NicknamesComponent implements OnInit {
     );
   }
 
+  /**
+   * This is used to populate the edit modal for used nickname edit
+   * @param id The system id of the nickname to be editied
+   */
   setUpEdit(id: number) {
     const nickname = this.nicknames.find(n => n.id === id);
 
@@ -48,6 +58,9 @@ export class NicknamesComponent implements OnInit {
     this.editForm.controls.modalEditNickname.setValue(nickname.nickname);
   }
 
+  /**
+   * used to generate a random nickname on the edit page
+   */
   generateNickname() {
     this.service.generateNickname().subscribe(
       result => {
@@ -59,6 +72,9 @@ export class NicknamesComponent implements OnInit {
     );
   }
 
+  /**
+   * Used to edit a nickname
+   */
   editNickname() {
     event.preventDefault();
 
@@ -89,6 +105,9 @@ export class NicknamesComponent implements OnInit {
     );
   }
 
+  /**
+   * Used to reset the edit modal when closing
+   */
   closeEdit() {
     this.editForm.reset();
   }

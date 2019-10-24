@@ -12,6 +12,9 @@ import { AddUpdateUnitRequest } from 'src/app/data/requests/units/add-unit-respo
   selector: 'app-admin-units',
   templateUrl: './units.component.html'
 })
+/**
+ * This component handles the CRUD actions for Units and Topics
+ */
 export class UnitsComponent {
   private errorMsg: string;
   public units: Unit[];
@@ -90,6 +93,9 @@ export class UnitsComponent {
       });
   }
 
+  /**
+   * used to add the topic selected to the units array for the helpdesk on the page
+   */
   addNewTopic() {
     const newTopicName: string = this.addForm.controls.unitTopic.value;
 
@@ -111,6 +117,10 @@ export class UnitsComponent {
     this.addForm.controls.unitTopic.setValue(null);
   }
 
+  /**
+   * used to remove the topic selected from the new unit information
+   * @param topicToRemove the topi to be removed
+   */
   removeNewTopic(topicToRemove: Topic) {
     event.preventDefault();
     const topic: Topic = this.newTopics.find(t => t.name === topicToRemove.name);
@@ -118,11 +128,17 @@ export class UnitsComponent {
     this.newTopics.splice(this.newTopics.indexOf(topic), 1);
   }
 
+  /**
+   * used to close the add unit modal
+   */
   closeAdd() {
     this.newTopics = [];
     this.addForm.reset();
   }
 
+  /**
+   * called to add a unit to the helpdesk
+   */
   addUnit() {
     event.preventDefault();
 
@@ -162,6 +178,10 @@ export class UnitsComponent {
       });
   }
 
+  /**
+   * Prepares the edit modal by prefilling he unit info using it's id
+   * @param id the id of the unit
+   */
   setUpEdit(id: number) {
     const unit: Unit = this.units.find(u => u.unitId === id);
 
@@ -171,6 +191,9 @@ export class UnitsComponent {
     this.editForm.controls.editUnitId.setValue(unit.unitId);
   }
 
+  /**
+   * used to add a new topic to the system
+   */
   addEditTopic() {
     const newTopicName = this.editForm.controls.editUnitTopic.value;
     if (!newTopicName) {
@@ -191,6 +214,10 @@ export class UnitsComponent {
     this.addForm.controls.unitTopic.setValue(null);
   }
 
+  /**
+   * Used to remove the topic selected from the existing units information
+   * @param topicToRemove the topic to be removed
+   */
   removeEditTopic(topicToRemove: Topic) {
     event.preventDefault();
     const topic: Topic = this.editTopics.find(t => t.name === topicToRemove.name);
@@ -198,11 +225,17 @@ export class UnitsComponent {
     this.editTopics.splice(this.editTopics.indexOf(topic), 1);
   }
 
+  /**
+   * Used to close the edit unit modal
+   */
   closeEdit() {
     this.editTopics = [];
     this.editForm.reset();
   }
 
+  /**
+   * Used to edit a unit
+   */
   editUnit() {
     if (this.editForm.invalid) {
 

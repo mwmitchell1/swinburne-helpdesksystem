@@ -11,6 +11,9 @@ import { UpdateUserRequest } from '../../data/requests/users/update-request';
   selector: 'app-admin-users',
   templateUrl: './users.component.html'
 })
+/**
+ * Used to handle CRUD and UI functionality for Users
+ */
 export class UsersComponent {
   public users: User[];
   deleteForm;
@@ -48,6 +51,10 @@ export class UsersComponent {
   }
 
 
+  /**
+   * Used to get a user by their id
+   * @param id the users id
+   */
   getUserById(id: number) {
     this.users.forEach(user => {
       if (user.id === id) { return user; } else { return null; }
