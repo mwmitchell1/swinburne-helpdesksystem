@@ -393,6 +393,7 @@ namespace Helpdesk.Services.Test
             {
                 StudentId = response.StudentID,
                 TopicId = topic.TopicId,
+                Description = "Check In Unit Test",
                 TimeAdded = DateTime.Now
             };
 

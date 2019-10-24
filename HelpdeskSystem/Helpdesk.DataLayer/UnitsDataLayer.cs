@@ -49,13 +49,22 @@ namespace Helpdesk.DataLayer
                             throw new Exception("Unable to add unit");
                         }
 
+                        Topic otherTopicOption = new Topic()
+                        {
+                            UnitId = newUnit.UnitId,
+                            Name = "Other",
+                            IsDeleted = false
+                        };
+
+                        context.Topic.Add(otherTopicOption);
+
                         foreach (string topic in request.Topics)
                         {
                             context.Topic.Add(new Topic()
                             {
                                 Name = topic,
                                 UnitId = unitId.Value,
-                                IsDeleted = false
+                                IsDeleted = false,
                             });
                         }
 

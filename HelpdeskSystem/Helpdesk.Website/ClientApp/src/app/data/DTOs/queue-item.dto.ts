@@ -3,6 +3,7 @@ export class QueueItem {
     public checkInId?: number;
     public nickname: string;
     public topic: string;
+    public description: string;
     public unit: string;
     public TimeAdded: Date;
     public TimeHelped?: Date;

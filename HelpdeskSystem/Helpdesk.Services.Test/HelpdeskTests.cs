@@ -215,7 +215,7 @@ namespace Helpdesk.Services.Test
 
             // Get topics that were created and check that there are 2 (Layouts and Lifecycle).
             List<TopicDTO> unitTopics = testEntityFactory.TopicsFacade.GetTopicsByUnitID(unitData.Response.UnitID).Topics;
-            Assert.IsTrue(unitTopics.Count == 2);
+            Assert.IsTrue(unitTopics.Count == 3);
 
             // Check that unit was created successfully.
             Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);

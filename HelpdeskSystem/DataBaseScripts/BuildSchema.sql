@@ -44,6 +44,7 @@ CREATE TABLE QueueItem (
     ItemID INT IDENTITY PRIMARY KEY NOT NULL,
     StudentID INT NOT NULL,
     TopicID INT NOT NULL,
+	[Description] VARCHAR(50) NOT NULL,
     TimeAdded DATETIME NOT NULL,
     TimeHelped DATETIME,
     TimeRemoved DATETIME,

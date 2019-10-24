@@ -15,6 +15,9 @@ namespace Helpdesk.Common.Requests.Queue
 
         public int TopicID { get; set; }
 
+        [Required (AllowEmptyStrings = false, ErrorMessage = "You must enter in a description")]
+        public string Description { get; set; }
+
         public int? CheckInID { get; set; }
 
         public string Nickname { get; set; }

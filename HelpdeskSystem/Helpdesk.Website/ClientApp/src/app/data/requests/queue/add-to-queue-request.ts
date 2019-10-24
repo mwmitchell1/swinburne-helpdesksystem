@@ -4,4 +4,5 @@ export class AddToQueueRequest {
     public nickname: string;
     public sid: string;
     public checkInID?: number;
+    public description: string;
 }

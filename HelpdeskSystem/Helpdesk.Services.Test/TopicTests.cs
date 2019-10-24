@@ -39,7 +39,7 @@ namespace Helpdesk.Services.Test
 
             // Check that the topics retrieved are correct.
             Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
-            Assert.IsTrue(topicResponse.Topics.Count == 2);
+            Assert.IsTrue(topicResponse.Topics.Count == 3);
         }
     }
 }

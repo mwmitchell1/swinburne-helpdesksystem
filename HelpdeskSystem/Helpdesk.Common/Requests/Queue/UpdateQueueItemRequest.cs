@@ -6,5 +6,7 @@ namespace Helpdesk.Common.Requests.Queue
     public class UpdateQueueItemRequest : BaseRequest
     {
         public int TopicID { get; set; }
+
+        public string Description { get; set; }
     }
 }

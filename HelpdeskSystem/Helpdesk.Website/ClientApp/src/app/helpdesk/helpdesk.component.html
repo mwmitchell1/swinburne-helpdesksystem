@@ -30,6 +30,7 @@
                         <th scope="col">Nickname</th>
                         <th scope="col">Unit</th>
                         <th scope="col">Topic</th>
+                        <th scope="col">Description</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -38,6 +39,7 @@
                         <td>{{item.nickname}}</td>
                         <td>{{item.unit}}</td>
                         <td>{{item.topic}}</td>
+                        <td>{{item.description}}</td>
                         <td>
                             <button class="btn btn-danger float-right ml-1" data-toggle="modal"
                                 (click)="remove(item.itemId)">Remove</button>
@@ -45,7 +47,7 @@
                                 data-toggle="modal" data-target="#modal-edit-queue"
                                 (click)="setupEdit(item.itemId)">Edit</button>
                             <button *ngIf="!item.timeHelped" class="btn btn-dark float-right" data-toggle="modal"
-                                (click)="collect(item.itemId)">Collect</button>
+                                (click)="collect(item.itemId)">Assist</button>
                         </td>
                     </tr>
                 </tbody>
@@ -96,7 +98,7 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="form-group" *ngIf="showTopic">
+                            <div class="form-group">
                                 <label for="modalJoinTopicId">Topic:</label>
                                 <select class="form-control" id="modalJoinTopicId" name="modalJoinTopicId"
                                     formControlName="modalJoinTopicId">
@@ -105,6 +107,11 @@
                                         {{topic.name}}
                                     </option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalJoinDescription">Description</label>
+                                <input type="text" class="form-control" id="modalJoinDescription"
+                                    formControlName="modalJoinDescription" name="modalJoinDescription" />
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -153,6 +160,11 @@
                                         {{topic.name}}
                                     </option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalEditDescription">Description</label>
+                                <input type="text" class="form-control" id="modalEditDescription"
+                                    formControlName="modalEditDescription" name="modalEditDescription" />
                             </div>
                         </div>
                         <div class="modal-footer">
