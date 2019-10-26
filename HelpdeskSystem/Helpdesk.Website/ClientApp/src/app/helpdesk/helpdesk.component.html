@@ -68,7 +68,7 @@
                                 <label for="modalJoinCheckId">Nickname:</label>
                                 <select class="form-control" id="modalJoinCheckId" name="modalJoinCheckId"
                                     formControlName="modalJoinCheckId" (change)="populateTopics($event.target.value)">
-                                    <option value="">What is your nickname?</option>
+                                    <option value="">Select your nickname</option>
                                     <option *ngFor="let checkIn of checkIns" value="{{checkIn.checkInId}}">
                                         {{checkIn.nickname}}
                                     </option>
@@ -76,23 +76,26 @@
                             </div>
                             <input type="hidden" *ngIf="!helpdesk.hasCheckIn" class="form-control"
                                 formControlName="modalJoinStudentId" id="modalJoinStudentId" name="modalJoinStudentId">
-                            <div class="form-group" *ngIf="!helpdesk.hasCheckIn">
-                                <label for="modalJoinSID">Student ID</label>
-                                <input type="text" class="form-control" formControlName="modalJoinSID" id="modalJoinSID"
-                                    name="modalJoinSID" placeholder="What is your student id?"
-                                    (blur)="validateQueueNickname()" required>
+                            <div  *ngIf="!helpdesk.hasCheckIn">
+                                <div class="alert alert-info">Try scanning your card for your Student ID.</div>
+                                <div class="form-group">
+                                    <label for="modalJoinSID">Student ID</label>
+                                    <input type="text" class="form-control" formControlName="modalJoinSID"
+                                        id="modalJoinSID" name="modalJoinSID" placeholder="Enter your student id."
+                                        (blur)="validateQueueNickname()" required>
+                                </div>
                             </div>
                             <div class="form-group" *ngIf="!helpdesk.hasCheckIn">
                                 <label for="modalJoinNickname">Nickname</label>
                                 <input type="text" class="form-control" id="modalJoinNickname"
                                     formControlName="modalJoinNickname" name="modalJoinNickname"
-                                    placeholder="What is your nickname?" (blur)="validateQueueNickname()" required>
+                                    placeholder="Enter your nickname." (blur)="validateQueueNickname()" required>
                             </div>
                             <div class="form-group" *ngIf="!helpdesk.hasCheckIn">
                                 <label for="modalJoinUnitId">Unit:</label>
                                 <select (change)="populateTopics($event.target.value)" class="form-control"
                                     id="modalJoinUnitId" name="modalJoinUnitId" formControlName="modalJoinUnitId">
-                                    <option value="">Which unit are you studying?</option>
+                                    <option value="">Select the unit you need help on.</option>
                                     <option *ngFor="let unit of units" value="{{unit.unitId}}">
                                         {{unit.name}}
                                     </option>
@@ -102,7 +105,7 @@
                                 <label for="modalJoinTopicId">Topic:</label>
                                 <select class="form-control" id="modalJoinTopicId" name="modalJoinTopicId"
                                     formControlName="modalJoinTopicId">
-                                    <option value="">Which topic do you need help on?</option>
+                                    <option value="">Select the topic you need help on.</option>
                                     <option *ngFor="let topic of topics" value="{{topic.topicId}}">
                                         {{topic.name}}
                                     </option>
@@ -111,7 +114,8 @@
                             <div class="form-group">
                                 <label for="modalJoinDescription">Description</label>
                                 <input type="text" class="form-control" id="modalJoinDescription"
-                                    formControlName="modalJoinDescription" name="modalJoinDescription" />
+                                    formControlName="modalJoinDescription" name="modalJoinDescription"
+                                    placeholder="Enter in a description." />
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -139,13 +143,14 @@
                             <div class="form-group">
                                 <label for="modalJoinNickname">Nickname</label>
                                 <input type="text" class="form-control" id="modalEditNickname"
-                                    formControlName="modalEditNickname" name="modalEditNickname" readonly />
+                                    formControlName="modalEditNickname" name="modalEditNickname"
+                                    placeholder="Enter in your nickname." readonly />
                             </div>
                             <div class="form-group" *ngIf="!helpdesk.hasCheckIn">
                                 <label for="modalEditUnitId">Unit:</label>
                                 <select (change)="populateTopics($event.target.value)" class="form-control"
                                     id="modalEditUnitId" name="modalEditUnitId" formControlName="modalEditUnitId">
-                                    <option value="">Which unit are you studying?</option>
+                                    <option value="">Select the unit you need help on.</option>
                                     <option *ngFor="let unit of units" value="{{unit.unitId}}">
                                         {{unit.name}}
                                     </option>
@@ -155,7 +160,7 @@
                                 <label for="modalEditTopicId">Topic:</label>
                                 <select class="form-control" id="modalEditTopicId" name="modalEditTopicId"
                                     formControlName="modalEditTopicId">
-                                    <option value="">Which topic do you need help on?</option>
+                                    <option value="">Select the topic you need help on.</option>
                                     <option *ngFor="let topic of topics" value="{{topic.topicId}}">
                                         {{topic.name}}
                                     </option>
@@ -164,7 +169,8 @@
                             <div class="form-group">
                                 <label for="modalEditDescription">Description</label>
                                 <input type="text" class="form-control" id="modalEditDescription"
-                                    formControlName="modalEditDescription" name="modalEditDescription" />
+                                    formControlName="modalEditDescription" name="modalEditDescription"
+                                    placeholder="Enter in a description." />
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -192,23 +198,24 @@
                         <div class="modal-body">
                             <input type="hidden" class="form-control" formControlName="modalStudentId"
                                 id="modalStudentId" name="modalStudentId">
+                            <div class="alert alert-info">Try scanning your card for your Student ID.</div>
                             <div class="form-group">
                                 <label for="modalSID">Student ID</label>
                                 <input type="text" class="form-control" formControlName="modalSID" id="modalSID"
-                                    name="modalSID" placeholder="What is your student id?" (blur)="validateNickname()"
+                                    name="modalSID" placeholder="Enter your student." (blur)="validateNickname()"
                                     required>
                             </div>
                             <div class="form-group">
                                 <label for="modalNickname">Nickname</label>
                                 <input type="text" class="form-control" id="modalNickname"
                                     formControlName="modalNickname" name="modalNickname"
-                                    placeholder="What is your nickname?" (blur)="validateNickname()" required>
+                                    placeholder="Enter your nickname." (blur)="validateNickname()" required>
                             </div>
                             <div class="form-group">
                                 <label for="modalUnitId">Unit:</label>
                                 <select class="form-control" id="modalUnitId" name="modalUnitId"
                                     formControlName="modalUnitId">
-                                    <option value="">Which unit are you studying?</option>
+                                    <option value="">Select the unit you are studying.</option>
                                     <option *ngFor="let unit of units" value="{{unit.unitId}}">
                                         {{unit.name}}
                                     </option>
@@ -240,7 +247,7 @@
                                 <label for="checkOutStudentId">User to Checked Out:</label>
                                 <select class="form-control" id="checkOutStudentId" name="checkOutStudentId"
                                     formControlName="checkOutStudentId">
-                                    <option value="">What is your nickname?</option>
+                                    <option value="">Select your nickname.</option>
                                     <option *ngFor="let checkIn of checkIns" value="{{checkIn.checkInId}}">
                                         {{checkIn.nickname}}
                                     </option>
@@ -248,7 +255,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="reset" class="btn btn-secondary" (click)="closeCheckOut()" data-dismiss="modal">Close</button>
+                            <button type="reset" class="btn btn-secondary" (click)="closeCheckOut()"
+                                data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Check Out</button>
                         </div>
                     </form>

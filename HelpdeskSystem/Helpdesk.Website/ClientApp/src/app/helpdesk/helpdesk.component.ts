@@ -15,6 +15,7 @@ import { Topic } from '../data/DTOs/topic.dto';
 import { AddToQueueRequest } from '../data/requests/queue/add-to-queue-request';
 import { UpdateQueueItemStatusRequest } from '../data/requests/queue/update-queue-item-status-request';
 import { UpdateQueueItemRequest } from '../data/requests/queue/update-queue-item-request';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-helpdesk',
@@ -510,7 +511,7 @@ export class HelpdeskComponent implements OnInit {
     const request = new UpdateQueueItemStatusRequest();
     request.TimeRemoved = new Date();
 
-    this.service.updateQueueItemStatus(id, request).subscribe(
+    this.service.updateQueueItemStatus(id, request).pipe(delay(200)).subscribe(
       result => {
         this.notifier.notify('success', 'Item removed from queue');
         this.getQueueItems();
