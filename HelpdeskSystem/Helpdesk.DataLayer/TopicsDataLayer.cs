@@ -11,10 +11,18 @@ using NLog;
 
 namespace Helpdesk.DataLayer
 {
+    /// <summary>
+    /// Used to handle CRUD for topic records in the database
+    /// </summary>
     public class TopicsDataLayer
     {
         private static Logger s_Logger = LogManager.GetCurrentClassLogger();
 
+        /// <summary>
+        /// This method retrieves all topics of a specific unit from the database
+        /// </summary>
+        /// <param name="id">ID of the unit to retrieve topics of</param>
+        /// <returns>A list of topics</returns>
         public List<TopicDTO> GetTopicsByUnitID(int id)
         {
             List<TopicDTO> topicDTOs = new List<TopicDTO>();
@@ -73,6 +81,11 @@ namespace Helpdesk.DataLayer
             return topics;
         }
 
+        /// <summary>
+        /// Converts the topic DAO to a DTO to send to the front end
+        /// </summary>
+        /// <param name="topic">The DAO for the topic</param>
+        /// <returns>The DTO for the topic</returns>
         private TopicDTO DAO2DTO(Topic topic)
         {
             TopicDTO topicDTO = new TopicDTO
@@ -85,6 +98,11 @@ namespace Helpdesk.DataLayer
             return topicDTO;
         }
 
+        /// <summary>
+        /// Converts the topic DTO to a DAO to interact with the database
+        /// </summary>
+        /// <param name="topic">The DTO for the topic</param>
+        /// <returns>The DAO for the topic</returns>
         private Topic DTO2DAO(TopicDTO topicDTO)
         {
             Topic topic = new Topic

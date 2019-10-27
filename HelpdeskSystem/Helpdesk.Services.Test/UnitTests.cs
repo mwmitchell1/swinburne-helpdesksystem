@@ -14,6 +14,9 @@ using Helpdesk.Common.Responses.Helpdesk;
 
 namespace Helpdesk.Services.Test
 {
+    /// <summary>
+    /// Used to test unit related code
+    /// </summary>
     [TestClass]
     public class UnitTests
     {
@@ -366,6 +369,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(topic.Name, getUnitResponse.Unit.Topics[1].Name);
         }
 
+        /// <summary>
+        /// Used to ensure getting all units in a specific helpdesk works
+        /// </summary>
         [TestMethod]
         public void GetAllUnitsByHelpdeskID()
         {

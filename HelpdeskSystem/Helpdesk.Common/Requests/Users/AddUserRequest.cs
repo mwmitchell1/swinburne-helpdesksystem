@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Helpdesk.Common.Requests.Users
 {
+    /// <summary>
+    /// This request is used to add a new user
+    /// </summary>
     public class AddUserRequest : BaseRequest
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "{0} cannot be empty!")]

@@ -12,6 +12,9 @@ using System.Data.Common;
 
 namespace Helpdesk.DataLayer
 {
+    /// <summary>
+    /// Used to handle CRUD for unit records in the database
+    /// </summary>
     public class UnitsDataLayer
     {
         private static Logger s_Logger = LogManager.GetCurrentClassLogger();

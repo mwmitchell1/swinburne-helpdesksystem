@@ -134,9 +134,10 @@ namespace Helpdesk.DataLayer
         }
 
         /// <summary>
-        /// This method retrieves a list of all the queue items in the database
+        /// This method retreives all queue items in a specific helpdesk from the database
         /// </summary>
-        /// <returns>A list of queue items retrieved from the database</returns>
+        /// <param name="id">ID of the helpdesk to retrieve queue items from</param>
+        /// <returns>A list of the queue items</returns>
         public List<QueueItemDTO> GetQueueItemsByHelpdeskID(int id)
         {
             List<QueueItemDTO> queueItemDTOs = new List<QueueItemDTO>();
