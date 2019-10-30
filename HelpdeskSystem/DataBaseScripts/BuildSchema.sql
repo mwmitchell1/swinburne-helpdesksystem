@@ -360,7 +360,8 @@ BEGIN
     SET NOCOUNT ON;
 
     DECLARE @tHelpDeskCheckInJoin TABLE (HelpdeskID INT, CheckInID INT, CheckInTime DATETIME)
-    DECLARE @tRepeats TABLE (HelpdeskID INT, StudentID INT, CheckInID INT, CheckInTime DATETIME)
+    DECLARE @tVisits TABLE (HelpdeskID INT, StudentID INT, CheckInID INT, CheckInTime DATETIME)
+    DECLARE @tRepeatVisits TABLE (HelpdeskID INT, StudentID INT, CheckInID INT, CheckInTime DATETIME)
     DECLARE @tRepeatCheck TABLE (StudentID INT)
     DECLARE @vStudentID INT
     DECLARE @vCheckInID INT
@@ -389,10 +390,16 @@ BEGIN
     WHILE 1=1
     BEGIN
         FETCH NEXT FROM sorter
-            INTO @vCheckInID, @vCheckInTime
+        INTO @vCheckInID, @vCheckInTime
+        IF @@FETCH_STATUS = 0
+        BEGIN
+            -- Fetched row; add to visits. Always add a record for each loop cycle.
+            INSERT INTO @tVisits (CheckInID, CheckInTime)
+            VALUES (@vCheckInID, @vCheckInTime)
+        END
         IF @@FETCH_STATUS <> 0
         BEGIN
-            -- Fetched all rows; break loop.
+            -- No more rows / a problem occurred; break loop.
             BREAK
         END
         ELSE IF NOT EXISTS (SELECT StudentID FROM @tRepeatCheck WHERE StudentID = @vStudentID)
@@ -402,12 +409,15 @@ BEGIN
         END
         ELSE
         BEGIN
-            INSERT INTO @tRepeats (CheckInID, CheckInTime)
+            INSERT INTO @tRepeatVisits (CheckInID, CheckInTime)
             VALUES (@vCheckInID, @vCheckInTime)
         END
     END
 
-    SELECT * FROM @tRepeats
+    SELECT          COUNT(v.CheckInID) AS VISITS, COUNT(rv.CheckInID) AS REPEAT_VISITS
+    FROM            @tVisits v
+    JOIN            @tRepeatVisits rv ON v.CheckInID = rv.CheckInId
+    GROUP BY        v.CheckInID;
     RETURN
 END
 GO
