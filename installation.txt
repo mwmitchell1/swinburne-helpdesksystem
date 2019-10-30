@@ -1,0 +1,26 @@
+Installation Instruction
+1. Database
+    1.1 Install SQL Express Server on the machine as admin account, can be found at https://www.microsoft.com/en-au/sql-server/sql-server-editions-express
+    1.2 Open SQL Management Studio or equivalent program and connect to the database server
+    1.3 Open and run BuildSchema.sql against the master database
+
+2. Application
+    2.1 Add: 
+	
+    # Helpdesk System
+	127.0.0.1 		swin.helpdesk.edu.au
+
+    to the system host file.
+    Usually found at C:\Windows\System32\drivers\etc\hosts on a windows machine
+    
+	2.2 Download and Install .Net Core 2.2 from https://dotnet.microsoft.com/download/dotnet-core/2.2
+    2.3 Unzip the application in the desired location.  
+    2.4 Run the app as the admin account by clicking Helpdesk.Website.exe
+    2.5 Open a broswer and navigate to <a href="swin.helpdesk.edu.au:5001">swin.helpdesk.edu.au:5001
+
+3. Configuration
+    3.1 Go to admin section:
+	Username: Admin
+	Password: Password 1
+    3.2 Create new User and delete original admin
+    3.3 Configure new helpdesk
