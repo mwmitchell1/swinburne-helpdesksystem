@@ -12,6 +12,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Helpdesk.Services.Test
 {
+    /// <summary>
+    /// Used to test helpdesk and timespan related code
+    /// </summary>
     [TestClass]
     public class HelpdeskTests
     {
@@ -56,6 +59,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
         }
 
+        /// <summary>
+        /// Ensures that retrieving all helpdesks works 
+        /// </summary>
         [TestMethod]
         public void GetHelpdesks()
         {
@@ -101,6 +107,9 @@ namespace Helpdesk.Services.Test
             Assert.IsTrue(!helpdeskIds.Contains(hd2.Response.HelpdeskID));
         }
 
+        /// <summary>
+        /// Ensures getting a specific helpdesk by helpdeskID works
+        /// </summary>
         [TestMethod]
         public void GetHelpdeskSuccess()
         {
@@ -115,6 +124,9 @@ namespace Helpdesk.Services.Test
             Assert.IsNotNull(response.Helpdesk);
         }
 
+        /// <summary>
+        /// Ensures attempting to get a helpdesk that doesn't exist is handled properly
+        /// </summary>
         [TestMethod]
         public void GetHelpdeskNotFound()
         {
@@ -215,7 +227,7 @@ namespace Helpdesk.Services.Test
 
             // Get topics that were created and check that there are 2 (Layouts and Lifecycle).
             List<TopicDTO> unitTopics = testEntityFactory.TopicsFacade.GetTopicsByUnitID(unitData.Response.UnitID).Topics;
-            Assert.IsTrue(unitTopics.Count == 2);
+            Assert.IsTrue(unitTopics.Count == 3);
 
             // Check that unit was created successfully.
             Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);

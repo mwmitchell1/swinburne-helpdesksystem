@@ -12,6 +12,9 @@ using System.Data.Common;
 
 namespace Helpdesk.DataLayer
 {
+    /// <summary>
+    /// Used to handle CRUD for unit records in the database
+    /// </summary>
     public class UnitsDataLayer
     {
         private static Logger s_Logger = LogManager.GetCurrentClassLogger();
@@ -49,13 +52,22 @@ namespace Helpdesk.DataLayer
                             throw new Exception("Unable to add unit");
                         }
 
+                        Topic otherTopicOption = new Topic()
+                        {
+                            UnitId = newUnit.UnitId,
+                            Name = "Other",
+                            IsDeleted = false
+                        };
+
+                        context.Topic.Add(otherTopicOption);
+
                         foreach (string topic in request.Topics)
                         {
                             context.Topic.Add(new Topic()
                             {
                                 Name = topic,
                                 UnitId = unitId.Value,
-                                IsDeleted = false
+                                IsDeleted = false,
                             });
                         }
 

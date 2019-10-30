@@ -95,6 +95,11 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Used to add a new user to the database
+        /// </summary>
+        /// <param name="request">Request which contains the new user information</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpPost]
         [Route("")]
         public IActionResult AddUser([FromBody] AddUserRequest request)
@@ -169,6 +174,11 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Used to delete a specific user from the database
+        /// </summary>
+        /// <param name="id">ID of the unit to be deleted</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpDelete]
         [Route("{id}")]
         public IActionResult DeleteUser([FromRoute] int id)

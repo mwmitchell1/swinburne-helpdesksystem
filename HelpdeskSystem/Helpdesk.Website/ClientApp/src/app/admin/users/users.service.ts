@@ -9,6 +9,9 @@ import { AddUserRequest } from '../../data/requests/users/add-request';
 import { AddUserResponse } from '../../data/responses/users/add-response';
 
 @Injectable()
+/**
+ * Used to call the APIs for Users
+ */
 export class UsersService {
   constructor(private http: HttpClient) { }
 

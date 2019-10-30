@@ -76,6 +76,7 @@ namespace Helpdesk.Services.Test
                 Nickname = AlphaNumericStringGenerator.GetString(10),
                 SID = AlphaNumericStringGenerator.GetStudentIDString(),
                 TopicID = topic.TopicId,
+                Description = "JoinQueueNoCheckInNewStudent Test"
             };
 
             QueueFacade facade = new QueueFacade();
@@ -159,6 +160,7 @@ namespace Helpdesk.Services.Test
             {
                 StudentID = nickname.StudentId,
                 TopicID = topic.TopicId,
+                Description = "JoinQueueNoCheckOldStudent Test"
             };
 
             QueueFacade facade = new QueueFacade();
@@ -250,7 +252,8 @@ namespace Helpdesk.Services.Test
             {
                 StudentID = nickname.StudentId,
                 TopicID = topic.TopicId,
-                CheckInID = checkin.CheckInId
+                CheckInID = checkin.CheckInId,
+                Description = "JoinQueueCheckInOldStudent Test"
             };
 
             QueueFacade facade = new QueueFacade();
@@ -311,7 +314,7 @@ namespace Helpdesk.Services.Test
                 Helpdeskunit helpdeskunit = new Helpdeskunit()
                 {
                     HelpdeskId = helpdesk.HelpdeskId,
-                    UnitId = unit.UnitId
+                    UnitId = unit.UnitId,
                 };
 
                 context.Helpdeskunit.Add(helpdeskunit);
@@ -326,6 +329,7 @@ namespace Helpdesk.Services.Test
             AddToQueueRequest request = new AddToQueueRequest()
             {
                 TopicID = topic.TopicId,
+                Description = "JoinQueueNoStudentFail Test"
             };
 
             QueueFacade facade = new QueueFacade();
@@ -376,7 +380,69 @@ namespace Helpdesk.Services.Test
             AddToQueueRequest request = new AddToQueueRequest()
             {
                 Nickname = AlphaNumericStringGenerator.GetString(10),
-                SID = AlphaNumericStringGenerator.GetStudentIDString()
+                SID = AlphaNumericStringGenerator.GetStudentIDString(),
+                Description = "JoinQueueNoTopicFail Test",
+            };
+
+            QueueFacade facade = new QueueFacade();
+
+            AddToQueueResponse response = facade.AddToQueue(request);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
+        }
+
+        /// <summary>
+        /// Used to ensure that joining the queue does not work without a description
+        /// </summary>
+        [TestMethod]
+        public void JoinQueueNoDescriptionFail()
+        {
+            Helpdesksettings helpdesk = new Helpdesksettings()
+            {
+                HasQueue = true,
+                HasCheckIn = true,
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            Unit unit = new Unit()
+            {
+                Code = AlphaNumericStringGenerator.GetString(8),
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            Topic topic = new Topic()
+            {
+                IsDeleted = false,
+                Name = AlphaNumericStringGenerator.GetString(10),
+            };
+
+            using (helpdesksystemContext context = new helpdesksystemContext())
+            {
+                context.Helpdesksettings.Add(helpdesk);
+                context.Unit.Add(unit);
+                context.SaveChanges();
+
+                topic.UnitId = unit.UnitId;
+
+                Helpdeskunit helpdeskunit = new Helpdeskunit()
+                {
+                    HelpdeskId = helpdesk.HelpdeskId,
+                    UnitId = unit.UnitId
+                };
+
+                context.Topic.Add(topic);
+                context.Helpdeskunit.Add(helpdeskunit);
+
+                context.SaveChanges();
+            }
+
+            AddToQueueRequest request = new AddToQueueRequest()
+            {
+                Nickname = AlphaNumericStringGenerator.GetString(10),
+                SID = AlphaNumericStringGenerator.GetStudentIDString(),
+                TopicID = topic.TopicId
             };
 
             QueueFacade facade = new QueueFacade();
@@ -554,7 +620,8 @@ namespace Helpdesk.Services.Test
                 TopicID = topic.TopicId,
                 Nickname = AlphaNumericStringGenerator.GetString(10),
                 SID = AlphaNumericStringGenerator.GetStudentIDString(),
-                CheckInID = -100
+                CheckInID = -100,
+                Description = "JoinInvalidCheckNotFound Test"
             };
 
             QueueFacade facade = new QueueFacade();
@@ -593,7 +660,7 @@ namespace Helpdesk.Services.Test
             GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
 
             // Check that there are two units in the response (Layouts, Lifecycle).
-            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+            Assert.IsTrue(topicResponse.Topics.Count() == 3);
 
             // Add test queue item, pass in topic [0].
             TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
@@ -604,7 +671,8 @@ namespace Helpdesk.Services.Test
             // Create request to alter queue item.
             var queueUpdateRequest = new UpdateQueueItemRequest
             {
-                TopicID = topicResponse.Topics[0].TopicId
+                TopicID = topicResponse.Topics[0].TopicId,
+                Description = "UpdateQueueItem Test"
             };
 
             // Update the queue item
@@ -616,7 +684,8 @@ namespace Helpdesk.Services.Test
             // Do another request to change to another topic
             queueUpdateRequest = new UpdateQueueItemRequest
             {
-                TopicID = topicResponse.Topics[1].TopicId
+                TopicID = topicResponse.Topics[1].TopicId,
+                Description = "UpdateQueueItem Test 2"
             };
 
             // Update the queue item again
@@ -626,6 +695,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, updateQueueResponse.Status);
         }
 
+        /// <summary>
+        /// Ensures attempting to update a queue item that doesn't exist is handled properly
+        /// </summary>
         [TestMethod]
         public void UpdateQueueItemDoesNotExist()
         {
@@ -641,6 +713,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
         }
 
+        /// <summary>
+        /// Ensures attempting to update a queue item without a topic is handled properly
+        /// </summary>
         [TestMethod]
         public void UpdateQueueItemTopicDoesNotExist()
         {
@@ -667,7 +742,7 @@ namespace Helpdesk.Services.Test
             GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
 
             // Check that there are two units in the response (Layouts, Lifecycle).
-            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+            Assert.IsTrue(topicResponse.Topics.Count() == 3);
 
             // Add test queue item, pass in topic [0].
             TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
@@ -679,7 +754,8 @@ namespace Helpdesk.Services.Test
             // NOTICE This should fail, as there's no TopicID -1
             var queueUpdateRequest = new UpdateQueueItemRequest
             {
-                TopicID = -1
+                TopicID = -1,
+                Description = "UpdateQueueItemTopicDoesNotExist"
             };
 
             // Update the queue item
@@ -718,7 +794,7 @@ namespace Helpdesk.Services.Test
             GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
 
             // Check that there are two units in the response (Layouts, Lifecycle).
-            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+            Assert.IsTrue(topicResponse.Topics.Count() == 3);
 
             // Add test queue item, pass in topic [0].
             TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
@@ -756,6 +832,9 @@ namespace Helpdesk.Services.Test
             Assert.IsTrue(queueUpdateResponse.Result == true);
         }
 
+        /// <summary>
+        /// Ensures attempting to update a queue item with no item status is handled properly
+        /// </summary>
         [TestMethod]
         public void UpdateQueueItemStatusDoesNotExist()
         {
@@ -811,6 +890,10 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
         }
 
+        /// <summary>
+        /// Ensures that attempting to update a queue item with a time removed that
+        /// occurs before the time added is handled properly
+        /// </summary>
         [TestMethod]
         public void UpdateQueueItemStatusInvalidTimeRemoved()
         {
@@ -837,7 +920,7 @@ namespace Helpdesk.Services.Test
             GetTopicsByUnitIDResponse topicResponse = topicsFacade.GetTopicsByUnitID(unitData.Response.UnitID);
 
             // Check that there are two units in the response (Layouts, Lifecycle).
-            Assert.IsTrue(topicResponse.Topics.Count() == 2);
+            Assert.IsTrue(topicResponse.Topics.Count() == 3);
 
             // Add test queue item, pass in topic [0].
             TestDataQueue queueData = testEntityFactory.AddQueueItem(null, topicResponse.Topics[0].TopicId);
@@ -928,6 +1011,7 @@ namespace Helpdesk.Services.Test
                 Nickname = AlphaNumericStringGenerator.GetString(10),
                 SID = AlphaNumericStringGenerator.GetStudentIDString(),
                 TopicID = topic.TopicId,
+                Description = "GetQueueItemsByHelpdeskID Test"
             };
 
             QueueFacade facade = new QueueFacade();

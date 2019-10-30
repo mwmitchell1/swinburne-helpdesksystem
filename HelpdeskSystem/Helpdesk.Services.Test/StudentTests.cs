@@ -11,9 +11,15 @@ using System.Text;
 
 namespace Helpdesk.Services.Test
 {
+    /// <summary>
+    /// Used to test student and nickname related code
+    /// </summary>
     [TestClass]
     public class StudentTests
     {
+        /// <summary>
+        /// Used to ensure adding a new student works
+        /// </summary>
         [TestMethod]
         public void AddStudentNickname()
         {
@@ -36,6 +42,10 @@ namespace Helpdesk.Services.Test
             }
         }
 
+        /// <summary>
+        /// Used to ensure attempting to add a new student with an already existing
+        /// nickname is handled properly
+        /// </summary>
         [TestMethod]
         public void AddStudentNicknameExists()
         {
@@ -61,6 +71,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
         }
 
+        /// <summary>
+        /// Used to ensure getting a student by a specific nickname works properly
+        /// </summary>
         [TestMethod]
         public void GetStudentByNickname()
         {
@@ -195,6 +208,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.BadRequest, editStudentNicknameResponse.Status);
         }
 
+        /// <summary>
+        /// Used to ensure the validation process to validate a new nickname works
+        /// </summary>
         [TestMethod]
         public void ValidateNicknameNew()
         {
@@ -211,6 +227,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, response.Status);
         }
 
+        /// <summary>
+        /// Used to ensure validating an already existing student nickname works
+        /// </summary>
         [TestMethod]
         public void ValidateNicknameOldValid()
         {
@@ -239,6 +258,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.Accepted, response.Status);
         }
 
+        /// <summary>
+        /// Used to ensure the validation process detects an invalid existing nickname
+        /// </summary>
         [TestMethod]
         public void ValidateNicknameOldInValid()
         {

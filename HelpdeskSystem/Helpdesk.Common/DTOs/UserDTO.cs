@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Helpdesk.Common.DTOs
 {
+    /// <summary>
+    /// Data transfer object used to represent a user
+    /// </summary>
     public class UserDTO
     {
         public int UserId { get; set; }

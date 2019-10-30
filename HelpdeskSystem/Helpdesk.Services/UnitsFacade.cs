@@ -13,6 +13,9 @@ using NLog;
 
 namespace Helpdesk.Services
 {
+    /// <summary>
+    /// This class is used to handle the business logic of units
+    /// </summary>
     public class UnitsFacade : ILoginClass
     {
         private static Logger s_logger = LogManager.GetCurrentClassLogger();
@@ -24,6 +27,12 @@ namespace Helpdesk.Services
             _appSettings = new AppSettings();
         }
 
+        /// <summary>
+        /// This method is used to add a new user or update an existing user
+        /// </summary>
+        /// <param name="id">The id of the user to be updated if requested</param>
+        /// <param name="request">Request that contains the new user information</param>
+        /// <returns>Response which indicates success or failure</returns>
         public AddUpdateUnitResponse AddOrUpdateUnit(int id, AddUpdateUnitRequest request)
         {
             s_logger.Info("Adding unit to helpdesk");

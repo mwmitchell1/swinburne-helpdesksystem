@@ -10,12 +10,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Helpdesk.Website.Controllers.api
 {
+    /// <summary>
+    /// Used as the access point for any features relating to units
+    /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/units")]
     [ApiController]
     public class UnitsController : BaseApiController
     {
-
+        /// <summary>
+        /// Used to either add a new unit, or update an existing unit, in the database
+        /// </summary>
+        /// <param name="id">The id of the unit if this is used to update a unit</param>
+        /// <param name="request">Request that contains the new unit information</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpPost]
         [Route("{id}")]
         public IActionResult AddOrUpdateUnit([FromRoute] int id, [FromBody] AddUpdateUnitRequest request)

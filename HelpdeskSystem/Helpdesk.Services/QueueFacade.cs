@@ -25,7 +25,7 @@ namespace Helpdesk.Services
         /// This method is used to add an item to a queue
         /// </summary>
         /// <param name="request">The information of the queue item</param>
-        /// <returns></returns>
+        /// <returns>Response which indicates success or failure</returns>
         public AddToQueueResponse AddToQueue(AddToQueueRequest request)
         {
             AddToQueueResponse response = new AddToQueueResponse();
@@ -78,6 +78,12 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This method is used to update an existing item in the queue
+        /// </summary>
+        /// <param name="id">ID of the queue item to be updated</param>
+        /// <param name="request">Request that contains the new queue item information</param>
+        /// <returns>Response which indicates success or failure</returns>
         public UpdateQueueItemResponse UpdateQueueItem(int id, UpdateQueueItemRequest request)
         {
             UpdateQueueItemResponse response = new UpdateQueueItemResponse();
@@ -109,10 +115,11 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method updates a queue items status by either entering a helped time or removed time.
+        /// This method is used to update a queue item's status
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
+        /// <param name="id">ID of the specific queue item to be updated</param>
+        /// <param name="request">Request which contains the new queue item status</param>
+        /// <returns>Response which indicates success or failure</returns>
         public UpdateQueueItemStatusResponse UpdateQueueItemStatus(int id, UpdateQueueItemStatusRequest request)
         {
             UpdateQueueItemStatusResponse response = new UpdateQueueItemStatusResponse();
@@ -156,10 +163,10 @@ namespace Helpdesk.Services
         }
 
         /// <summary>
-        /// This method is responsible for retrieving all queue items from the helpdesk system
+        /// This method gets all the queue items in a specific helpdesk
         /// </summary>
-        /// <returns>The response that indicates if the operation was a success,
-        /// and the list of queue items</returns>
+        /// <param name="id">The id of the helpdesk</param>
+        /// <returns>Response which indicates success or failure</returns>
         public GetQueueItemsByHelpdeskIDResponse GetQueueItemsByHelpdeskID(int id)
         {
             s_logger.Info("Getting queue items by helpdesk id...");

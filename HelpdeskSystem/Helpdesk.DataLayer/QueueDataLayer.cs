@@ -34,6 +34,7 @@ namespace Helpdesk.DataLayer
                     StudentId = request.StudentID.Value,
                     TimeAdded = DateTime.Now,
                     TopicId = request.TopicID,
+                    Description = request.Description,
                 };
 
                 context.Queueitem.Add(item);
@@ -126,15 +127,17 @@ namespace Helpdesk.DataLayer
                     throw new NotFoundException($"Unable to find topic with id [{request.TopicID}]");
 
                 item.TopicId = request.TopicID;
+                item.Description = request.Description;
                 context.SaveChanges();
                 return true;
             }
         }
 
         /// <summary>
-        /// This method retrieves a list of all the queue items in the database
+        /// This method retreives all queue items in a specific helpdesk from the database
         /// </summary>
-        /// <returns>A list of queue items retrieved from the database</returns>
+        /// <param name="id">ID of the helpdesk to retrieve queue items from</param>
+        /// <returns>A list of the queue items</returns>
         public List<QueueItemDTO> GetQueueItemsByHelpdeskID(int id)
         {
             List<QueueItemDTO> queueItemDTOs = new List<QueueItemDTO>();
@@ -252,6 +255,7 @@ namespace Helpdesk.DataLayer
             queueItemDTO.TimeAdded = queueItem.TimeAdded;
             queueItemDTO.TimeHelped = queueItem.TimeHelped;
             queueItemDTO.TimeRemoved = queueItem.TimeRemoved;
+            queueItemDTO.Description = queueItem.Description;
 
             return queueItemDTO;
         }
@@ -263,14 +267,16 @@ namespace Helpdesk.DataLayer
         /// <returns>The DAO for the queue item</returns>
         private Queueitem DTO2DAO(QueueItemDTO queueItemDTO)
         {
-            Queueitem queueItem = null;
-            queueItem = new Queueitem();
-            queueItem.ItemId = queueItemDTO.ItemId;
-            queueItem.StudentId = queueItemDTO.StudentId;
-            queueItem.TopicId = queueItemDTO.TopicId;
-            queueItem.TimeAdded = queueItemDTO.TimeAdded;
-            queueItem.TimeHelped = queueItemDTO.TimeHelped;
-            queueItem.TimeRemoved = queueItemDTO.TimeRemoved;
+            Queueitem queueItem = new Queueitem
+            {
+                ItemId = queueItemDTO.ItemId,
+                StudentId = queueItemDTO.StudentId,
+                TopicId = queueItemDTO.TopicId,
+                Description = queueItemDTO.Description,
+                TimeAdded = queueItemDTO.TimeAdded,
+                TimeHelped = queueItemDTO.TimeHelped,
+                TimeRemoved = queueItemDTO.TimeRemoved
+            };
 
             return queueItem;
         }

@@ -9,6 +9,9 @@ import { RouteStateService } from '../helpers/route-state.service';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
+/**
+ * Used to handle the UI logic of the main nav bar
+ */
 export class NavbarComponent implements OnInit, OnDestroy {
   isExpanded = false;
   public authenticationService: AuthenticationService;
@@ -33,7 +36,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.dropdownLabel = 'No helpdesk selected';
     this.dropdownPrefix = 'helpdesk';
     this.adminLink = 'admin';
-    this.logoutLink = 'logout'
+    this.logoutLink = 'logout';
   }
 
   ngOnInit(): void {

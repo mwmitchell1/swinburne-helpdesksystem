@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Helpdesk.Common.DTOs
 {
+    /// <summary>
+    /// Data transfer object used to represent a check in item
+    /// </summary>
     public class CheckInDTO
     {
         public int CheckInId { get; set; }

@@ -196,7 +196,7 @@ namespace Helpdesk.Services.Test
             return data;
         }
 
-        public TestDataQueue AddQueueItem(int? studentID = null, int? topicID = null, int? checkInID = null, string nickname = "", string sID = "")
+        public TestDataQueue AddQueueItem(int? studentID = null, int? topicID = null, int? checkInID = null, string nickname = "", string sID = "", string description = "")
         {
             var request = new AddToQueueRequest();
 
@@ -210,6 +210,10 @@ namespace Helpdesk.Services.Test
             if (sID != null)
             {
                 if (sID == "" && PopulateEmptyStrings) request.SID = AlphaNumericStringGenerator.GetStudentIDString(); else request.SID = sID;
+            }
+            if (description != null)
+            {
+                if (description == "" && PopulateEmptyStrings) request.Description = "From Test Factory"; else request.Description = description;
             }
 
             var response = QueueFacade.AddToQueue(request);

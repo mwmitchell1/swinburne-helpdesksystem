@@ -181,6 +181,11 @@ namespace Helpdesk.Services
             return response;
         }
 
+        /// <summary>
+        /// This method is responsible for validating a given student's nickname
+        /// </summary>
+        /// <param name="request">Request that contains the nickname information</param>
+        /// <returns>Response which indicates success or failure</returns>
         public ValidateNicknameResponse ValidateNickname(ValidateNicknameRequest request)
         {
             var response = new ValidateNicknameResponse();

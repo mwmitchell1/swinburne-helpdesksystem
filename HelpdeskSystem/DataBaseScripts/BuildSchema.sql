@@ -44,6 +44,7 @@ CREATE TABLE QueueItem (
     ItemID INT IDENTITY PRIMARY KEY NOT NULL,
     StudentID INT NOT NULL,
     TopicID INT NOT NULL,
+	[Description] VARCHAR(50) NOT NULL,
     TimeAdded DATETIME NOT NULL,
     TimeHelped DATETIME,
     TimeRemoved DATETIME,
@@ -285,6 +286,69 @@ BEGIN
 	FROM CheckInQueueItem
 END
 GO
+
+/*
+CREATE PROCEDURE GetAvgHelpTimePerTopic @HelpdeskID INT, @StartDate DATETIME, @EndDate DATETIME
+AS
+
+-- =============================================
+-- Author:		Dylan Rossi
+-- Create date: 2019-10-27 17:47
+-- Description:	Used to get the average time over all topics for a specific helpdesk
+-- =============================================
+
+	DECLARE @AverageHelpTime TABLE (TopicID INT, AverageTime TIME)
+	DECLARE @HelpdeskTopicIDs TABLE (ID Int IDENTITY(1,1), TopicID INT)
+	DECLARE @cnt INT = 1
+
+	INSERT INTO @HelpdeskTopicIDs (TopicID) SELECT Topic.TopicID FROM Topic INNER JOIN HelpdeskUnit ON Topic.UnitID = HelpdeskUnit.UnitID AND HelpdeskUnit.HelpdeskID = @HelpdeskID
+
+	WHILE @cnt <= (SELECT COUNT(*) FROM @HelpdeskTopicIDs)
+		BEGIN
+			DECLARE @CurrentTopicID INT = (SELECT TopicID FROM @HelpdeskTopicIDs WHERE ID = @cnt)
+			DECLARE @sumRemoved FLOAT = (SELECT SUM(CAST(TimeRemoved AS FLOAT)) FROM QueueItem WHERE TopicID = @CurrentTopicID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @sumHelped FLOAT = (SELECT SUM(CAST(TimeHelped AS FLOAT)) FROM QueueItem WHERE TopicID = @CurrentTopicID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @rowCount FLOAT = (SELECT COUNT(*) FROM Queueitem WHERE TopicID = @CurrentTopicID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @totalHelpTime FLOAT = @sumRemoved - @sumHelped;
+			DECLARE @averageTime TIME = CAST(CAST(@totalHelpTime/@rowCount AS DATETIME)AS TIME);
+			INSERT INTO @AverageHelpTime VALUES(@CurrentTopicID, @AverageTime)
+			SET @cnt = @cnt + 1;
+		END
+
+	SELECT * FROM @AverageHelpTime
+GO
+*/
+
+/*
+CREATE PROCEDURE GetAvgHelpTimePerUnit @HelpdeskID INT, @StartDate DATETIME, @EndDate DATETIME
+AS
+
+-- =============================================
+-- Author:		Dylan Rossi
+-- Create date: 2019-10-27 17:48
+-- Description:	Used to get the average time over all units for a specific helpdesk
+
+	DECLARE @AverageHelpTime TABLE (UnitID INT, AverageTime TIME)
+	DECLARE @HelpdeskUnitIDs TABLE (ID INT IDENTITY(1,1), UnitID INT)
+	DECLARE @cnt INT = 1
+
+	INSERT INTO @HelpdeskUnitIDs (UnitID) SELECT Unit.UnitID FROM Unit INNER JOIN HelpdeskUnit ON Unit.UnitID = HelpdeskUnit.UnitID AND HelpdeskUnit.HelpdeskID = @HelpdeskID
+
+		WHILE @cnt <= (SELECT COUNT(*) FROM @HelpdeskUnitIDs)
+		BEGIN
+			DECLARE @CurrentUnitID INT = (SELECT UnitID FROM @HelpdeskUnitIDs WHERE ID = @cnt)
+			DECLARE @sumRemoved FLOAT = (SELECT SUM(CAST(TimeRemoved AS FLOAT)) FROM QueueItem WHERE (SELECT UnitID FROM Topic WHERE Topic.TopicID = QueueItem.TopicID) = @CurrentUnitID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @sumHelped FLOAT = (SELECT SUM(CAST(TimeHelped AS FLOAT)) FROM QueueItem WHERE (SELECT UnitID FROM Topic WHERE Topic.TopicID = QueueItem.TopicID) = @CurrentUnitID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @rowCount FLOAT = (SELECT COUNT(*) FROM Queueitem WHERE (SELECT UnitID FROM Topic WHERE Topic.TopicID = QueueItem.TopicID) = @CurrentUnitID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @totalHelpTime FLOAT = @sumRemoved - @sumHelped;
+			DECLARE @averageTime TIME = CAST(CAST(@totalHelpTime/@rowCount AS DATETIME)AS TIME);
+			INSERT INTO @AverageHelpTime VALUES(@CurrentUnitID, @AverageTime)
+			SET @cnt = @cnt + 1;
+		END
+
+	SELECT * FROM @AverageHelpTime
+GO
+*/
 
 /*
 CREATE PROCEDURE GetRepeatVisitsSingle

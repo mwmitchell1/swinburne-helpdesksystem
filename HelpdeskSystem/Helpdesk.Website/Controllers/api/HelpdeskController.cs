@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Helpdesk.Website.Controllers.api
 {
+    /// <summary>
+    /// Used as the access point for any features relating to helpdesks and timespans
+    /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/helpdesk")]
     [ApiController]
@@ -277,6 +280,11 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Adds a new timespan into the database
+        /// </summary>
+        /// <param name="request">The request with the timespan information</param>
+        /// <returns>Response which indicates success or failure</returns>
         [HttpPost]
         [Route("timespan")]
         public IActionResult AddTimeSpan([FromBody] AddTimeSpanRequest request)

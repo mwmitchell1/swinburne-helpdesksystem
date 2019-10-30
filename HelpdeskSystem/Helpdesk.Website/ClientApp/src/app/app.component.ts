@@ -6,17 +6,14 @@ import { CookieService } from 'ngx-cookie-service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
+/**
+ * The main app component
+ */
 export class AppComponent {
   title = 'app';
-
-  //private _userService: UserService;
   public userIsAuthorized: boolean;
 
-  /**
-   * 
-   */
   constructor(private cookieService: CookieService) {
-    //this._userService = service;
   }
 }
 

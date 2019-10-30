@@ -127,6 +127,11 @@ namespace Helpdesk.Website.Controllers.api
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Used to validate a student's nickname
+        /// </summary>
+        /// <param name="request">Request that contains the nickname information</param>
+        /// <returns>Response which indicates success or failure</returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("validate")]

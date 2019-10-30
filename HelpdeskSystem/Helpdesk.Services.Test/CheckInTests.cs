@@ -393,6 +393,7 @@ namespace Helpdesk.Services.Test
             {
                 StudentId = response.StudentID,
                 TopicId = topic.TopicId,
+                Description = "Check In Unit Test",
                 TimeAdded = DateTime.Now
             };
 
@@ -522,7 +523,7 @@ namespace Helpdesk.Services.Test
         }
 
         /// <summary>
-        /// This tests that the get checkins by helpdesk id workds
+        /// This tests that the get checkins by helpdesk id works
         /// </summary>
         [TestMethod]
         public void GetCheckinsNoCheckedOut()

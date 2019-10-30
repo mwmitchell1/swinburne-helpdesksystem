@@ -14,6 +14,9 @@ using Helpdesk.Common.Responses.Helpdesk;
 
 namespace Helpdesk.Services.Test
 {
+    /// <summary>
+    /// Used to test unit related code
+    /// </summary>
     [TestClass]
     public class UnitTests
     {
@@ -54,7 +57,7 @@ namespace Helpdesk.Services.Test
                     unitData.Request.IsDeleted == unit.IsDeleted
                     && unitData.Request.Name == unit.Name
                     && unitData.Request.Code == unit.Code
-                    && unitData.Request.Topics.Count == unit.Topic.Count
+                    && unitData.Request.Topics.Count + 1 == unit.Topic.Count
                     && unit.Topic.Count > 0
                 );
             }
@@ -260,7 +263,7 @@ namespace Helpdesk.Services.Test
                     unitData.Request.IsDeleted == unit.IsDeleted
                     && unitData.Request.Name == unit.Name
                     && unitData.Request.Code == unit.Code
-                    && unitData.Request.Topics.Count == unit.Topic.Count
+                    && unitData.Request.Topics.Count + 1 == unit.Topic.Count
                     && unit.Topic.Count > 0
                 );
             }
@@ -362,10 +365,13 @@ namespace Helpdesk.Services.Test
             // Check that unit response is okay and that names match.
             Assert.AreEqual(HttpStatusCode.OK, getUnitResponse.Status);
             Assert.AreEqual(unitData.Request.Name, getUnitResponse.Unit.Name);
-            Assert.IsTrue(getUnitResponse.Unit.Topics.Count == 1);
-            Assert.AreEqual(topic.Name, getUnitResponse.Unit.Topics[0].Name);
+            Assert.IsTrue(getUnitResponse.Unit.Topics.Count == 2);
+            Assert.AreEqual(topic.Name, getUnitResponse.Unit.Topics[1].Name);
         }
 
+        /// <summary>
+        /// Used to ensure getting all units in a specific helpdesk works
+        /// </summary>
         [TestMethod]
         public void GetAllUnitsByHelpdeskID()
         {

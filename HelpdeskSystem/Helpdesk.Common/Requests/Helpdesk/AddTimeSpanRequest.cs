@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Helpdesk.Common.Requests.Helpdesk
 {
+    /// <summary>
+    /// This request is used to add a new timespan
+    /// </summary>
     public class AddTimeSpanRequest : BaseRequest
     {
         [Range(1, int.MaxValue, ErrorMessage = "You must select a helpdesk")]

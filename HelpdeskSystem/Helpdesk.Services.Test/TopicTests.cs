@@ -6,12 +6,18 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Helpdesk.Services.Test
 {
+    /// <summary>
+    /// Used to test topic related code
+    /// </summary>
     [TestClass]
     public class TopicTests
     {
         // Recommend setting testEntityFactory.PopulateEmptyStrings = true; at the start of each method
         private readonly TestEntityFactory testEntityFactory = new TestEntityFactory();
 
+        /// <summary>
+        /// Used to test getting topics by their unit id works
+        /// </summary>
         [TestMethod]
         public void GetTopicsByUnitID()
         {
@@ -39,7 +45,7 @@ namespace Helpdesk.Services.Test
 
             // Check that the topics retrieved are correct.
             Assert.AreEqual(HttpStatusCode.OK, unitData.Response.Status);
-            Assert.IsTrue(topicResponse.Topics.Count == 2);
+            Assert.IsTrue(topicResponse.Topics.Count == 3);
         }
     }
 }

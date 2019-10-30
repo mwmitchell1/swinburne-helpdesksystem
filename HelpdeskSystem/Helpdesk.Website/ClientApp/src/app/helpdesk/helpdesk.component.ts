@@ -1,26 +1,30 @@
-import { Component, OnInit } from "@angular/core";
-import { HelpdeskService } from "./helpdesk.service";
-import { NotifierService } from "angular-notifier";
-import { Helpdesk } from "../data/DTOs/helpdesk.dto";
-import { ActivatedRoute } from "@angular/router";
-import { CheckIn } from "../data/DTOs/check-in.dto";
-import { FormBuilder, FormControl, FormGroup, Validators, RequiredValidator } from "@angular/forms";
-import { Unit } from "../data/DTOs/unit.dto";
-import { CheckInRequest } from "../data/requests/check-in/chek-in-request";
-import { ValidateNicknameRequest } from "../data/requests/student/validate-nickname-request";
-import { NicknameService } from "../admin/nicknames/nickname.service";
-import { CheckOutRequest } from "../data/requests/check-in/check-out-request";
-import { QueueItem } from "../data/DTOs/queue-item.dto";
-import { Topic } from "../data/DTOs/topic.dto";
-import { AddToQueueRequest } from "../data/requests/queue/add-to-queue-request";
-import { UpdateQueueItemStatusRequest } from "../data/requests/queue/update-queue-item-status-request";
-import { UpdateQueueItemRequest } from "../data/requests/queue/update-queue-item-request";
+import { Component, OnInit } from '@angular/core';
+import { HelpdeskService } from './helpdesk.service';
+import { NotifierService } from 'angular-notifier';
+import { Helpdesk } from '../data/DTOs/helpdesk.dto';
+import { ActivatedRoute } from '@angular/router';
+import { CheckIn } from '../data/DTOs/check-in.dto';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Unit } from '../data/DTOs/unit.dto';
+import { CheckInRequest } from '../data/requests/check-in/chek-in-request';
+import { ValidateNicknameRequest } from '../data/requests/student/validate-nickname-request';
+import { NicknameService } from '../admin/nicknames/nickname.service';
+import { CheckOutRequest } from '../data/requests/check-in/check-out-request';
+import { QueueItem } from '../data/DTOs/queue-item.dto';
+import { Topic } from '../data/DTOs/topic.dto';
+import { AddToQueueRequest } from '../data/requests/queue/add-to-queue-request';
+import { UpdateQueueItemStatusRequest } from '../data/requests/queue/update-queue-item-status-request';
+import { UpdateQueueItemRequest } from '../data/requests/queue/update-queue-item-request';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-helpdesk',
   templateUrl: './helpdesk.component.html',
   styleUrls: ['./helpdesk.component.css']
 })
+/**
+ * Used to handle all UI logic for the helpdesk UI page
+ */
 export class HelpdeskComponent implements OnInit {
   public checkInForm: FormGroup;
   public checkOutForm: FormGroup;
@@ -32,7 +36,7 @@ export class HelpdeskComponent implements OnInit {
   public units: Unit[] = [];
   public topics: Topic[] = [];
   public queue: QueueItem[] = [];
-  public showTopic: boolean = false;
+  public showTopic = false;
   public ding: HTMLAudioElement;
 
   constructor(private service: HelpdeskService
@@ -51,22 +55,24 @@ export class HelpdeskComponent implements OnInit {
       modalUnitId: new FormControl(''),
     });
     this.checkOutForm = this.builder.group({
-      checkOutStudentId: new FormControl("", [Validators.required])
+      checkOutStudentId: new FormControl('', [Validators.required])
     });
     this.joinForm = this.builder.group({
-      modalJoinCheckId: new FormControl(""),
-      modalJoinStudentId: new FormControl(""),
-      modalJoinSID: new FormControl(""),
-      modalJoinNickname: new FormControl(""),
+      modalJoinCheckId: new FormControl(''),
+      modalJoinStudentId: new FormControl(''),
+      modalJoinSID: new FormControl(''),
+      modalJoinNickname: new FormControl(''),
       modalJoinUnitId: new FormControl(''),
-      modalJoinTopicId: new FormControl('', [Validators.required])
+      modalJoinTopicId: new FormControl('', [Validators.required]),
+      modalJoinDescription: new FormControl('', [Validators.required])
     });
 
     this.editQueueForm = this.builder.group({
-      modalEditItemId: new FormControl(""),
-      modalEditNickname: new FormControl(""),
+      modalEditItemId: new FormControl(''),
+      modalEditNickname: new FormControl(''),
       modalEditUnitId: new FormControl(''),
-      modalEditTopicId: new FormControl('')
+      modalEditTopicId: new FormControl(''),
+      modalEditDescription: new FormControl('', [Validators.required])
     });
   }
 
@@ -80,8 +86,8 @@ export class HelpdeskComponent implements OnInit {
               this.checkIns = result.checkIns;
             },
             error => {
-              if (error.status != 404) {
-                this.notifier.notify('error', "Unable to retreive check ins, please contact admin");
+              if (error.status !== 404) {
+                this.notifier.notify('error', 'Unable to retreive check ins, please contact admin');
               }
             }
           );
@@ -91,13 +97,14 @@ export class HelpdeskComponent implements OnInit {
           this.getQueueItems();
         }
 
-        if (this.helpdesk.hasQueue && (!this.helpdesk.hasCheckIn))
+        if (this.helpdesk.hasQueue && (!this.helpdesk.hasCheckIn)) {
           $(document).on('shown.bs.modal', '#modal-join-queue', function () {
             $('#modalJoinSID').focus();
           });
+        }
       },
       error => {
-        this.notifier.notify('error', "Unable to retreive helpdesk information, please contact admin");
+        this.notifier.notify('error', 'Unable to retreive helpdesk information, please contact admin');
       }
     );
 
@@ -106,20 +113,22 @@ export class HelpdeskComponent implements OnInit {
         this.units = result.units;
       },
       error => {
-        if (error.status == 404) {
+        if (error.status === 404) {
           this.notifier.notify('warning', 'There are no units for this helpdesk, please talk to admin');
-        }
-        else {
+        } else {
           this.notifier.notify('error', 'Unable to retreive the units for the helpdesk.');
         }
       }
-    )
+    );
 
     $(document).on('shown.bs.modal', '#modal-check-in', function () {
       $('#modalSID').focus();
     });
   }
 
+  /**
+   * Used to check in a student
+   */
   checkIn() {
 
     if (!this.checkInForm.valid) {
@@ -140,7 +149,7 @@ export class HelpdeskComponent implements OnInit {
       return;
     }
 
-    var request = new CheckInRequest();
+    const request = new CheckInRequest();
     request.Nickname = this.checkInForm.controls.modalNickname.value;
     request.StudentId = this.checkInForm.controls.modalStudentId.value;
     request.SID = this.checkInForm.controls.modalSID.value;
@@ -148,7 +157,7 @@ export class HelpdeskComponent implements OnInit {
     this.service.checkIn(request).subscribe(
       result => {
         this.notifier.notify('success', 'Check in successful');
-        var checkIn = new CheckIn();
+        const checkIn = new CheckIn();
         checkIn.checkInId = result.checkInID;
         checkIn.nickname = request.Nickname;
         checkIn.unitId = request.UnitID;
@@ -159,16 +168,22 @@ export class HelpdeskComponent implements OnInit {
         this.checkInForm.controls.modalUnitId.setValue('');
       },
       error => {
-        this.notifier.notify('error', "Unable to check in.");
+        this.notifier.notify('error', 'Unable to check in.');
       }
     );
   }
 
+  /**
+   * Used to reset the check in modal
+   */
   closeCheckIn() {
     this.checkInForm.reset();
     this.checkInForm.controls.modalUnitId.setValue('');
   }
 
+  /**
+   * Used to checkout a student from the helpdesk
+   */
   checkOut() {
     if (!this.checkOutForm.valid) {
 
@@ -179,103 +194,122 @@ export class HelpdeskComponent implements OnInit {
       return;
     }
 
-    var request = new CheckOutRequest();
+    const request = new CheckOutRequest();
     request.ForcedCheckout = false;
-    var id = this.checkOutForm.controls.checkOutStudentId.value;
+    const id = this.checkOutForm.controls.checkOutStudentId.value;
     this.service.checkOut(id, request).subscribe(
       result => {
 
-        if (this.helpdesk.hasQueue)
+        if (this.helpdesk.hasQueue) {
           this.getQueueItems();
+        }
 
         this.notifier.notify('success', 'Checkout successful');
         $('#modal-check-out').modal('hide');
         this.checkOutForm.reset();
-        var checkIn = this.checkIns.find(c => c.checkInId == id);
+        const checkIn = this.checkIns.find(c => c.checkInId === id);
         this.checkIns.splice(this.checkIns.indexOf(checkIn), 1);
         this.checkOutForm.controls.checkOutStudentId.setValue('');
       },
       error => {
-        if (error.status != 404) {
+        if (error.status !== 404) {
           this.notifier.notify('error', 'Unable to check you out, please contact admin.');
         }
       }
     );
   }
 
+  /**
+   * Used to reset the checkout modal when closed
+   */
   closeCheckOut() {
     this.checkOutForm.reset();
     this.checkOutForm.controls.checkOutStudentId.setValue('');
   }
 
+    /**
+   * Used to ensure that the nickname entered is unique or to retreive the students information
+   * if they are already in the system
+   */
   validateNickname() {
 
-    var request = new ValidateNicknameRequest();
+    const request = new ValidateNicknameRequest();
     request.Name = this.checkInForm.controls.modalNickname.value;
     request.SID = this.checkInForm.controls.modalSID.value;
 
-    if ((!request.SID) && (!request.Name))
+    if ((!request.SID) && (!request.Name)) {
       return;
+    }
 
     this.nicknameService.validateNickname(request).subscribe(
       result => {
-        if (result.status == 202) {
-          if (result.sid)
+        if (result.status === 202) {
+          if (result.sid) {
             this.checkInForm.controls.modalSID.setValue(result.studentId);
+          }
 
-          if (result.nickname)
+          if (result.nickname) {
             this.checkInForm.controls.modalNickname.setValue(result.nickname);
+          }
 
-          if (result.studentId)
+          if (result.studentId) {
             this.checkInForm.controls.modalStudentId.setValue(result.sid);
-
+          }
         }
       },
       error => {
-        if (error.status == 400) {
+        if (error.status === 400) {
           this.notifier.notify('warning', 'This nickname is already taken, please choose another.');
-        }
-        else if (error.sttaus != 404) {
+        } else if (error.sttaus !== 404) {
           this.notifier.notify('error', 'Unable to validate nickname, please contact admin.');
         }
       }
     );
   }
 
+  /**
+   * Used to ensure that the nickname entered is unique or to retreive the students information
+   * if they are already in the system
+   */
   validateQueueNickname() {
 
-    var request = new ValidateNicknameRequest();
+    const request = new ValidateNicknameRequest();
     request.Name = this.joinForm.controls.modalJoinNickname.value;
     request.SID = this.joinForm.controls.modalJoinSID.value;
 
-    if ((!request.SID) && (!request.Name))
+    if ((!request.SID) && (!request.Name)) {
       return;
+    }
 
     this.nicknameService.validateNickname(request).subscribe(
       result => {
-        if (result.status == 202) {
-          if (result.sid)
+        if (result.status === 202) {
+          if (result.sid) {
             this.joinForm.controls.modalJoinSID.setValue(result.studentId);
+          }
 
-          if (result.nickname)
+          if (result.nickname) {
             this.joinForm.controls.modalJoinNickname.setValue(result.nickname);
+          }
 
-          if (result.studentId)
+          if (result.studentId) {
             this.joinForm.controls.modalJoinStudentId.setValue(result.sid);
-
+          }
         }
       },
       error => {
-        if (error.status == 400) {
+        if (error.status === 400) {
           this.notifier.notify('warning', 'This nickname is already taken, please choose another.');
-        }
-        else if (error.status != 404) {
+        } else if (error.status !== 404) {
           this.notifier.notify('error', 'Unable to validate nickname, please contact admin.');
         }
       }
     );
   }
 
+  /**
+   * Used to retreive the items currently queued at the helpdesk
+   */
   getQueueItems() {
     this.queue = [];
 
@@ -284,19 +318,23 @@ export class HelpdeskComponent implements OnInit {
         this.queue = result.queueItems;
       },
       error => {
-        if (error.status != 404) {
-          this.notifier.notify('error', "Unable to retreive queue items, please contact admin");
+        if (error.status !== 404) {
+          this.notifier.notify('error', 'Unable to retreive queue items, please contact admin');
         }
       }
     );
   }
 
-  populateTopics(value: number) {
+  /**
+   * Used to populate the topics in the various modals
+   * @param value the information required for populating the topics
+   */
+  populateTopics(value?: number) {
 
-    if (value) {
+    if (value !== null) {
       if (this.helpdesk.hasCheckIn) {
-        var checkIn = this.checkIns.find(c => c.checkInId == value);
-        this.topics = this.units.find(u => u.unitId == checkIn.unitId).topics;
+        const checkIn = this.checkIns.find(c => c.checkInId == value);
+        this.topics = this.units.find(u => u.unitId === checkIn.unitId).topics;
         this.showTopic = true;
       } else {
         this.showTopic = true;
@@ -308,20 +346,29 @@ export class HelpdeskComponent implements OnInit {
     }
   }
 
+  /**
+   * Used to join the helpdesk queue
+   */
   joinQueue() {
-    var valid: boolean = true;
+    let valid = true;
 
     if (this.helpdesk.hasCheckIn) {
       if (!this.joinForm.controls.modalJoinCheckId.value) {
         this.notifier.notify('warning', 'You must select your nickname.');
         valid = false;
       }
-    }
-    else {
-      if ((!this.joinForm.controls.modalJoinStudentId.value) && ((!this.joinForm.controls.modalJoinNickname.value) || (!this.joinForm.controls.modalJoinSID.value))) {
-        this.notifier.notify('warning', 'You must enter a nickname and your student id.')
+    } else if (
+      (!this.joinForm.controls.modalJoinStudentId.value)
+      && ((!this.joinForm.controls.modalJoinNickname.value)
+      || (!this.joinForm.controls.modalJoinSID.value))
+      ) {
+        this.notifier.notify('warning', 'You must enter a nickname and your student id.');
         valid = false;
-      }
+    }
+
+    if (!this.joinForm.controls.modalJoinDescription.value) {
+      this.notifier.notify('warning', 'You must enter in a description');
+      valid = false;
     }
 
     if ((!this.joinForm.controls.modalJoinUnitId.value) && (!this.helpdesk.hasCheckIn)) {
@@ -334,12 +381,14 @@ export class HelpdeskComponent implements OnInit {
       valid = false;
     }
 
-    if (!valid)
+    if (!valid) {
       return;
+    }
 
-    var request = new AddToQueueRequest();
-    request.nickname = this.joinForm.controls.modalJoinNickname.value
+    const request = new AddToQueueRequest();
+    request.nickname = this.joinForm.controls.modalJoinNickname.value;
     request.sid = this.joinForm.controls.modalJoinSID.value;
+    request.description = this.joinForm.controls.modalJoinDescription.value;
 
     if (this.helpdesk.hasCheckIn) {
       request.checkInID = this.joinForm.controls.modalJoinCheckId.value;
@@ -366,6 +415,9 @@ export class HelpdeskComponent implements OnInit {
     );
   }
 
+  /**
+   * Used to reset join queue modal upon close
+   */
   closeJoinQueue() {
     this.joinForm.reset();
     this.joinForm.controls.modalJoinCheckId.setValue('');
@@ -375,28 +427,35 @@ export class HelpdeskComponent implements OnInit {
     this.showTopic = false;
   }
 
+  /**
+   * Used to prepare the edit modal for editing a queue item
+   * @param id the id of the queue item to be edited
+   */
   setupEdit(id: number) {
-    var item = this.queue.find(i => i.itemId == id);
+    const item = this.queue.find(i => i.itemId === id);
 
     this.editQueueForm.controls.modalEditItemId.setValue(item.itemId);
     this.editQueueForm.controls.modalEditNickname.setValue(item.nickname);
+    this.editQueueForm.controls.modalEditNickname.setValue(item.description);
 
     if (!this.helpdesk.hasCheckIn) {
-      var unitSelected = this.units.find(u => u.name == item.unit).unitId;
+      const unitSelected = this.units.find(u => u.name === item.unit).unitId;
       this.populateTopics(unitSelected);
       this.editQueueForm.controls.modalEditUnitId.setValue(unitSelected);
-    }
-    else {
+    } else {
       this.populateTopics(item.checkInId);
     }
 
-    var topicId = this.topics.find(t => t.name == item.topic).topicId;
+    const topicId = this.topics.find(t => t.name === item.topic).topicId;
     this.editQueueForm.controls.modalEditTopicId.setValue(topicId);
   }
 
+  /**
+   * Used to update a queue item
+   */
   editQueue() {
 
-    var valid = true;
+    let valid = true;
 
     if (!this.helpdesk.hasCheckIn) {
       if (!this.editQueueForm.controls.modalEditUnitId.value) {
@@ -405,15 +464,21 @@ export class HelpdeskComponent implements OnInit {
       }
     }
 
+    if (!this.editQueueForm.controls.modalEditDescription.value) {
+      this.notifier.notify('warning', 'You must enter in a description');
+        valid = false;
+    }
+
     if (!this.editQueueForm.controls.modalEditTopicId.value) {
       this.notifier.notify('warning', 'You must select a Topic');
       valid = false;
     }
 
-    if (!valid)
+    if (!valid) {
       return false;
+    }
 
-    var request = new UpdateQueueItemRequest();
+    const request = new UpdateQueueItemRequest();
     request.topicId = this.editQueueForm.controls.modalEditTopicId.value;
 
     this.service.updateQueueItem(this.editQueueForm.controls.modalEditItemId.value, request).subscribe(
@@ -429,20 +494,26 @@ export class HelpdeskComponent implements OnInit {
     );
   }
 
+  /**
+   * Used to reset the edit queue item modal upon close
+   */
   closeEditQueue() {
     this.editQueueForm.reset();
     this.topics = [];
     this.showTopic = false;
   }
 
+  /**
+   * Used to remove an item from the queue using it's id
+   * @param id the id of the queue item to be removed
+   */
   remove(id: number) {
-    var request = new UpdateQueueItemStatusRequest();
+    const request = new UpdateQueueItemStatusRequest();
     request.TimeRemoved = new Date();
 
-    this.service.updateQueueItemStatus(id, request).subscribe(
+    this.service.updateQueueItemStatus(id, request).pipe(delay(200)).subscribe(
       result => {
         this.notifier.notify('success', 'Item removed from queue');
-        var item = this.queue.find(q => q.itemId == id);
         this.getQueueItems();
       },
       error => {
@@ -451,14 +522,17 @@ export class HelpdeskComponent implements OnInit {
     );
   }
 
+  /**
+   * Used to indicate that a tutor is assisting a student
+   * @param id the id of the queue item the tutor is asindicating the are assisting with
+   */
   collect(id: number) {
-    var request = new UpdateQueueItemStatusRequest();
+    const request = new UpdateQueueItemStatusRequest();
     request.TimeHelped = new Date();
 
     this.service.updateQueueItemStatus(id, request).subscribe(
       result => {
         this.notifier.notify('success', 'Item collected');
-        var item = this.queue.find(q => q.itemId == id);
         this.getQueueItems();
       },
       error => {

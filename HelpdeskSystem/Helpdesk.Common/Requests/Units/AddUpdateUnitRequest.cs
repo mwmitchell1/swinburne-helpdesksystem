@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Helpdesk.Common.Requests.Units
 {
+    /// <summary>
+    /// This request is used to either add a new unit or update an existing one
+    /// </summary>
     public class AddUpdateUnitRequest : BaseRequest
     {
         [Range(1, int.MaxValue, ErrorMessage = "You must select a helpdesk to add the unit to.")]
