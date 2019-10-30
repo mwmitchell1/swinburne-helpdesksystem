@@ -19,14 +19,18 @@
           <td>
             <button class="btn btn-danger float-right ml-1" data-toggle="modal"
               data-target="#modal-user-delete" (click)="setupDelete(user.id)">Delete</button>
-            <button class="btn btn-secondary float-right" data-toggle="modal"
+            <button class="btn btn-secondary float-right ml-1" data-toggle="modal"
               data-target="#modal-user-edit" (click)="setupEdit(user)">Edit</button>
+            <button class="btn btn-secondary float-right" data-toggle="modal"
+              data-target="#modal-set-password" (click)="passwordService.setupPasswordReset(user)">Reset Password</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
+
+<app-password-reset></app-password-reset>
 
 <!-- Add User Modal -->
 <div class="modal fade" id="modal-user-add" tabindex="-1" role="dialog">

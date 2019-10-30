@@ -695,6 +695,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.OK, updateQueueResponse.Status);
         }
 
+        /// <summary>
+        /// Ensures attempting to update a queue item that doesn't exist is handled properly
+        /// </summary>
         [TestMethod]
         public void UpdateQueueItemDoesNotExist()
         {
@@ -710,6 +713,9 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.NotFound, response.Status);
         }
 
+        /// <summary>
+        /// Ensures attempting to update a queue item without a topic is handled properly
+        /// </summary>
         [TestMethod]
         public void UpdateQueueItemTopicDoesNotExist()
         {
@@ -826,6 +832,9 @@ namespace Helpdesk.Services.Test
             Assert.IsTrue(queueUpdateResponse.Result == true);
         }
 
+        /// <summary>
+        /// Ensures attempting to update a queue item with no item status is handled properly
+        /// </summary>
         [TestMethod]
         public void UpdateQueueItemStatusDoesNotExist()
         {
@@ -881,6 +890,10 @@ namespace Helpdesk.Services.Test
             Assert.AreEqual(HttpStatusCode.BadRequest, response.Status);
         }
 
+        /// <summary>
+        /// Ensures that attempting to update a queue item with a time removed that
+        /// occurs before the time added is handled properly
+        /// </summary>
         [TestMethod]
         public void UpdateQueueItemStatusInvalidTimeRemoved()
         {

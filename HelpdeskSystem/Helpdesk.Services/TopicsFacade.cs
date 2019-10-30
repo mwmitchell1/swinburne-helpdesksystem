@@ -12,6 +12,9 @@ using NLog;
 
 namespace Helpdesk.Services
 {
+    /// <summary>
+    /// This class is used to handle the business logic of topics
+    /// </summary>
     public class TopicsFacade : ILoginClass
     {
         private static Logger s_logger = LogManager.GetCurrentClassLogger();
@@ -23,6 +26,11 @@ namespace Helpdesk.Services
             _appSettings = new AppSettings();
         }
 
+        /// <summary>
+        /// This method is used to get all topics of a specific unit
+        /// </summary>
+        /// <param name="id">ID of the unit to get topics from</param>
+        /// <returns>Response which indicates success or failure</returns>
         public GetTopicsByUnitIDResponse GetTopicsByUnitID(int id)
         {
             var response = new GetTopicsByUnitIDResponse();

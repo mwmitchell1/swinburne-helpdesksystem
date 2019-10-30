@@ -13,7 +13,7 @@ using System.Data.Common;
 namespace Helpdesk.DataLayer
 {
     /// <summary>
-    /// This is used to before CRUD actions for the helpdesks and timespans
+    /// This is used to perform CRUD actions for the helpdesks and timespans
     /// </summary>
     public class HelpdeskDataLayer
     {

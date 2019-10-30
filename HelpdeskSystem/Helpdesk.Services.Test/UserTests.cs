@@ -12,6 +12,9 @@ using System;
 
 namespace Helpdesk.Services.Test
 {
+    /// <summary>
+    /// Used to test user related code
+    /// </summary>
     [TestClass]
     public class UserTests
     {

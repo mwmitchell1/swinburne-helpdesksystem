@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import { UsersService } from './users.service';
 import { User } from './user.model';
+import { PasswordResetService } from '../../authentication/password-reset/password-reset.service';
 import { NotifierService } from 'angular-notifier';
 import { FormBuilder, FormControl } from '@angular/forms';
 import { AddUserRequest } from '../../data/requests/users/add-request';
@@ -23,7 +24,8 @@ export class UsersComponent {
 
   constructor(private usersService: UsersService
     , private notifierService: NotifierService
-    , private builder: FormBuilder) {
+    , private builder: FormBuilder
+    , private passwordService: PasswordResetService) {
 
     this.userToAdd = new AddUserRequest();
     this.userToEdit = new UpdateUserRequest();

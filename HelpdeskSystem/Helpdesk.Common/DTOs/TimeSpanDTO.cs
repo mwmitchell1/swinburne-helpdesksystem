@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Helpdesk.Common.DTOs
 {
+    /// <summary>
+    /// Data transfer object used to represent a timespan
+    /// </summary>
     public class TimeSpanDTO
     {
         public int SpanId { get; set; }

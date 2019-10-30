@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Helpdesk.Common.DTOs
 {
+    /// <summary>
+    /// Data transfer object used to represent a unit
+    /// </summary>
     public class UnitDTO
     {
         public int UnitId { get; set; }

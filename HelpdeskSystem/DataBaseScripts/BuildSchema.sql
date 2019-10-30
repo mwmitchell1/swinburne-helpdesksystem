@@ -288,6 +288,69 @@ END
 GO
 
 /*
+CREATE PROCEDURE GetAvgHelpTimePerTopic @HelpdeskID INT, @StartDate DATETIME, @EndDate DATETIME
+AS
+
+-- =============================================
+-- Author:		Dylan Rossi
+-- Create date: 2019-10-27 17:47
+-- Description:	Used to get the average time over all topics for a specific helpdesk
+-- =============================================
+
+	DECLARE @AverageHelpTime TABLE (TopicID INT, AverageTime TIME)
+	DECLARE @HelpdeskTopicIDs TABLE (ID Int IDENTITY(1,1), TopicID INT)
+	DECLARE @cnt INT = 1
+
+	INSERT INTO @HelpdeskTopicIDs (TopicID) SELECT Topic.TopicID FROM Topic INNER JOIN HelpdeskUnit ON Topic.UnitID = HelpdeskUnit.UnitID AND HelpdeskUnit.HelpdeskID = @HelpdeskID
+
+	WHILE @cnt <= (SELECT COUNT(*) FROM @HelpdeskTopicIDs)
+		BEGIN
+			DECLARE @CurrentTopicID INT = (SELECT TopicID FROM @HelpdeskTopicIDs WHERE ID = @cnt)
+			DECLARE @sumRemoved FLOAT = (SELECT SUM(CAST(TimeRemoved AS FLOAT)) FROM QueueItem WHERE TopicID = @CurrentTopicID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @sumHelped FLOAT = (SELECT SUM(CAST(TimeHelped AS FLOAT)) FROM QueueItem WHERE TopicID = @CurrentTopicID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @rowCount FLOAT = (SELECT COUNT(*) FROM Queueitem WHERE TopicID = @CurrentTopicID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @totalHelpTime FLOAT = @sumRemoved - @sumHelped;
+			DECLARE @averageTime TIME = CAST(CAST(@totalHelpTime/@rowCount AS DATETIME)AS TIME);
+			INSERT INTO @AverageHelpTime VALUES(@CurrentTopicID, @AverageTime)
+			SET @cnt = @cnt + 1;
+		END
+
+	SELECT * FROM @AverageHelpTime
+GO
+*/
+
+/*
+CREATE PROCEDURE GetAvgHelpTimePerUnit @HelpdeskID INT, @StartDate DATETIME, @EndDate DATETIME
+AS
+
+-- =============================================
+-- Author:		Dylan Rossi
+-- Create date: 2019-10-27 17:48
+-- Description:	Used to get the average time over all units for a specific helpdesk
+
+	DECLARE @AverageHelpTime TABLE (UnitID INT, AverageTime TIME)
+	DECLARE @HelpdeskUnitIDs TABLE (ID INT IDENTITY(1,1), UnitID INT)
+	DECLARE @cnt INT = 1
+
+	INSERT INTO @HelpdeskUnitIDs (UnitID) SELECT Unit.UnitID FROM Unit INNER JOIN HelpdeskUnit ON Unit.UnitID = HelpdeskUnit.UnitID AND HelpdeskUnit.HelpdeskID = @HelpdeskID
+
+		WHILE @cnt <= (SELECT COUNT(*) FROM @HelpdeskUnitIDs)
+		BEGIN
+			DECLARE @CurrentUnitID INT = (SELECT UnitID FROM @HelpdeskUnitIDs WHERE ID = @cnt)
+			DECLARE @sumRemoved FLOAT = (SELECT SUM(CAST(TimeRemoved AS FLOAT)) FROM QueueItem WHERE (SELECT UnitID FROM Topic WHERE Topic.TopicID = QueueItem.TopicID) = @CurrentUnitID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @sumHelped FLOAT = (SELECT SUM(CAST(TimeHelped AS FLOAT)) FROM QueueItem WHERE (SELECT UnitID FROM Topic WHERE Topic.TopicID = QueueItem.TopicID) = @CurrentUnitID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @rowCount FLOAT = (SELECT COUNT(*) FROM Queueitem WHERE (SELECT UnitID FROM Topic WHERE Topic.TopicID = QueueItem.TopicID) = @CurrentUnitID AND TimeAdded BETWEEN @StartDate AND @EndDate);
+			DECLARE @totalHelpTime FLOAT = @sumRemoved - @sumHelped;
+			DECLARE @averageTime TIME = CAST(CAST(@totalHelpTime/@rowCount AS DATETIME)AS TIME);
+			INSERT INTO @AverageHelpTime VALUES(@CurrentUnitID, @AverageTime)
+			SET @cnt = @cnt + 1;
+		END
+
+	SELECT * FROM @AverageHelpTime
+GO
+*/
+
+/*
 CREATE PROCEDURE GetRepeatVisitsSingle
     @pHelpdeskID INT,
     @pStartDate DATETIME,
@@ -297,7 +360,8 @@ BEGIN
     SET NOCOUNT ON;
 
     DECLARE @tHelpDeskCheckInJoin TABLE (HelpdeskID INT, CheckInID INT, CheckInTime DATETIME)
-    DECLARE @tRepeats TABLE (HelpdeskID INT, StudentID INT, CheckInID INT, CheckInTime DATETIME)
+    DECLARE @tVisits TABLE (HelpdeskID INT, StudentID INT, CheckInID INT, CheckInTime DATETIME)
+    DECLARE @tRepeatVisits TABLE (HelpdeskID INT, StudentID INT, CheckInID INT, CheckInTime DATETIME)
     DECLARE @tRepeatCheck TABLE (StudentID INT)
     DECLARE @vStudentID INT
     DECLARE @vCheckInID INT
@@ -326,10 +390,16 @@ BEGIN
     WHILE 1=1
     BEGIN
         FETCH NEXT FROM sorter
-            INTO @vCheckInID, @vCheckInTime
+        INTO @vCheckInID, @vCheckInTime
+        IF @@FETCH_STATUS = 0
+        BEGIN
+            -- Fetched row; add to visits. Always add a record for each loop cycle.
+            INSERT INTO @tVisits (CheckInID, CheckInTime)
+            VALUES (@vCheckInID, @vCheckInTime)
+        END
         IF @@FETCH_STATUS <> 0
         BEGIN
-            -- Fetched all rows; break loop.
+            -- No more rows / a problem occurred; break loop.
             BREAK
         END
         ELSE IF NOT EXISTS (SELECT StudentID FROM @tRepeatCheck WHERE StudentID = @vStudentID)
@@ -339,12 +409,15 @@ BEGIN
         END
         ELSE
         BEGIN
-            INSERT INTO @tRepeats (CheckInID, CheckInTime)
+            INSERT INTO @tRepeatVisits (CheckInID, CheckInTime)
             VALUES (@vCheckInID, @vCheckInTime)
         END
     END
 
-    SELECT * FROM @tRepeats
+    SELECT          COUNT(v.CheckInID) AS VISITS, COUNT(rv.CheckInID) AS REPEAT_VISITS
+    FROM            @tVisits v
+    JOIN            @tRepeatVisits rv ON v.CheckInID = rv.CheckInId
+    GROUP BY        v.CheckInID;
     RETURN
 END
 GO

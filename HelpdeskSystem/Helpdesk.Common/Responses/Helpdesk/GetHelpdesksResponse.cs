@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Helpdesk.Common.Responses.Helpdesk
 {
+    /// <summary>
+    /// Used to indicate the result of getting all helpdesks
+    /// </summary>
     public class GetHelpdesksResponse : BaseResponse
     {
         public List<HelpdeskDTO> Helpdesks { get; set; }

@@ -2,6 +2,9 @@
 
 namespace Helpdesk.Common.DTOs
 {
+    /// <summary>
+    /// Data transfer object used to represent a queue item
+    /// </summary>
     public class QueueItemDTO
     {
         public int ItemId { get; set; }
