@@ -3,7 +3,7 @@ Helpdesk system for the Programming, MASH and networking helpdesks at Swinburne 
 
 ## Developers
 ### Version - 1
-Wade Russell - Full Stack
-Andrew Hill - Back-End and Database
-Pramodh Ganeshan - Front-End
-Dylan Rossi - Back-End and Database
+* Wade Russell - Full Stack
+* Andrew Hill - Back-End and Database
+* Pramodh Ganeshan - Front-End
+* Dylan Rossi - Back-End and Database
