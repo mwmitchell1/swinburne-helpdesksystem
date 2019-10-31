@@ -8,7 +8,7 @@ import { PasswordResetService } from './password-reset.service';
 
 export class PasswordResetComponent {
 
-  constructor(private passwordService: PasswordResetService) {
+  constructor(public passwordService: PasswordResetService) {
   }
 
 }
