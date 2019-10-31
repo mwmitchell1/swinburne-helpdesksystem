@@ -334,7 +334,7 @@ export class HelpdeskComponent implements OnInit {
     if (value !== null) {
       if (this.helpdesk.hasCheckIn) {
         const checkIn = this.checkIns.find(c => c.checkInId == value);
-        this.topics = this.units.find(u => u.unitId === checkIn.unitId).topics;
+        this.topics = this.units.find(u => u.unitId == checkIn.unitId).topics;
         this.showTopic = true;
       } else {
         this.showTopic = true;

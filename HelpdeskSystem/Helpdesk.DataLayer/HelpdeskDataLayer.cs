@@ -249,6 +249,7 @@ namespace Helpdesk.DataLayer
                 helpdesk.Name = request.Name;
                 helpdesk.HasCheckIn = request.HasCheckIn;
                 helpdesk.HasQueue = request.HasQueue;
+                helpdesk.IsDeleted = request.IsDisabled;
 
                 context.SaveChanges();
                 result = true;

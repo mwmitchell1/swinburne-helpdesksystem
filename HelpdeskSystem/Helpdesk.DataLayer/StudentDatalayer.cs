@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 using Helpdesk.Common.DTOs;
+using Helpdesk.Common.Extensions;
 using Helpdesk.Common.Requests.Students;
 using Helpdesk.Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +28,9 @@ namespace Helpdesk.DataLayer
             using (helpdesksystemContext context = new helpdesksystemContext())
             {
                 var nicknames = context.Nicknames.ToList();
+
+                if (nicknames.Count == 0)
+                    throw new NotFoundException("No nicknames in system");
 
                 foreach (var nickname in nicknames)
                 {

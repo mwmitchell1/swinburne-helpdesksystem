@@ -16,5 +16,7 @@ namespace Helpdesk.Common.Requests.Helpdesk
         public bool HasCheckIn { get; set; }
 
         public bool HasQueue { get; set; }
+
+        public bool IsDisabled { get; set; }
     }
 }

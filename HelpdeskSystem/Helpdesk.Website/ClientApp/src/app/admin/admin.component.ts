@@ -68,7 +68,6 @@ export class AdminComponent {
 
         this.notifier.notify('success', 'Helpdesk added successfully!');
       }, error => {
-        console.log(error);
         this.notifier.notify('error', 'Could not add new helpdesk, please contact helpdesk admin.');
       }
     );

@@ -42,6 +42,12 @@ namespace Helpdesk.Services
                 else
                     response.Status = HttpStatusCode.NotFound;
             }
+            catch (NotFoundException ex)
+            {
+                s_logger.Error(ex, "No nicknames in system");
+                response.Status = HttpStatusCode.NotFound;
+                response.StatusMessages.Add(new StatusMessage(HttpStatusCode.NotFound, "No nicknames in system"));
+            }
             catch (Exception ex)
             {
                 s_logger.Error(ex, "Unable to a get nicknames");

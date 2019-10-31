@@ -40,6 +40,8 @@ namespace Helpdesk.Website.Controllers.api
                 {
                     case HttpStatusCode.OK:
                         return Ok(response);
+                    case HttpStatusCode.NotFound:
+                        return NotFound();
                     case HttpStatusCode.BadRequest:
                         return BadRequest(BuildBadRequestMessage(response));
                     case HttpStatusCode.InternalServerError:

@@ -48,8 +48,6 @@ export class SetUpComponent implements OnInit {
     // Assign form data to request object
     const updateRequest: UpdateHelpdeskRequest = this.helpdesk;
 
-    console.log(updateRequest);
-
     // Check if name has been touched - do not allow submit - required to show invalid msg on submit
     if (!updateRequest.hasOwnProperty('name')) {
       form.controls['settings-name'].markAsDirty();
@@ -69,7 +67,6 @@ export class SetUpComponent implements OnInit {
       result => {
         this.notifier.notify('success', 'Helpdesk edited successfully!');
       }, error => {
-        console.log(error);
         this.notifier.notify('error', 'Could not edit helpdesk, please contact helpdesk admin.');
       }
     );

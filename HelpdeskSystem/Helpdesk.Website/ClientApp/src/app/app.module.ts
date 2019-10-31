@@ -28,11 +28,12 @@ import { ReportingComponent } from './admin/reporting/reporting.component';
 import { NicknamesComponent } from './admin/nicknames/nicknames.component';
 import { ConfigurationComponent } from './admin/configuration/configuration.component';
 import { HelpdeskComponent } from './helpdesk/helpdesk.component';
+import { DataTablesModule } from 'angular-datatables';
 
 import { UsersService } from './admin/users/users.service';
 import { UnitsService } from './admin/configuration/units/units.service';
-import {PasswordResetComponent} from "./authentication/password-reset/password-reset.component";
-import {PasswordResetService} from "./authentication/password-reset/password-reset.service";
+import {PasswordResetComponent} from './authentication/password-reset/password-reset.component';
+import {PasswordResetService} from './authentication/password-reset/password-reset.service';
 
 
 @NgModule({
@@ -57,6 +58,7 @@ import {PasswordResetService} from "./authentication/password-reset/password-res
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    DataTablesModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'login', component: LoginComponent, pathMatch: 'full' },
