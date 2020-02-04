@@ -15,6 +15,7 @@ Installation Instruction
     
 	2.2 Download and Install .Net Core 2.2 from https://dotnet.microsoft.com/download/dotnet-core/2.2
     2.3 Unzip the application in the desired location.  
+    2.3.1 In order to trigger a build that will create a exe, from the command navigate to the Helpdesk.Website folder then run the following command: "dotnet publish -c Release -r win10-x64". this should generate the site with and exe for Windows 10.
     2.4 Run the app as the admin account by clicking Helpdesk.Website.exe
     2.5 Open a broswer and navigate to <a href="swin.helpdesk.edu.au:5001">swin.helpdesk.edu.au:5001
 
