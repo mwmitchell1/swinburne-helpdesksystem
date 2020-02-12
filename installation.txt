@@ -20,7 +20,7 @@ Installation Instruction
     2.3.1 download .NET core https://dotnet.microsoft.com/download/dotnet-core/2.0
     2.3.2 Download and install Nodejs - add nodejs to PATH.
     2.3.3 In order to trigger a build that will create a exe, from the command navigate to the Helpdesk.Website folder then run the following command: "dotnet publish -c Release -r win10-x64". this should generate the site with and exe for Windows 10.
-    2.4 Run the app as the admin account by clicking Helpdesk.Website.exe
+    2.4 Run the app as the admin account by clicking Helpdesk.Website.exe (make sure this is the one in the 'publish' folder)
     2.5 Open a broswer and navigate to <a href="swin.helpdesk.edu.au:5001">swin.helpdesk.edu.au:5001
 
 3. Configuration
