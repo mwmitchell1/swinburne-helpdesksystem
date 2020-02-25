@@ -3,8 +3,8 @@ Installation Instruction
     1.1 Install SQL Express Server on the machine as admin account, can be found at https://www.microsoft.com/en-au/sql-server/sql-server-editions-express
     1.1.1 Install Sql Management studio
     1.2 Open SQL Management Studio or equivalent program and connect to the database server
-      (click Connect then right click on Database to create a new database)
-    1.3 Open and run BuildSchema.sql against the master database
+      (First click Connect then right click on Database to create a new database)
+    1.3 Open and execute BuildSchema.sql against the master database
 
 2. Application
     2.1 Add: 
