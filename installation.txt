@@ -29,3 +29,8 @@ Installation Instruction
 	Password: Password 1
     3.2 Create new User and delete original admin
     3.3 Configure new helpdesk
+
+Notes: HelpdeskSupport database needs to be created manually before running the script in SQL Management Studio. SQLExress is the default name so appsettings.json does not need to be modified if installing SQLExpress 2019 with defaults.
+ 
+After some investigation, Dotnet core runtime was not sufficient on its own - it needed the dotnet core SDK (required to build but includes the core runtime) and needs both versions 2 and 3 installed (dotnet-sdk-2.1.202-win-x64.exe and dotnet-sdk-3.1.101-win-x64.exe).  It would not compile with just v2 only after v3 was also present.
+Node.js is required to be installed, but also after this a command required to set up Windows environment needs to be run to install Python 2.7 and Visual C++ components: (“npm install --global --production windows-build-tools”) required to compile.  After this, running "dotnet publish -c Release -r win10-x64" in the helpdesk.website folder works successfully.
