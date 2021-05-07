@@ -37,7 +37,7 @@
     "datatables.net-dt": "^1.10.20",
     "extend": "^3.0.2",
     "fstream": "^1.0.12",
-    "handlebars": "^4.1.2",
+    "handlebars": "^4.7.7",
     "jquery": "^3.4.1",
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.14",
