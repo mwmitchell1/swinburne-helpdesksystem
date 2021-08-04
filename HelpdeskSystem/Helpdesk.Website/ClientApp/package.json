@@ -44,7 +44,7 @@
     "ngx-cookie-service": "^2.2.0",
     "popper.js": "^1.15.0",
     "rxjs": "^6.5.2",
-    "tar": "^4.4.10",
+    "tar": "^4.4.15",
     "webpack-dev-server": "^3.7.2",
     "zone.js": "^0.9.1"
   },
